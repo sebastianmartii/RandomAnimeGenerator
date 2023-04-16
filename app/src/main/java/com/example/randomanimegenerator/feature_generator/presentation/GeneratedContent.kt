@@ -17,41 +17,17 @@ import com.example.randomanimegenerator.feature_generator.domain.model.Generator
 fun GeneratedContent(
     modifier: Modifier = Modifier,
     paddingValues: PaddingValues,
-    singleItem: GeneratorModel = GeneratorModel(),
+    generatedType: String,
     listOfItems: List<GeneratorModel> = emptyList(),
     isLoading: Boolean
 ) {
-    if (listOfItems.isNotEmpty()) {
-        LazyColumn(
-            modifier = modifier
-                .padding(paddingValues),
-        ) {
-            item {
-                Text(
-                    text = "Generate Random Anime",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.headlineLarge,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .padding(top = 8.dp)
-                        .fillMaxWidth()
-                )
-            }
-            items(listOfItems) { generatedItem ->
-                GeneratedItem(
-                    title = generatedItem.title,
-                    imageUrl = generatedItem.imageUrl
-                )
-            }
-        }
-    } else {
-        Column(
-            modifier = Modifier
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+    LazyColumn(
+        modifier = modifier
+            .padding(paddingValues),
+    ) {
+        item {
             Text(
-                text = "Generate Random Anime",
+                text = "Generate Random $generatedType",
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.headlineLarge,
                 textAlign = TextAlign.Center,
@@ -59,19 +35,25 @@ fun GeneratedContent(
                     .padding(top = 8.dp)
                     .fillMaxWidth()
             )
-            Box(
-                modifier = Modifier
-                    .weight(10f),
-                contentAlignment = Alignment.Center
-            ) {
-                if (isLoading) {
+        }
+        if (isLoading) {
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(150.dp),
+                    contentAlignment = Alignment.Center
+                ) {
                     CircularProgressIndicator()
-                } else {
-                    GeneratedItem(
-                        title = singleItem.title,
-                        imageUrl = singleItem.imageUrl
-                    )
                 }
+            }
+        } else {
+            listOfItems.shuffled()
+            items(listOfItems) { generatedItem ->
+                GeneratedItem(
+                    title = generatedItem.title,
+                    imageUrl = generatedItem.imageUrl
+                )
             }
         }
     }
@@ -91,8 +73,8 @@ private fun GeneratedItem(
                 vertical = 4.dp
             ),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            contentColor = MaterialTheme.colorScheme.onSurfaceVariant
         ),
         shape = MaterialTheme.shapes.small
     ) {
@@ -113,7 +95,7 @@ private fun GeneratedItem(
             )
             Text(
                 text = title,
-                style = MaterialTheme.typography.titleLarge,
+                style = MaterialTheme.typography.titleMedium,
                 textAlign = TextAlign.Start,
                 modifier = Modifier
                     .weight(2f)

@@ -72,6 +72,7 @@ private val DarkColorScheme = darkColorScheme(
     onSurfaceVariant = md_theme_dark_onSurfaceVariant,
 )
 
+
 @Composable
 fun RandomAnimeGeneratorTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),

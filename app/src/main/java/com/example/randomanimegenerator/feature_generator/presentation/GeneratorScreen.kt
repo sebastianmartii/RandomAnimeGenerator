@@ -2,13 +2,16 @@ package com.example.randomanimegenerator.feature_generator.presentation
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
@@ -23,14 +26,15 @@ fun GeneratorScreen(
           viewModel.generate(it)
         },
         onTypeSelect = {
-            viewModel.selectType(it)
+            viewModel.selectType(it.toType())
         },
         onScoreSelect = {
             viewModel.selectScore(it)
         },
         onAmountSelect = {
-            viewModel.selectAmount(it)
-        }
+            viewModel.selectAmount(it.toAmount())
+        },
+        onGeneratingParamsEdit = viewModel::onGeneratingParamsEdit
     )
 }
 
@@ -43,18 +47,34 @@ private fun GeneratorScreen(
     onGenerate: (GeneratorState) -> Unit,
     onTypeSelect: (String) -> Unit,
     onScoreSelect: (String) -> Unit,
-    onAmountSelect: (String) -> Unit
+    onAmountSelect: (String) -> Unit,
+    onGeneratingParamsEdit: () -> Unit
 ) {
     Scaffold(
         modifier = modifier
             .fillMaxSize(),
         floatingActionButton = {
-            ExtendedFloatingActionButton(
-                onClick = { onGenerate(generatorState) },
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
+            Column(
+                horizontalAlignment = Alignment.End
             ) {
-                Text(text = "GENERATE")
+                FloatingActionButton(
+                    onClick = onGeneratingParamsEdit,
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = "Edit generating params"
+                    )
+                }
+                ExtendedFloatingActionButton(
+                    onClick = { onGenerate(generatorState) },
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                ) {
+                    Text(text = "GENERATE")
+                }
             }
         }
     ) { paddingValues ->
@@ -63,7 +83,7 @@ private fun GeneratorScreen(
                 false -> {
                     GeneratorSettingsContent(
                         paddingValues = paddingValues,
-                        typeSelected = generatorState.typeSelected,
+                        typeSelected = generatorState.typeSelected.toTypeString(),
                         onTypeSelect = {
                             onTypeSelect(it)
                         },
@@ -71,7 +91,7 @@ private fun GeneratorScreen(
                         onScoreSelect = {
                             onScoreSelect(it)
                         },
-                        amountSelected = generatorState.amountSelected,
+                        amountSelected = generatorState.amountSelected.toAmountString(),
                         onAmountSelect = {
                             onAmountSelect(it)
                         }
@@ -80,7 +100,7 @@ private fun GeneratorScreen(
                 true -> {
                     GeneratedContent(
                         paddingValues = paddingValues,
-                        singleItem = generatorState.item,
+                        generatedType = generatorState.typeSelected.toTypeString(),
                         listOfItems = generatorState.listOfItems,
                         isLoading = generatorState.isLoading
                     )

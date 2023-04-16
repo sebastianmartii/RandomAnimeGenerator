@@ -1,7 +1,5 @@
 package com.example.randomanimegenerator.feature_generator.data.remote.anime_dto
 
-import com.example.randomanimegenerator.feature_generator.domain.model.GeneratorModel
-
 data class Data(
     val aired: Aired,
     val airing: Boolean,
@@ -39,11 +37,4 @@ data class Data(
     val type: String,
     val url: String,
     val year: Int
-) {
-    fun dataToGeneratorModel(): GeneratorModel {
-        return GeneratorModel(
-            title = title,
-            imageUrl = images.jpg.image_url
-        )
-    }
-}
+)

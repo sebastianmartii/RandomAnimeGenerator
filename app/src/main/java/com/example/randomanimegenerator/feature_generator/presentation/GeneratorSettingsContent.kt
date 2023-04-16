@@ -32,8 +32,8 @@ fun GeneratorSettingsContent(
         ChipGroup(
             chipGroupTitle = "Type",
             selected = typeSelected,
-            onSelect = onTypeSelect,
             listOfItems = listOfTypes,
+            onSelect = onTypeSelect,
             modifier = Modifier.padding(top = 32.dp)
         )
         ChipGroup(
