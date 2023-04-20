@@ -1,9 +1,26 @@
 package com.example.randomanimegenerator.feature_generator.presentation
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,26 +34,14 @@ import com.example.randomanimegenerator.feature_generator.domain.model.Generator
 fun GeneratedContent(
     modifier: Modifier = Modifier,
     paddingValues: PaddingValues,
-    generatedType: String,
-    listOfItems: List<GeneratorModel> = emptyList(),
-    isLoading: Boolean
+    state: GeneratorState,
+    viewModel: GeneratorViewModel,
 ) {
     LazyColumn(
         modifier = modifier
             .padding(paddingValues),
     ) {
-        item {
-            Text(
-                text = "Generate Random $generatedType",
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.headlineLarge,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .padding(top = 8.dp)
-                    .fillMaxWidth()
-            )
-        }
-        if (isLoading) {
+        if (state.isLoading) {
             item {
                 Box(
                     modifier = Modifier
@@ -48,11 +53,13 @@ fun GeneratedContent(
                 }
             }
         } else {
-            listOfItems.shuffled()
-            items(listOfItems) { generatedItem ->
+            state.listOfItems.shuffled()
+            items(state.listOfItems) { generatedItem ->
                 GeneratedItem(
-                    title = generatedItem.title,
-                    imageUrl = generatedItem.imageUrl
+                    item = generatedItem,
+                    add = {
+                        viewModel.onEvent(GeneratorEvent.Add(type = state.typeSelected, content = it))
+                    }
                 )
             }
         }
@@ -61,9 +68,9 @@ fun GeneratedContent(
 
 @Composable
 private fun GeneratedItem(
-    title: String,
-    imageUrl: String,
-    modifier: Modifier = Modifier
+    item: GeneratorModel,
+    modifier: Modifier = Modifier,
+    add: (GeneratorModel) -> Unit
 ) {
     Card(
         modifier = modifier
@@ -85,8 +92,8 @@ private fun GeneratedItem(
             verticalAlignment = Alignment.Top
         ) {
             AsyncImage(
-                model = imageUrl,
-                contentDescription = title,
+                model = item.imageUrl,
+                contentDescription = item.titleEng,
                 modifier = Modifier
                     .weight(1f)
                     .clip(MaterialTheme.shapes.small)
@@ -94,13 +101,25 @@ private fun GeneratedItem(
                     .aspectRatio(2f / 3f)
             )
             Text(
-                text = title,
+                text = item.titleEng,
                 style = MaterialTheme.typography.titleMedium,
                 textAlign = TextAlign.Start,
                 modifier = Modifier
                     .weight(2f)
                     .padding(16.dp)
             )
+            IconButton(
+                onClick = {
+                    add(item)
+                },
+                modifier = Modifier
+                    .fillMaxHeight()
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "add"
+                )
+            }
         }
     }
 }

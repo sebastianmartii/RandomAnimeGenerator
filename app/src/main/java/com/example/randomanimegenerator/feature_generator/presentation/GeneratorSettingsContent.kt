@@ -6,23 +6,20 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.randomanimegenerator.core.constants.listOfAmounts
 import com.example.randomanimegenerator.core.constants.listOfScores
 import com.example.randomanimegenerator.core.constants.listOfTypes
 
+
 @Composable
-fun GeneratorSettingsContent(
-    modifier: Modifier = Modifier,
+fun GeneratorSettings(
     paddingValues: PaddingValues,
-    typeSelected: String,
-    onTypeSelect: (String) -> Unit,
-    scoreSelected: String,
-    onScoreSelect: (String) -> Unit,
-    amountSelected: String,
-    onAmountSelect: (String) -> Unit,
+    state: GeneratorState,
+    viewModel: GeneratorViewModel,
+    modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier
@@ -31,22 +28,28 @@ fun GeneratorSettingsContent(
     ) {
         ChipGroup(
             chipGroupTitle = "Type",
-            selected = typeSelected,
+            selected = state.typeSelected.toTypeString(),
             listOfItems = listOfTypes,
-            onSelect = onTypeSelect,
+            onSelect = {
+                viewModel.onEvent(GeneratorEvent.SetType(it.toType()))
+            },
             modifier = Modifier.padding(top = 32.dp)
         )
         ChipGroup(
             chipGroupTitle = "Minimum Score",
-            selected = scoreSelected,
+            selected = state.scoreSelected,
             listOfItems = listOfScores,
-            onSelect = onScoreSelect
+            onSelect = {
+                viewModel.onEvent(GeneratorEvent.SetScore(it))
+            }
         )
         ChipGroup(
             chipGroupTitle = "Generated Amount",
-            selected = amountSelected,
+            selected = state.amountSelected.toAmountString(),
             listOfItems = listOfAmounts,
-            onSelect = onAmountSelect
+            onSelect = {
+                viewModel.onEvent(GeneratorEvent.SetAmount(it.toAmount()))
+            }
         )
     }
 }
