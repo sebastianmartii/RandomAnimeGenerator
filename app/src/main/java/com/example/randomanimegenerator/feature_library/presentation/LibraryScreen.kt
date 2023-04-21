@@ -2,17 +2,27 @@ package com.example.randomanimegenerator.feature_library.presentation
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -46,7 +56,11 @@ fun AnimeLibraryScreen(
     val state by viewModel.state.collectAsStateWithLifecycle(LibraryState())
     LibraryScreen(
         state = state,
-        paddingValues = paddingValues
+        paddingValues = paddingValues,
+        statusList = animeStatusList,
+        onSelect = {
+            viewModel.selectStatus(it)
+        }
     )
 }
 
@@ -61,7 +75,11 @@ fun MangaLibraryScreen(
     val state by viewModel.state.collectAsStateWithLifecycle(LibraryState())
     LibraryScreen(
         state = state,
-        paddingValues = paddingValues
+        paddingValues = paddingValues,
+        statusList = mangaStatusList,
+        onSelect = {
+            viewModel.selectStatus(it)
+        }
     )
 }
 
@@ -70,7 +88,9 @@ fun MangaLibraryScreen(
 @Composable
 private fun LibraryScreen(
     state: LibraryState,
-    paddingValues: PaddingValues
+    statusList: List<LibraryStatus>,
+    paddingValues: PaddingValues,
+    onSelect: (String) -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -93,6 +113,24 @@ private fun LibraryScreen(
             modifier = Modifier
                 .padding(values)
         ) {
+            item(span = { GridItemSpan(3) }) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .horizontalScroll(rememberScrollState()),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    statusList.onEach { item ->
+                        CustomFilterChip(
+                            text = item.name,
+                            selected = item.name == state.libraryStatus,
+                            onSelect = {
+                                onSelect(it)
+                            }
+                        )
+                    }
+                }
+            }
             items(state.content) {
                 LibraryCard(title = it.title, imageUrl = it.imageUrl)
             }
@@ -153,4 +191,37 @@ private fun LibraryCard(
             }
         }
     }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun CustomFilterChip(
+    text: String,
+    selected: Boolean,
+    onSelect: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    FilterChip(
+        selected = selected,
+        onClick = { onSelect(text) },
+        label = { Text(text = text) },
+        leadingIcon = if (selected) {
+            {
+                Icon(
+                    imageVector = Icons.Filled.Done,
+                    contentDescription = null,
+                    modifier = Modifier.size(FilterChipDefaults.IconSize)
+                )
+            }
+        } else {
+            null
+        },
+        modifier = modifier.padding(
+            start = 4.dp,
+            top = 1.dp,
+            bottom = 1.dp,
+            end = 2.dp
+        )
+    )
 }

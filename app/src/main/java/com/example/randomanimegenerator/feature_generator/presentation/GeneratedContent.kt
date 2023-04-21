@@ -1,9 +1,12 @@
 package com.example.randomanimegenerator.feature_generator.presentation
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,9 +24,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -37,30 +42,67 @@ fun GeneratedContent(
     state: GeneratorState,
     viewModel: GeneratorViewModel,
 ) {
-    LazyColumn(
-        modifier = modifier
-            .padding(paddingValues),
-    ) {
-        if (state.isLoading) {
-            item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(150.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
+
+    when {
+        state.listOfItems.isEmpty() && !state.isLoading -> {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Generate Random Anime",
+                    style = MaterialTheme.typography.headlineSmall,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.alpha(0.6f)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Or Change Generating Settings By Pressing The Edit Button",
+                    style = MaterialTheme.typography.labelSmall,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.alpha(0.4f)
+                )
+            }
+        }
+
+        state.listOfItems.isEmpty() && state.isLoading -> {
+            LazyColumn(
+                modifier = modifier
+                    .padding(paddingValues),
+            ) {
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(150.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
                 }
             }
-        } else {
-            state.listOfItems.shuffled()
-            items(state.listOfItems) { generatedItem ->
-                GeneratedItem(
-                    item = generatedItem,
-                    add = {
-                        viewModel.onEvent(GeneratorEvent.Add(type = state.typeSelected, content = it))
-                    }
-                )
+        }
+
+        else -> {
+            LazyColumn(
+                modifier = modifier
+                    .padding(paddingValues),
+            ) {
+                items(state.listOfItems) { generatedItem ->
+                    GeneratedItem(
+                        item = generatedItem,
+                        add = {
+                            viewModel.onEvent(
+                                GeneratorEvent.Add(
+                                    type = state.typeSelected,
+                                    content = it
+                                )
+                            )
+                        }
+                    )
+
+                }
             }
         }
     }
@@ -80,7 +122,7 @@ private fun GeneratedItem(
                 vertical = 4.dp
             ),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp),
             contentColor = MaterialTheme.colorScheme.onSurfaceVariant
         ),
         shape = MaterialTheme.shapes.small
@@ -97,7 +139,7 @@ private fun GeneratedItem(
                 modifier = Modifier
                     .weight(1f)
                     .clip(MaterialTheme.shapes.small)
-                    .height(150.dp)
+                    .height(170.dp)
                     .aspectRatio(2f / 3f)
             )
             Text(

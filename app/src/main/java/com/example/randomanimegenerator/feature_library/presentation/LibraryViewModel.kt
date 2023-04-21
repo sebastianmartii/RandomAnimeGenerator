@@ -20,6 +20,8 @@ class LibraryViewModel @Inject constructor(
     private val repository: LibraryRepository
 ) : ViewModel() {
 
+    private val _status = MutableStateFlow(LibraryStatus.ALL.name)
+
     private val _type = MutableStateFlow(Type.ANIME)
 
     private val _libraryContent = _type.flatMapLatest {type ->
@@ -31,15 +33,20 @@ class LibraryViewModel @Inject constructor(
 
 
     private val _state = MutableStateFlow(LibraryState())
-    val state = combine(_state, _type, _libraryContent) { state, type, content ->
+    val state = combine(_state, _type, _libraryContent, _status) { state, type, content, status ->
         state.copy(
             content = content.map { it.toLibraryModel() },
-            type = type
+            type = type,
+            libraryStatus = status
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), LibraryState())
 
     fun setType(type: Type) {
         _type.value = type
+    }
+
+    fun selectStatus(status: String) {
+        _status.value = status
     }
 
 }

@@ -35,7 +35,7 @@ class GeneratorViewModel @Inject constructor(
             }
             is GeneratorEvent.EditGeneratorParams -> {
                 _state.value = state.value.copy(
-                    hasGenerated = false
+                    editGeneratingParams = true
                 )
             }
             is GeneratorEvent.Generate -> {
@@ -50,7 +50,7 @@ class GeneratorViewModel @Inject constructor(
                                         result.data ?: emptyList()
                                     },
                                     isLoading = false,
-                                    hasGenerated = false
+                                    editGeneratingParams = false
                                 )
                             }
                             is Resource.Loading -> {
@@ -61,7 +61,7 @@ class GeneratorViewModel @Inject constructor(
                                         result.data ?: emptyList()
                                     },
                                     isLoading = true,
-                                    hasGenerated = true
+                                    editGeneratingParams = false
                                 )
                             }
                             is Resource.Success -> {
@@ -72,7 +72,7 @@ class GeneratorViewModel @Inject constructor(
                                         result.data ?: emptyList()
                                     },
                                     isLoading = false,
-                                    hasGenerated = true,
+                                    editGeneratingParams = false
                                 )
                             }
                         }

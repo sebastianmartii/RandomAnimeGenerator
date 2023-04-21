@@ -69,10 +69,10 @@ private fun ChipGroup(
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = modifier.padding(
             start = 8.dp,
-            bottom = 2.dp
+            bottom = 2.dp,
+            top = 4.dp
         )
     )
-    Divider(color = MaterialTheme.colorScheme.outlineVariant)
     LazyRow(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Start
@@ -85,6 +85,7 @@ private fun ChipGroup(
             )
         }
     }
+    Divider(color = MaterialTheme.colorScheme.outlineVariant)
 }
 
 
