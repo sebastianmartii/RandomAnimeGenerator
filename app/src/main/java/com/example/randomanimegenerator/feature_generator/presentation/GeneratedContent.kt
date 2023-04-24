@@ -40,7 +40,7 @@ fun GeneratedContent(
     modifier: Modifier = Modifier,
     paddingValues: PaddingValues,
     state: GeneratorState,
-    viewModel: GeneratorViewModel,
+    onEvent: (GeneratorEvent) -> Unit
 ) {
 
     when {
@@ -93,7 +93,7 @@ fun GeneratedContent(
                     GeneratedItem(
                         item = generatedItem,
                         add = {
-                            viewModel.onEvent(
+                            onEvent(
                                 GeneratorEvent.Add(
                                     type = state.typeSelected,
                                     content = it

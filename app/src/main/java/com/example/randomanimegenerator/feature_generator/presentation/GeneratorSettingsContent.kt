@@ -18,7 +18,7 @@ import com.example.randomanimegenerator.core.constants.listOfTypes
 fun GeneratorSettings(
     paddingValues: PaddingValues,
     state: GeneratorState,
-    viewModel: GeneratorViewModel,
+    onEvent: (GeneratorEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -31,7 +31,7 @@ fun GeneratorSettings(
             selected = state.typeSelected.toTypeString(),
             listOfItems = listOfTypes,
             onSelect = {
-                viewModel.onEvent(GeneratorEvent.SetType(it.toType()))
+                onEvent(GeneratorEvent.SetType(it.toType()))
             },
             modifier = Modifier.padding(top = 32.dp)
         )
@@ -40,7 +40,7 @@ fun GeneratorSettings(
             selected = state.scoreSelected,
             listOfItems = listOfScores,
             onSelect = {
-                viewModel.onEvent(GeneratorEvent.SetScore(it))
+                onEvent(GeneratorEvent.SetScore(it))
             }
         )
         ChipGroup(
@@ -48,7 +48,7 @@ fun GeneratorSettings(
             selected = state.amountSelected.toAmountString(),
             listOfItems = listOfAmounts,
             onSelect = {
-                viewModel.onEvent(GeneratorEvent.SetAmount(it.toAmount()))
+                onEvent(GeneratorEvent.SetAmount(it.toAmount()))
             }
         )
     }

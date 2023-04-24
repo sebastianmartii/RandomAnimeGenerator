@@ -28,10 +28,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 @Composable
 fun GeneratorScreen(
     paddingValues: PaddingValues,
-    modifier: Modifier = Modifier
+    state: GeneratorState,
+    modifier: Modifier = Modifier,
+    onEvent: (GeneratorEvent) -> Unit,
 ) {
-    val viewModel = hiltViewModel<GeneratorViewModel>()
-    val state by viewModel.state.collectAsStateWithLifecycle(GeneratorState())
     Scaffold(
         topBar = {
             TopAppBar(
@@ -48,7 +48,7 @@ fun GeneratorScreen(
                         }
                     ) {
                         IconButton(
-                            onClick = { viewModel.onEvent(GeneratorEvent.EditGeneratorParams) },
+                            onClick = { onEvent(GeneratorEvent.EditGeneratorParams) },
                             modifier = Modifier
                                 .tooltipAnchor()
                         ) {
@@ -64,7 +64,7 @@ fun GeneratorScreen(
                         }
                     ){
                         IconButton(
-                            onClick = { viewModel.onEvent(GeneratorEvent.Generate(state)) },
+                            onClick = { onEvent(GeneratorEvent.Generate(state)) },
                             modifier = Modifier.tooltipAnchor()
                         ) {
                             Icon(
@@ -87,14 +87,14 @@ fun GeneratorScreen(
                     GeneratedContent(
                         paddingValues = values,
                         state = state,
-                        viewModel = viewModel
+                        onEvent = onEvent
                     )
                 }
                 true -> {
                     GeneratorSettings(
                         paddingValues = values,
                         state = state,
-                        viewModel = viewModel
+                        onEvent = onEvent
                     )
                 }
             }

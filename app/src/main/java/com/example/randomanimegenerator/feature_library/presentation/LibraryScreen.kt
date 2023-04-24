@@ -30,8 +30,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -39,54 +37,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
-import com.example.randomanimegenerator.feature_generator.presentation.Type
 import com.example.randomanimegenerator.feature_generator.presentation.toTypeString
-
-@Composable
-fun AnimeLibraryScreen(
-    paddingValues: PaddingValues,
-    viewModel: LibraryViewModel = hiltViewModel()
-) {
-    LaunchedEffect(key1 = true) {
-        viewModel.setType(Type.ANIME)
-    }
-    val state by viewModel.state.collectAsStateWithLifecycle(LibraryState())
-    LibraryScreen(
-        state = state,
-        paddingValues = paddingValues,
-        statusList = animeStatusList,
-        onSelect = {
-            viewModel.selectStatus(it)
-        }
-    )
-}
-
-@Composable
-fun MangaLibraryScreen(
-    paddingValues: PaddingValues,
-    viewModel: LibraryViewModel = hiltViewModel()
-) {
-    LaunchedEffect(key1 = true) {
-        viewModel.setType(Type.MANGA)
-    }
-    val state by viewModel.state.collectAsStateWithLifecycle(LibraryState())
-    LibraryScreen(
-        state = state,
-        paddingValues = paddingValues,
-        statusList = mangaStatusList,
-        onSelect = {
-            viewModel.selectStatus(it)
-        }
-    )
-}
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun LibraryScreen(
+fun LibraryScreen(
     state: LibraryState,
     statusList: List<LibraryStatus>,
     paddingValues: PaddingValues,

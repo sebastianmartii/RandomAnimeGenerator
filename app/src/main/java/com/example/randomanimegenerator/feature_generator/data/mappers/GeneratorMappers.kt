@@ -41,6 +41,7 @@ fun Data.dataToGeneratorModel(): GeneratorModel {
         titleEng = title,
         imageUrl = images.jpg.image_url,
         malId = mal_id,
+        synopsis = synopsis
     )
 }
 
@@ -52,6 +53,7 @@ fun MangaData.dataToGeneratorModel(): GeneratorModel {
         titleEng = title,
         imageUrl = images.jpg.image_url,
         malId = mal_id,
+        synopsis = synopsis
 
     )
 }
