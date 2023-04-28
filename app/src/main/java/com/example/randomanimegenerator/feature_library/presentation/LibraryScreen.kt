@@ -46,6 +46,7 @@ fun LibraryScreen(
     state: LibraryState,
     statusList: List<LibraryStatus>,
     paddingValues: PaddingValues,
+    modifier: Modifier = Modifier,
     onSelect: (String) -> Unit
 ) {
     Scaffold(
@@ -62,7 +63,8 @@ fun LibraryScreen(
                 )
             )
         },
-        modifier = Modifier.padding(paddingValues)
+        modifier = modifier
+            .padding(paddingValues)
     ) {values ->
         LazyVerticalGrid(
             columns = GridCells.Fixed(3),

@@ -18,11 +18,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -31,6 +28,7 @@ fun GeneratorScreen(
     state: GeneratorState,
     modifier: Modifier = Modifier,
     onEvent: (GeneratorEvent) -> Unit,
+    onDetailsNavigate: (Int) -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -87,7 +85,8 @@ fun GeneratorScreen(
                     GeneratedContent(
                         paddingValues = values,
                         state = state,
-                        onEvent = onEvent
+                        onEvent = onEvent,
+                        onDetailsNavigate = onDetailsNavigate
                     )
                 }
                 true -> {

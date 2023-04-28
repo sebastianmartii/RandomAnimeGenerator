@@ -26,5 +26,5 @@ data class GeneratorModel(
     val episodes: String? = "",
     val volumes: Int? = 0,
     val libraryStatus: String = "planned",
-    val libraryType: String = "anime"
+    val libraryType: String = "Anime"
 ) : Parcelable

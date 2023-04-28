@@ -1,5 +1,6 @@
 package com.example.randomanimegenerator.feature_generator.presentation
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,7 +41,8 @@ fun GeneratedContent(
     modifier: Modifier = Modifier,
     paddingValues: PaddingValues,
     state: GeneratorState,
-    onEvent: (GeneratorEvent) -> Unit
+    onEvent: (GeneratorEvent) -> Unit,
+    onDetailsNavigate: (Int) -> Unit
 ) {
 
     when {
@@ -99,6 +101,9 @@ fun GeneratedContent(
                                     content = it
                                 )
                             )
+                        },
+                        modifier = Modifier.clickable {
+                            onDetailsNavigate(generatedItem.malId)
                         }
                     )
 
@@ -112,7 +117,7 @@ fun GeneratedContent(
 private fun GeneratedItem(
     item: GeneratorModel,
     modifier: Modifier = Modifier,
-    add: (GeneratorModel) -> Unit
+    add: (GeneratorModel) -> Unit,
 ) {
     Card(
         modifier = modifier

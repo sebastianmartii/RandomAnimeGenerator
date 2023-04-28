@@ -1,14 +1,12 @@
 package com.example.randomanimegenerator.feature_generator.data.remote.manga_dto
 
-import com.example.randomanimegenerator.feature_generator.data.remote.anime_dto.Demographic
-
 data class MangaData(
     val approved: Boolean,
     val authors: List<Author>,
-    val background: Any,
+    val background: String,
     val chapters: Int,
     val demographics: List<Demographic>,
-    val explicit_genres: List<Any>,
+    val explicit_genres: List<ExplicitGenre>,
     val favorites: Int,
     val genres: List<Genre>,
     val images: Images,
@@ -19,16 +17,14 @@ data class MangaData(
     val publishing: Boolean,
     val rank: Int,
     val score: Double,
-    val scored: Double,
     val scored_by: Int,
-    val serializations: List<Any>,
+    val serializations: List<Serialization>,
     val status: String,
     val synopsis: String,
-    val themes: List<Any>,
+    val themes: List<Theme>,
     val title: String,
     val title_english: String,
     val title_japanese: String,
-    val title_synonyms: List<Any>,
     val titles: List<Title>,
     val type: String,
     val url: String,
