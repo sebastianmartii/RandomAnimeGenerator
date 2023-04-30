@@ -37,7 +37,7 @@ data class MainModel(
     private val mangaStatusList = listOf(
         AdditionalInfo(statusName = "Format", status = type),
         AdditionalInfo(statusName = "Status", status = status),
-        AdditionalInfo(statusName = "Authors", status = authors.joinToString(separator = ", ")),
+        AdditionalInfo(statusName = "Authors", status = authors.joinToString(separator = "; ")),
         AdditionalInfo(statusName = "Chapters", status = "$chapters"),
         AdditionalInfo(statusName = "Score", status = "$score"),
         AdditionalInfo(statusName = "Genres", status = genres.joinToString(separator = ", ")),

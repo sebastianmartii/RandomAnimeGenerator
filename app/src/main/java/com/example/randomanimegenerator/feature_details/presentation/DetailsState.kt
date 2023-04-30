@@ -5,6 +5,7 @@ import com.example.randomanimegenerator.feature_details.domain.model.Character
 import com.example.randomanimegenerator.feature_details.domain.model.Recommendation
 import com.example.randomanimegenerator.feature_details.domain.model.Review
 import com.example.randomanimegenerator.feature_details.domain.model.Staff
+import com.example.randomanimegenerator.feature_generator.presentation.Type
 
 data class DetailsState(
     val imageUrl: String = "",
@@ -16,6 +17,9 @@ data class DetailsState(
     val recommendation: List<Recommendation> = emptyList(),
     val additionalInfo: List<AdditionalInfo> = emptyList(),
     val isFavorite: Boolean = false,
-    val isLoading: Boolean = true
+    val isLoading: Boolean = true,
+    val getRecommendations: Boolean = true,
+    val getStaff: Boolean = true,
+    val type: Type = Type.ANIME
 )
 

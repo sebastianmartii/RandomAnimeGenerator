@@ -9,20 +9,15 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
@@ -41,7 +36,6 @@ fun GeneratedContent(
     modifier: Modifier = Modifier,
     paddingValues: PaddingValues,
     state: GeneratorState,
-    onEvent: (GeneratorEvent) -> Unit,
     onDetailsNavigate: (Int) -> Unit
 ) {
 
@@ -94,14 +88,6 @@ fun GeneratedContent(
                 items(state.listOfItems) { generatedItem ->
                     GeneratedItem(
                         item = generatedItem,
-                        add = {
-                            onEvent(
-                                GeneratorEvent.Add(
-                                    type = state.typeSelected,
-                                    content = it
-                                )
-                            )
-                        },
                         modifier = Modifier.clickable {
                             onDetailsNavigate(generatedItem.malId)
                         }
@@ -116,8 +102,7 @@ fun GeneratedContent(
 @Composable
 private fun GeneratedItem(
     item: GeneratorModel,
-    modifier: Modifier = Modifier,
-    add: (GeneratorModel) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier
@@ -155,18 +140,6 @@ private fun GeneratedItem(
                     .weight(2f)
                     .padding(16.dp)
             )
-            IconButton(
-                onClick = {
-                    add(item)
-                },
-                modifier = Modifier
-                    .fillMaxHeight()
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "add"
-                )
-            }
         }
     }
 }

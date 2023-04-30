@@ -7,6 +7,7 @@ import com.example.randomanimegenerator.core.util.Resource
 import com.example.randomanimegenerator.feature_details.domain.use_cases.DetailsUseCases
 import com.example.randomanimegenerator.feature_generator.presentation.toType
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
@@ -20,7 +21,10 @@ class DetailsViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(DetailsState())
+    private val id = savedStateHandle.get<Int>("id")
+    private val type = savedStateHandle.get<String>("type")
+
+    private val _state = MutableStateFlow(DetailsState(type = type!!.toType()))
     val state = _state.asStateFlow()
 
     init {
@@ -29,10 +33,25 @@ class DetailsViewModel @Inject constructor(
 
     private fun getMainInfo() {
         viewModelScope.launch {
-            useCases.getInfoUseCase(
-                id = savedStateHandle.get<Int>("id")!!,
-                type = savedStateHandle.get<String>("type")!!.toType()
-            ).onEach { result ->
+            val mainInfo = async {
+                useCases.getInfoUseCase(
+                    id = id!!,
+                    type = type!!.toType()
+                )
+            }
+            val characters = async {
+                useCases.getCharactersUseCase(
+                    id = id!!,
+                    type = type!!.toType()
+                )
+            }
+            val reviews = async {
+                useCases.getReviewsUseCase(
+                    id = id!!,
+                    type = type!!.toType()
+                )
+            }
+            mainInfo.await().onEach { result ->
                 when (result) {
                     is Resource.Error -> {
                         _state.value = state.value.copy(
@@ -65,10 +84,7 @@ class DetailsViewModel @Inject constructor(
                     }
                 }
             }.launchIn(this)
-            useCases.getCharactersUseCase(
-                id = savedStateHandle.get<Int>("id")!!,
-                type = savedStateHandle.get<String>("type")!!.toType()
-            ).onEach { result ->
+            characters.await().onEach { result ->
                 when (result) {
                     is Resource.Error -> {
                         _state.value = state.value.copy(
@@ -92,10 +108,7 @@ class DetailsViewModel @Inject constructor(
                     }
                 }
             }.launchIn(this)
-            useCases.getReviewsUseCase(
-                id = savedStateHandle.get<Int>("id")!!,
-                type = savedStateHandle.get<String>("type")!!.toType()
-            ).onEach { result ->
+            reviews.await().onEach { result ->
                 when (result) {
                     is Resource.Error -> {
                         _state.value = state.value.copy(
@@ -119,33 +132,78 @@ class DetailsViewModel @Inject constructor(
                     }
                 }
             }.launchIn(this)
-            useCases.getRecommendationsUseCase(
-                id = savedStateHandle.get<Int>("id")!!,
-                type = savedStateHandle.get<String>("type")!!.toType()
-            ).onEach { result ->
-                when (result) {
-                    is Resource.Error -> {
-                        _state.value = state.value.copy(
-                            recommendation = result.data ?: emptyList(),
-                            isLoading = false
-                        )
-                    }
+        }
+    }
 
-                    is Resource.Loading -> {
-                        _state.value = state.value.copy(
-                            recommendation = result.data ?: emptyList(),
-                            isLoading = true
-                        )
-                    }
+    fun onEvent(event: DetailsEvent) {
+        when(event) {
+            is DetailsEvent.AddToLibrary -> {
+                _state.value = state.value.copy(
+                    isFavorite = event.isFavorite
+                )
+            }
+            is DetailsEvent.GenerateRecommendations -> {
+                viewModelScope.launch {
+                    useCases.getRecommendationsUseCase(id!!, type!!.toType()).onEach { result ->
+                        when(result) {
+                            is Resource.Error -> {
+                                _state.value = state.value.copy(
+                                    recommendation = result.data ?: emptyList(),
+                                    isLoading = false,
+                                    getRecommendations = false
+                                )
+                            }
 
-                    is Resource.Success -> {
-                        _state.value = state.value.copy(
-                            recommendation = result.data ?: emptyList(),
-                            isLoading = false
-                        )
-                    }
+                            is Resource.Loading -> {
+                                _state.value = state.value.copy(
+                                    recommendation = result.data ?: emptyList(),
+                                    isLoading = true,
+                                    getRecommendations = false
+                                )
+                            }
+
+                            is Resource.Success -> {
+                                _state.value = state.value.copy(
+                                    recommendation = result.data ?: emptyList(),
+                                    isLoading = false,
+                                    getRecommendations = false
+                                )
+                            }
+                        }
+                    }.launchIn(this)
                 }
-            }.launchIn(this)
+            }
+            is DetailsEvent.GenerateStaff -> {
+                viewModelScope.launch {
+                    useCases.getStaffUseCase(id!!).onEach { result ->
+                        when(result) {
+                            is Resource.Error -> {
+                                _state.value = state.value.copy(
+                                    staff = result.data ?: emptyList(),
+                                    isLoading = false,
+                                    getStaff = false
+                                )
+                            }
+
+                            is Resource.Loading -> {
+                                _state.value = state.value.copy(
+                                    staff = result.data ?: emptyList(),
+                                    isLoading = true,
+                                    getStaff = false
+                                )
+                            }
+
+                            is Resource.Success -> {
+                                _state.value = state.value.copy(
+                                    staff = result.data ?: emptyList(),
+                                    isLoading = false,
+                                    getStaff = false
+                                )
+                            }
+                        }
+                    }.launchIn(this)
+                }
+            }
         }
     }
 }

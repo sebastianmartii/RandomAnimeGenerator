@@ -85,7 +85,6 @@ fun GeneratorScreen(
                     GeneratedContent(
                         paddingValues = values,
                         state = state,
-                        onEvent = onEvent,
                         onDetailsNavigate = onDetailsNavigate
                     )
                 }

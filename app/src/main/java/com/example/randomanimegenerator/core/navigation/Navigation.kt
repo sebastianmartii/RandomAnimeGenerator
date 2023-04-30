@@ -83,7 +83,8 @@ fun Navigation(
                 state = state,
                 onNavigateBack = {
                     navController.popBackStack()
-                }
+                },
+                onEvent = viewModel::onEvent
             )
         }
     }

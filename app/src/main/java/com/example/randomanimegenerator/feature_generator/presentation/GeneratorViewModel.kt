@@ -3,8 +3,6 @@ package com.example.randomanimegenerator.feature_generator.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.randomanimegenerator.core.util.Resource
-import com.example.randomanimegenerator.feature_generator.data.mappers.toLibraryEntity
-import com.example.randomanimegenerator.feature_generator.domain.repository.GeneratorRepository
 import com.example.randomanimegenerator.feature_generator.domain.use_case.GenerateContentUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,7 +15,6 @@ import javax.inject.Inject
 @HiltViewModel
 class GeneratorViewModel @Inject constructor(
     private val generateContentUseCase: GenerateContentUseCase,
-    private val repo: GeneratorRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(GeneratorState())
@@ -25,14 +22,6 @@ class GeneratorViewModel @Inject constructor(
 
     fun onEvent(event: GeneratorEvent) {
         when(event) {
-            is GeneratorEvent.Add -> {
-                viewModelScope.launch {
-                    event.content = event.content.copy(
-                        libraryType = event.type.toTypeString()
-                    )
-                    repo.addToLibrary(event.content.toLibraryEntity())
-                }
-            }
             is GeneratorEvent.EditGeneratorParams -> {
                 _state.value = state.value.copy(
                     editGeneratingParams = true
