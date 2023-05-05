@@ -20,4 +20,9 @@ interface DetailsRepository {
     fun getCharacters(id: Int, type: Type): Flow<Resource<List<Character>>>
 
     fun getStaff(id: Int): Flow<Resource<List<Staff>>>
+
+    suspend fun addToFavorites(malId: Int, type: String, isFavorite: Boolean)
+
+    suspend fun deleteFromFavorites(malId: Int, type: String)
+
 }

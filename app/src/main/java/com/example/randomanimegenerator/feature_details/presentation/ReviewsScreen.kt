@@ -1,0 +1,2 @@
+package com.example.randomanimegenerator.feature_details.presentation
+

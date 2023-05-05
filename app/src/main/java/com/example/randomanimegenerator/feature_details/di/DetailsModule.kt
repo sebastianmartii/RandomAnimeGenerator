@@ -1,6 +1,7 @@
 package com.example.randomanimegenerator.feature_details.di
 
 import com.example.randomanimegenerator.core.constants.BASE_URL
+import com.example.randomanimegenerator.core.database.RandomAnimeGeneratorDb
 import com.example.randomanimegenerator.feature_details.data.remote.DetailsApi
 import com.example.randomanimegenerator.feature_details.data.repository.DetailsRepositoryImpl
 import com.example.randomanimegenerator.feature_details.domain.repository.DetailsRepository
@@ -85,9 +86,10 @@ object DetailsModule {
     @Provides
     @Singleton
     fun provideDetailsRepository(
-        detailsApi: DetailsApi
+        detailsApi: DetailsApi,
+        database: RandomAnimeGeneratorDb
     ): DetailsRepository {
-        return DetailsRepositoryImpl(detailsApi)
+        return DetailsRepositoryImpl(detailsApi, database)
     }
 
     @Provides

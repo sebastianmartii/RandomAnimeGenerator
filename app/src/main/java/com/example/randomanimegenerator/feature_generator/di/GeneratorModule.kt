@@ -1,7 +1,6 @@
 package com.example.randomanimegenerator.feature_generator.di
 
 import com.example.randomanimegenerator.core.constants.BASE_URL
-import com.example.randomanimegenerator.core.database.RandomAnimeGeneratorDb
 import com.example.randomanimegenerator.feature_generator.data.remote.GeneratorApi
 import com.example.randomanimegenerator.feature_generator.data.repository.GeneratorRepositoryImpl
 import com.example.randomanimegenerator.feature_generator.domain.repository.GeneratorRepository
@@ -29,11 +28,9 @@ object GeneratorModule {
     @Singleton
     fun provideGeneratorRepository(
         generatorApi: GeneratorApi,
-        database: RandomAnimeGeneratorDb
     ): GeneratorRepository {
         return GeneratorRepositoryImpl(
             generatorApi = generatorApi,
-            libraryDao = database.libraryDao
         )
     }
 

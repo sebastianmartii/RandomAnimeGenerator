@@ -9,6 +9,7 @@ import com.example.randomanimegenerator.feature_generator.presentation.Type
 
 data class DetailsState(
     val imageUrl: String = "",
+    val malId: Int = 0,
     val title: String = "",
     val description: String = "",
     val characters: List<Character> = emptyList(),

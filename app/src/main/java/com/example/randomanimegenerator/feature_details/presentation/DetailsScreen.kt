@@ -1,5 +1,6 @@
 package com.example.randomanimegenerator.feature_details.presentation
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -59,6 +60,7 @@ fun DetailsScreen(
     state: DetailsState,
     modifier: Modifier = Modifier,
     onNavigateBack: () -> Unit,
+    onNavigateToDescriptionScreen: () -> Unit,
     onEvent: (DetailsEvent) -> Unit
 ) {
     val scrollState = rememberScrollState()
@@ -82,7 +84,7 @@ fun DetailsScreen(
                     )
                 },
                 actions = {
-                    IconButton(onClick = { onEvent(DetailsEvent.AddToLibrary(!state.isFavorite)) }) {
+                    IconButton(onClick = { onEvent(DetailsEvent.AddOrRemoveFromFavorites(state.isFavorite)) }) {
                         Icon(
                             imageVector = if (state.isFavorite) Icons.Filled.Favorite else Icons.Default.FavoriteBorder,
                             contentDescription = "Add to library"
@@ -109,7 +111,8 @@ fun DetailsScreen(
             MainInfoSection(
                 imageUrl = state.imageUrl,
                 title = state.title,
-                description = state.description
+                description = state.description,
+                onNavigateToDescriptionScreen = onNavigateToDescriptionScreen
             )
             Spacer(modifier = Modifier.height(8.dp))
             CharactersSection(characters = state.characters)
@@ -141,6 +144,7 @@ private fun MainInfoSection(
     imageUrl: String,
     title: String,
     description: String,
+    onNavigateToDescriptionScreen: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -176,7 +180,10 @@ private fun MainInfoSection(
                     text = description,
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Light,
-                    maxLines = 8
+                    maxLines = 8,
+                    modifier = Modifier.clickable {
+                        onNavigateToDescriptionScreen()
+                    }
                 )
             }
         }

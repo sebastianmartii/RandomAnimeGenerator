@@ -1,7 +1,5 @@
 package com.example.randomanimegenerator.feature_generator.data.repository
 
-import com.example.randomanimegenerator.core.database.daos.LibraryDao
-import com.example.randomanimegenerator.core.database.entities.LibraryEntity
 import com.example.randomanimegenerator.core.util.Resource
 import com.example.randomanimegenerator.feature_generator.data.mappers.toListOfGeneratorModel
 import com.example.randomanimegenerator.feature_generator.data.remote.GeneratorApi
@@ -14,7 +12,6 @@ import java.io.IOException
 
 class GeneratorRepositoryImpl(
     private val generatorApi: GeneratorApi,
-    private val libraryDao: LibraryDao,
 ) : GeneratorRepository {
 
     override fun generateAnime(page: Int, minScore: Int): Flow<Resource<List<GeneratorModel>>> = flow {
@@ -46,10 +43,4 @@ class GeneratorRepositoryImpl(
             emit(Resource.Error(message = "error"))
         }
     }
-
-    override suspend fun addToLibrary(content: LibraryEntity) {
-        libraryDao.insert(content)
-    }
-
-
 }

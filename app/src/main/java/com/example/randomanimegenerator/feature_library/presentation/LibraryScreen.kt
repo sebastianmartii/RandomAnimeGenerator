@@ -47,7 +47,8 @@ fun LibraryScreen(
     statusList: List<LibraryStatus>,
     paddingValues: PaddingValues,
     modifier: Modifier = Modifier,
-    onSelect: (String) -> Unit
+    onSelect: (String) -> Unit,
+    onNavigateToDetailsScreen: (Int) -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -90,7 +91,13 @@ fun LibraryScreen(
                 }
             }
             items(state.content) {
-                LibraryCard(title = it.title, imageUrl = it.imageUrl)
+                LibraryCard(
+                    title = it.title,
+                    imageUrl = it.imageUrl,
+                    modifier = Modifier.clickable {
+                        onNavigateToDetailsScreen(it.malId)
+                    }
+                )
             }
         }
     }
@@ -108,8 +115,7 @@ private fun LibraryCard(
     Card(
         modifier = modifier
             .height(IntrinsicSize.Max)
-            .padding(4.dp)
-            .clickable { },
+            .padding(4.dp),
         shape = MaterialTheme.shapes.small
     ) {
         Box(

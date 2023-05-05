@@ -22,7 +22,7 @@ import coil.compose.AsyncImage
 fun StaffCard(
     name: String,
     imageUrl: String,
-    positions: List<String>,
+    positions: String,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -54,7 +54,7 @@ fun StaffCard(
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = positions.joinToString(separator = ", "),
+                text = positions,
                 style = MaterialTheme.typography.labelMedium,
                 fontWeight = FontWeight.Light,
                 maxLines = 1,

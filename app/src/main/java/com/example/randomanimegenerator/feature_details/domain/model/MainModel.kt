@@ -2,12 +2,12 @@ package com.example.randomanimegenerator.feature_details.domain.model
 
 data class MainModel(
     // manga only
-    val authors: List<String>,
+    val authors: String,
     val chapters: Int,
     // anime only
     val source: String,
     val episodes: Int,
-    val studios: List<String>,
+    val studios: String,
     // shared
     val malId: Int,
     val title: String,
@@ -16,33 +16,34 @@ data class MainModel(
     val type: String,
     val status: String,
     val score: Double,
-    val genres: List<String>,
-    val themes: List<String>,
-    val demographic: List<String>,
-    val isLoading: Boolean
+    val genres: String,
+    val themes: String,
+    val demographic: String,
+    val isLoading: Boolean,
+    val isFavorite: Boolean
 ) {
 
     private val animeStatusList = listOf(
         AdditionalInfo(statusName = "Format", status = type),
         AdditionalInfo(statusName = "Status", status = status),
-        AdditionalInfo(statusName = "Studios", status = studios.joinToString(separator = ", ")),
+        AdditionalInfo(statusName = "Studios", status = studios),
         AdditionalInfo(statusName = "Source", status = source),
         AdditionalInfo(statusName = "Episodes", status = "$episodes"),
         AdditionalInfo(statusName = "Score", status = "$score"),
-        AdditionalInfo(statusName = "Genres", status = genres.joinToString(separator = ", ")),
-        AdditionalInfo(statusName = "Themes", status = themes.joinToString(separator = ", ")),
-        AdditionalInfo(statusName = "Demographic", status = demographic.joinToString(separator = ", ")),
+        AdditionalInfo(statusName = "Genres", status = genres),
+        AdditionalInfo(statusName = "Themes", status = themes),
+        AdditionalInfo(statusName = "Demographic", status = demographic),
     )
 
     private val mangaStatusList = listOf(
         AdditionalInfo(statusName = "Format", status = type),
         AdditionalInfo(statusName = "Status", status = status),
-        AdditionalInfo(statusName = "Authors", status = authors.joinToString(separator = "; ")),
+        AdditionalInfo(statusName = "Authors", status = authors),
         AdditionalInfo(statusName = "Chapters", status = "$chapters"),
         AdditionalInfo(statusName = "Score", status = "$score"),
-        AdditionalInfo(statusName = "Genres", status = genres.joinToString(separator = ", ")),
-        AdditionalInfo(statusName = "Themes", status = themes.joinToString(separator = ", ")),
-        AdditionalInfo(statusName = "Demographic", status = demographic.joinToString(separator = ", ")),
+        AdditionalInfo(statusName = "Genres", status = genres),
+        AdditionalInfo(statusName = "Themes", status = themes),
+        AdditionalInfo(statusName = "Demographic", status = demographic),
     )
 
     val statusList: List<AdditionalInfo> = if (type == "Manga") mangaStatusList else animeStatusList
