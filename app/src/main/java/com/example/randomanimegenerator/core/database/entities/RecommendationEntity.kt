@@ -9,6 +9,7 @@ data class RecommendationEntity(
     @PrimaryKey(autoGenerate = true) val id: Int? = null,
     @ColumnInfo("mal_id") val malId: Int,
     @ColumnInfo("type") val type: String,
+    @ColumnInfo("recommendation_id") val recommendationId: Int,
     @ColumnInfo("recommendation_title") val recommendationTitle: String,
     @ColumnInfo("recommendation_image") val recommendationImage: String,
 )

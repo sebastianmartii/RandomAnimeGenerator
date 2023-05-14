@@ -21,8 +21,7 @@ interface DetailsRepository {
 
     fun getStaff(id: Int): Flow<Resource<List<Staff>>>
 
-    suspend fun addToFavorites(malId: Int, type: String, isFavorite: Boolean)
+    suspend fun addOrRemoveFromFavorites(malId: Int, type: String, isFavorite: Boolean)
 
-    suspend fun deleteFromFavorites(malId: Int, type: String)
-
+    suspend fun updateLibraryStatus(malId: Int, type: String, libraryStatus: String)
 }

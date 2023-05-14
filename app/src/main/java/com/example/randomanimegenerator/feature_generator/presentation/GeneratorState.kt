@@ -10,6 +10,6 @@ data class GeneratorState(
     val isLoading: Boolean = false,
     val editGeneratingParams: Boolean = false,
     val typeSelected: Type = Type.ANIME,
-    val scoreSelected: String = "7",
+    val scoreSelected: String = "8",
     val amountSelected: Amount = Amount.ONE
 ) : Parcelable

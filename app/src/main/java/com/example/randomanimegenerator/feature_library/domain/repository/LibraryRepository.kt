@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface LibraryRepository {
 
-    fun getAnime(): Flow<List<MainInfoEntity>>
+    fun getAll(type: String): Flow<List<MainInfoEntity>>
 
-    fun getManga(): Flow<List<MainInfoEntity>>
+    fun getAllByStatus(type: String, libraryStatus: String): Flow<List<MainInfoEntity>>
 }

@@ -20,13 +20,11 @@ import com.example.randomanimegenerator.feature_details.domain.model.Review
 import com.example.randomanimegenerator.feature_details.domain.model.Staff
 import com.example.randomanimegenerator.feature_details.domain.repository.DetailsRepository
 import com.example.randomanimegenerator.feature_generator.presentation.Type
-import com.example.randomanimegenerator.feature_generator.presentation.toType
 import com.example.randomanimegenerator.feature_generator.presentation.toTypeString
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
 import java.io.IOException
-import java.lang.NullPointerException
 
 class DetailsRepositoryImpl(
     private val detailsApi: DetailsApi,
@@ -46,24 +44,30 @@ class DetailsRepositoryImpl(
                 false
             }
 
+            val libraryId = try {
+                dbInfo.id
+            } catch (e: NullPointerException) {
+                null
+            }
+
             try {
                 when (type) {
                     Type.ANIME -> {
                         val response = detailsApi.getAnime(id)
                         db.mainInfoDao.delete(id, type.toTypeString())
-                        db.mainInfoDao.insert(response.toMainInfoEntity(type, isFavorite))
+                        db.mainInfoDao.insert(response.toMainInfoEntity(type, isFavorite, libraryId))
                     }
 
                     Type.MANGA -> {
                         val response = detailsApi.getManga(id)
                         db.mainInfoDao.delete(id, type.toTypeString())
-                        db.mainInfoDao.insert(response.toMainInfoEntity(type, isFavorite))
+                        db.mainInfoDao.insert(response.toMainInfoEntity(type, isFavorite, libraryId))
                     }
                 }
             } catch (e: IOException) {
-                emit(Resource.Error(message = "io error"))
+                emit(Resource.Error(message = "$e"))
             } catch (e: HttpException) {
-                emit(Resource.Error(message = "http error"))
+                emit(Resource.Error(message = "$e"))
             }
 
             val newInfo = db.mainInfoDao.getOne(id, type.toTypeString())
@@ -84,9 +88,9 @@ class DetailsRepositoryImpl(
             db.reviewDao.deleteReviews(id, type.toTypeString())
             db.reviewDao.upsertReviews(response.toReviewsEntity(id, type))
         } catch (e: IOException) {
-            emit(Resource.Error(message = "io error"))
+            emit(Resource.Error(message = "$e"))
         } catch (e: HttpException) {
-            emit(Resource.Error(message = "http error"))
+            emit(Resource.Error(message = "$e"))
         }
 
         val newReviews = db.reviewDao.getReviews(id, type.toTypeString())
@@ -113,9 +117,9 @@ class DetailsRepositoryImpl(
                     )
                 )
             } catch (e: IOException) {
-                emit(Resource.Error(message = "io error"))
+                emit(Resource.Error(message = "$e"))
             } catch (e: HttpException) {
-                emit(Resource.Error(message = "http error"))
+                emit(Resource.Error(message = "$e"))
             }
 
             val newRecommendations =
@@ -144,9 +148,9 @@ class DetailsRepositoryImpl(
                 }
             }
         } catch (e: IOException) {
-            emit(Resource.Error(message = "io error"))
+            emit(Resource.Error(message = "$e"))
         } catch (e: HttpException) {
-            emit(Resource.Error(message = "http error"))
+            emit(Resource.Error(message = "$e"))
         }
 
         val newCharacters = db.characterDao.getCharacters(id, type.toTypeString())
@@ -165,26 +169,20 @@ class DetailsRepositoryImpl(
             db.staffDao.deleteStaff(id)
             db.staffDao.upsertStaff(response.toStaffEntity(id))
         } catch (e: IOException) {
-            emit(Resource.Error(message = "io error"))
+            emit(Resource.Error(message = "$e"))
         } catch (e: HttpException) {
-            emit(Resource.Error(message = "http error"))
+            emit(Resource.Error(message = "$e"))
         }
 
         val newStaff = db.staffDao.getStaff(id)
         emit(Resource.Success(data = newStaff.map { it.toStaff() }))
     }
 
-    override suspend fun addToFavorites(malId: Int, type: String, isFavorite: Boolean) {
-        db.mainInfoDao.updateEntry(malId, type)
+    override suspend fun addOrRemoveFromFavorites(malId: Int, type: String, isFavorite: Boolean) {
+        db.mainInfoDao.updateEntry(malId, type, isFavorite)
     }
 
-    override suspend fun deleteFromFavorites(malId: Int, type: String) {
-        db.mainInfoDao.delete(malId, type)
-        db.characterDao.deleteCharacters(malId, type)
-        db.reviewDao.deleteReviews(malId, type)
-        db.recommendationDao.deleteRecommendations(malId, type)
-        if (type.toType() == Type.ANIME) {
-            db.staffDao.deleteStaff(malId)
-        }
+    override suspend fun updateLibraryStatus(malId: Int, type: String, libraryStatus: String) {
+        db.mainInfoDao.updateEntryStatus(malId, type, libraryStatus)
     }
 }

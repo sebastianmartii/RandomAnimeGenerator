@@ -20,7 +20,7 @@ data class MangaData(
     val scored_by: Int,
     val serializations: List<Serialization>,
     val status: String,
-    val synopsis: String,
+    val synopsis: String?,
     val themes: List<Theme>,
     val title: String,
     val title_english: String,

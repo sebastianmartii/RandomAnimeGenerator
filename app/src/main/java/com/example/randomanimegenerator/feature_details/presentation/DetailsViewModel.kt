@@ -4,15 +4,18 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.randomanimegenerator.core.util.Resource
+import com.example.randomanimegenerator.feature_details.data.mappers.toStatusString
 import com.example.randomanimegenerator.feature_details.domain.repository.DetailsRepository
 import com.example.randomanimegenerator.feature_details.domain.use_cases.DetailsUseCases
 import com.example.randomanimegenerator.feature_generator.presentation.toType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -21,7 +24,7 @@ import javax.inject.Inject
 class DetailsViewModel @Inject constructor(
     private val useCases: DetailsUseCases,
     private val repo: DetailsRepository,
-    private val savedStateHandle: SavedStateHandle
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val id = savedStateHandle.get<Int>("id")
@@ -30,11 +33,14 @@ class DetailsViewModel @Inject constructor(
     private val _state = MutableStateFlow(DetailsState(type = type!!.toType()))
     val state = _state.asStateFlow()
 
+    private val _channel = Channel<UiEvent>()
+    val eventFlow = _channel.receiveAsFlow()
+
     init {
-        getMainInfo()
+        getScreenContents()
     }
 
-    private fun getMainInfo() {
+    private fun getScreenContents() {
         viewModelScope.launch {
             val mainInfo = async {
                 useCases.getInfoUseCase(
@@ -62,12 +68,15 @@ class DetailsViewModel @Inject constructor(
                                 title = result.data?.title ?: "",
                                 malId = result.data?.malId ?: 0,
                                 imageUrl = result.data?.imageUrl ?: "",
+                                authors = result.data?.authors ?: "",
+                                studios = result.data?.studios ?: "",
                                 description = result.data?.synopsis ?: "",
                                 additionalInfo = result.data?.statusList ?: emptyList(),
                                 isLoading = false,
                                 isFavorite = result.data?.isFavorite ?: false
                             )
                         }
+                        _channel.send(UiEvent.ShowSnackBar(message = result.message ?: "Error"))
                     }
 
                     is Resource.Loading -> {
@@ -77,6 +86,8 @@ class DetailsViewModel @Inject constructor(
                                 malId = result.data?.malId ?: 0,
                                 imageUrl = result.data?.imageUrl ?: "",
                                 description = result.data?.synopsis ?: "",
+                                authors = result.data?.authors ?: "",
+                                studios = result.data?.studios ?: "",
                                 additionalInfo = result.data?.statusList ?: emptyList(),
                                 isLoading = true,
                                 isFavorite = result.data?.isFavorite ?: false
@@ -91,6 +102,8 @@ class DetailsViewModel @Inject constructor(
                                 malId = result.data?.malId ?: 0,
                                 imageUrl = result.data?.imageUrl ?: "",
                                 description = result.data?.synopsis ?: "",
+                                authors = result.data?.authors ?: "",
+                                studios = result.data?.studios ?: "",
                                 additionalInfo = result.data?.statusList ?: emptyList(),
                                 isLoading = false,
                                 isFavorite = result.data?.isFavorite ?: false
@@ -108,6 +121,7 @@ class DetailsViewModel @Inject constructor(
                                 isLoading = false
                             )
                         }
+                        _channel.send(UiEvent.ShowSnackBar(message = result.message ?: "Error"))
                     }
 
                     is Resource.Loading -> {
@@ -138,6 +152,7 @@ class DetailsViewModel @Inject constructor(
                                 isLoading = false
                             )
                         }
+                        _channel.send(UiEvent.ShowSnackBar(message = result.message ?: "Error"))
                     }
 
                     is Resource.Loading -> {
@@ -164,6 +179,16 @@ class DetailsViewModel @Inject constructor(
 
     fun onEvent(event: DetailsEvent) {
         when(event) {
+            is DetailsEvent.SelectStatus -> {
+                _state.update {
+                    it.copy(
+                        libraryStatus = event.status
+                    )
+                }
+                viewModelScope.launch {
+                    repo.updateLibraryStatus(id!!, type!!, event.status.toStatusString())
+                }
+            }
             is DetailsEvent.AddOrRemoveFromFavorites -> {
                 _state.update {
                     it.copy(
@@ -173,88 +198,133 @@ class DetailsViewModel @Inject constructor(
                 viewModelScope.launch {
                     when(event.isFavorite) {
                         true -> {
-                            repo.deleteFromFavorites(id!!, type!!)
+                            repo.addOrRemoveFromFavorites(id!!, type!!, false)
+                            _channel.send(UiEvent.ShowSnackBar("Entry has been deleted from favorites"))
                         }
                         false -> {
-                            repo.addToFavorites(id!!, type!!, true)
+                            repo.addOrRemoveFromFavorites(id!!, type!!, true)
+                            _channel.send(UiEvent.ShowSnackBar("Entry has been added to favorites"))
                         }
                     }
                 }
             }
             is DetailsEvent.GenerateRecommendations -> {
                 viewModelScope.launch {
-                    useCases.getRecommendationsUseCase(id!!, type!!.toType()).onEach { result ->
-                        when(result) {
-                            is Resource.Error -> {
-                                _state.update {
-                                    it.copy(
-                                        recommendation = result.data ?: emptyList(),
-                                        isLoading = false,
-                                        getRecommendations = false
+                    val recommendations = async {
+                        useCases.getRecommendationsUseCase(id!!, type!!.toType()).onEach { result ->
+                            when (result) {
+                                is Resource.Error -> {
+                                    _state.update {
+                                        it.copy(
+                                            recommendation = result.data ?: emptyList(),
+                                            isLoading = false,
+                                            getRecommendations = false
+                                        )
+                                    }
+                                    _channel.send(
+                                        UiEvent.ShowSnackBar(
+                                            message = result.message ?: "Error"
+                                        )
                                     )
                                 }
-                            }
 
-                            is Resource.Loading -> {
-                                _state.update {
-                                    it.copy(
-                                        recommendation = result.data ?: emptyList(),
-                                        isLoading = true,
-                                        getRecommendations = false
-                                    )
+                                is Resource.Loading -> {
+                                    _state.update {
+                                        it.copy(
+                                            recommendation = result.data ?: emptyList(),
+                                            isLoading = true,
+                                            getRecommendations = false
+                                        )
+                                    }
                                 }
-                            }
 
-                            is Resource.Success -> {
-                                _state.update {
-                                    it.copy(
-                                        recommendation = result.data ?: emptyList(),
-                                        isLoading = false,
-                                        getRecommendations = false
-                                    )
+                                is Resource.Success -> {
+                                    _state.update {
+                                        it.copy(
+                                            recommendation = result.data ?: emptyList(),
+                                            isLoading = false,
+                                            getRecommendations = false
+                                        )
+                                    }
                                 }
                             }
-                        }
-                    }.launchIn(this)
+                        }.launchIn(this)
+                    }
+                    recommendations.await()
                 }
             }
             is DetailsEvent.GenerateStaff -> {
                 viewModelScope.launch {
-                    useCases.getStaffUseCase(id!!).onEach { result ->
-                        when(result) {
-                            is Resource.Error -> {
-                                _state.update {
-                                    it.copy(
-                                        staff = result.data ?: emptyList(),
-                                        isLoading = false,
-                                        getStaff = false
+                    val staff = async {
+                        useCases.getStaffUseCase(id!!).onEach { result ->
+                            when (result) {
+                                is Resource.Error -> {
+                                    _state.update {
+                                        it.copy(
+                                            staff = result.data ?: emptyList(),
+                                            isLoading = false,
+                                            getStaff = false
+                                        )
+                                    }
+                                    _channel.send(
+                                        UiEvent.ShowSnackBar(
+                                            message = result.message ?: "Error"
+                                        )
                                     )
                                 }
-                            }
 
-                            is Resource.Loading -> {
-                                _state.update {
-                                    it.copy(
-                                        staff = result.data ?: emptyList(),
-                                        isLoading = true,
-                                        getStaff = false
-                                    )
+                                is Resource.Loading -> {
+                                    _state.update {
+                                        it.copy(
+                                            staff = result.data ?: emptyList(),
+                                            isLoading = true,
+                                            getStaff = false
+                                        )
+                                    }
                                 }
-                            }
 
-                            is Resource.Success -> {
-                                _state.update {
-                                    it.copy(
-                                        staff = result.data ?: emptyList(),
-                                        isLoading = false,
-                                        getStaff = false
-                                    )
+                                is Resource.Success -> {
+                                    _state.update {
+                                        it.copy(
+                                            staff = result.data ?: emptyList(),
+                                            isLoading = false,
+                                            getStaff = false
+                                        )
+                                    }
                                 }
                             }
-                        }
-                    }.launchIn(this)
+                        }.launchIn(this)
+                    }
+                    staff.await()
+                }
+            }
+            is DetailsEvent.NavigateBack -> {
+                viewModelScope.launch {
+                    _channel.send(UiEvent.NavigateBack)
+                }
+            }
+            is DetailsEvent.NavigateToDestination -> {
+                viewModelScope.launch {
+                    _channel.send(UiEvent.NavigateToDestination("${event.destination}/$id/$type"))
+                }
+            }
+            is DetailsEvent.NavigateToSingleReview -> {
+                viewModelScope.launch {
+                    _channel.send(UiEvent.NavigateToDestination("${event.destination}/${event.author}/${event.score}/${event.review}"))
+                }
+            }
+            is DetailsEvent.NavigateToRecommendation -> {
+                viewModelScope.launch {
+                    _channel.send(UiEvent.NavigateToDestination("${event.destination}/${event.malId}/$type"))
                 }
             }
         }
+    }
+
+
+    sealed class UiEvent {
+        data class ShowSnackBar(val message: String) : UiEvent()
+        data class NavigateToDestination(val destinationRoute: String) : UiEvent()
+        object NavigateBack : UiEvent()
     }
 }

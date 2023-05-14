@@ -1,7 +1,7 @@
 package com.example.randomanimegenerator.feature_library.presentation
 
 enum class LibraryStatus {
-    ALL, FINISHED, PLANNING, WATCHING, READING, DROPPED, PAUSED
+    ALL, FINISHED, PLANNING, WATCHING, READING, PAUSED
 }
 
 val animeStatusList = listOf(
@@ -9,7 +9,6 @@ val animeStatusList = listOf(
     LibraryStatus.FINISHED,
     LibraryStatus.PLANNING,
     LibraryStatus.WATCHING,
-    LibraryStatus.DROPPED,
     LibraryStatus.PAUSED
 )
 

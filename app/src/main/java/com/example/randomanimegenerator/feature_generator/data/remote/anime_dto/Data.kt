@@ -26,7 +26,7 @@ data class Data(
     val source: String,
     val status: String,
     val studios: List<Studio>,
-    val synopsis: String,
+    val synopsis: String?,
     val themes: List<Theme>,
     val title: String,
     val title_english: String,

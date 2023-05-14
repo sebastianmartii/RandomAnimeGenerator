@@ -6,5 +6,5 @@ import com.example.randomanimegenerator.feature_library.domain.model.LibraryMode
 data class LibraryState(
     val content: List<LibraryModel> = emptyList(),
     val type: Type = Type.ANIME,
-    val libraryStatus: String = LibraryStatus.ALL.name
+    val libraryStatus: LibraryStatus = LibraryStatus.ALL
 )

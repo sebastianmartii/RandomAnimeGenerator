@@ -1,18 +1,18 @@
 package com.example.randomanimegenerator.core.navigation
 
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.example.randomanimegenerator.feature_generator.presentation.GeneratorScreen
 import com.example.randomanimegenerator.feature_generator.presentation.GeneratorState
 import com.example.randomanimegenerator.feature_generator.presentation.GeneratorViewModel
-import com.example.randomanimegenerator.feature_generator.presentation.Type
 import com.example.randomanimegenerator.feature_generator.presentation.toTypeString
 import com.example.randomanimegenerator.feature_library.presentation.LibraryScreen
 import com.example.randomanimegenerator.feature_library.presentation.LibraryState
@@ -40,35 +40,39 @@ fun NavGraphBuilder.bottomNavGraph(
                 }
             )
         }
-        composable(route = Destinations.AnimeLibrary.route) {
+        composable(
+            route = Destinations.AnimeLibrary.route,
+            arguments = listOf(
+                navArgument(name = "type") { type = NavType.StringType}
+            )
+        ) {
             val viewModel = hiltViewModel<LibraryViewModel>()
             val state by viewModel.state.collectAsStateWithLifecycle(initialValue = LibraryState())
-            LaunchedEffect(key1 = true) {
-                viewModel.setType(Type.ANIME)
-            }
             LibraryScreen(
                 paddingValues = paddingValues,
                 state = state,
                 statusList = animeStatusList,
-                onSelect = viewModel::selectStatus,
+                onEvent = viewModel::onEvent,
                 onNavigateToDetailsScreen = {
-                    navController.navigate("details/$it/${viewModel.exposedType.value.toTypeString()}")
+                    navController.navigate("details/$it/${viewModel.type}")
                 }
             )
         }
-        composable(route = Destinations.MangaLibrary.route) {
+        composable(
+            route = Destinations.MangaLibrary.route,
+            arguments = listOf(
+                navArgument(name = "type") { type = NavType.StringType}
+            )
+        ) {
             val viewModel = hiltViewModel<LibraryViewModel>()
             val state by viewModel.state.collectAsStateWithLifecycle(initialValue = LibraryState())
-            LaunchedEffect(key1 = true) {
-                viewModel.setType(Type.MANGA)
-            }
             LibraryScreen(
                 paddingValues = paddingValues,
                 state = state,
                 statusList = mangaStatusList,
-                onSelect = viewModel::selectStatus,
+                onEvent = viewModel::onEvent,
                 onNavigateToDetailsScreen = {
-                    navController.navigate("details/$it/${viewModel.exposedType.value.toTypeString()}")
+                    navController.navigate("details/$it/${viewModel.type}")
                 }
             )
         }

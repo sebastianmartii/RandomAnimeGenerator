@@ -1,17 +1,15 @@
 package com.example.randomanimegenerator.feature_details.presentation
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -28,15 +26,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
-import com.example.randomanimegenerator.feature_details.domain.model.Character
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CharactersScreen(
+fun SingleReviewScreen(
     paddingValues: PaddingValues,
-    characterList: List<Character>,
+    review: String,
+    author: String,
+    score: Int,
     modifier: Modifier = Modifier,
     onNavigateBack: () -> Unit
 ) {
@@ -45,14 +44,14 @@ fun CharactersScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Characters",
+                        text = "Review",
                         style = MaterialTheme.typography.titleLarge
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = { onNavigateBack() }) {
                         Icon(
-                            imageVector = Icons.Filled.ArrowBack,
+                            imageVector = Icons.Default.ArrowBack,
                             contentDescription = "Back Action Button"
                         )
                     }
@@ -62,61 +61,47 @@ fun CharactersScreen(
                 )
             )
         },
-        modifier = modifier.padding(paddingValues)
+        modifier = modifier
+            .padding(paddingValues)
     ) { values ->
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            modifier = Modifier.padding(values)
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(values)
+                .background(MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp)),
+            horizontalAlignment = Alignment.Start,
         ) {
-            items(characterList) {character ->
-                CharacterItem(
-                    imageUrl = character.imageUrl,
-                    name = character.name,
-                    role = character.role
+            Text(
+                text = "$author · $score",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+                textAlign = TextAlign.Start,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, bottom = 4.dp)
+            )
+            Column(
+                modifier = Modifier
+                    .clip(
+                        shape = MaterialTheme.shapes.medium.copy(
+                            bottomStart = CornerSize(0.dp),
+                            bottomEnd = CornerSize(0.dp)
+                        )
+                    )
+                    .verticalScroll(rememberScrollState())
+                    .background(MaterialTheme.colorScheme.background)
+            ) {
+                Text(
+                    text = review,
+                    style = MaterialTheme.typography.bodyMedium,
+                    textAlign = TextAlign.Start,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier
+                        .padding(horizontal = 12.dp, vertical = 8.dp)
                 )
+                Spacer(modifier = Modifier.height(256.dp))
             }
         }
     }
 }
-
-@Composable
-private fun CharacterItem(
-    imageUrl: String,
-    name: String,
-    role: String,
-    modifier: Modifier = Modifier,
-) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(4.dp)
-            .height(IntrinsicSize.Max),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        AsyncImage(
-            model = imageUrl,
-            contentDescription = name,
-            modifier = Modifier
-                .clip(MaterialTheme.shapes.small)
-                .height(120.dp)
-                .aspectRatio(2f / 3f)
-                .padding(end = 8.dp)
-        )
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.Start
-        ) {
-            Text(
-                text = name,
-                style = MaterialTheme.typography.titleSmall
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = role,
-                style = MaterialTheme.typography.labelMedium,
-                fontWeight = FontWeight.Light,
-            )
-        }
-    }
-}
-

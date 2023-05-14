@@ -9,7 +9,7 @@ class LibraryRepositoryImpl(
     private val mainInfoDao: MainInfoDao,
 ) : LibraryRepository {
 
-    override fun getAnime(): Flow<List<MainInfoEntity>> = mainInfoDao.getAll(type = "Anime", isFavorite = true)
+    override fun getAll(type: String): Flow<List<MainInfoEntity>> = mainInfoDao.getAll(type)
 
-    override fun getManga(): Flow<List<MainInfoEntity>> = mainInfoDao.getAll(type = "Manga", isFavorite = true)
+    override fun getAllByStatus(type: String, libraryStatus: String): Flow<List<MainInfoEntity>>  = mainInfoDao.getAllByStatus(type, libraryStatus)
 }

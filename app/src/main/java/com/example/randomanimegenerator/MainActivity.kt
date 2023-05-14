@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.Scaffold
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.rememberNavController
 import com.example.randomanimegenerator.core.constants.navigationItems
 import com.example.randomanimegenerator.core.navigation.BottomNavigationBar
@@ -24,7 +25,11 @@ class MainActivity : ComponentActivity() {
                             items = navigationItems,
                             navController = navController,
                             onItemClick = {
-                                navController.navigate(it.route)
+                                navController.navigate(it.route) {
+                                    popUpTo(navController.graph.findStartDestination().id)
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
                             }
                         )
                     }

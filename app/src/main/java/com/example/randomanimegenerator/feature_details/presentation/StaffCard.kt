@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
@@ -27,6 +27,7 @@ fun StaffCard(
 ) {
     Row(
         modifier = modifier
+            .fillMaxWidth()
             .padding(
                 start = 8.dp,
                 top = 8.dp
@@ -44,9 +45,9 @@ fun StaffCard(
                 .padding(end = 4.dp)
         )
         Column(
-            modifier = Modifier
-                .fillMaxHeight(),
-            verticalArrangement = Arrangement.SpaceAround
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.SpaceAround,
+            horizontalAlignment = Alignment.Start
         ) {
             Text(
                 text = name,

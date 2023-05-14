@@ -3,7 +3,7 @@ package com.example.randomanimegenerator.feature_details.presentation
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -18,21 +18,25 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.example.randomanimegenerator.feature_details.domain.model.Recommendation
 
 @Composable
 fun RecommendationCard(
-    title: String,
-    imageUrl: String,
-    modifier: Modifier = Modifier
+    recommendation: Recommendation,
+    modifier: Modifier = Modifier,
+    onNavigateToRecommendation: (Int) -> Unit
 ) {
     Card(
         modifier = modifier
-            .height(IntrinsicSize.Max)
-            .width(100.dp)
+            .height(120.dp)
+            .width(90.dp)
             .padding(4.dp)
-            .clickable { },
+            .clickable {
+                onNavigateToRecommendation(recommendation.malId)
+            },
         shape = MaterialTheme.shapes.small
     ) {
         Box(
@@ -40,10 +44,10 @@ fun RecommendationCard(
                 .fillMaxWidth()
         ) {
             AsyncImage(
-                model = imageUrl,
-                contentDescription = title,
+                model = recommendation.imageUrl,
+                contentDescription = recommendation.title,
                 modifier = Modifier
-                    .height(120.dp)
+                    .fillMaxHeight()
                     .align(Alignment.TopCenter),
                 contentScale = ContentScale.FillBounds
             )
@@ -60,11 +64,12 @@ fun RecommendationCard(
                     )
             ) {
                 Text(
-                    text = title,
+                    text = recommendation.title,
                     style = MaterialTheme.typography.titleSmall,
-                    maxLines = 1,
+                    maxLines = 2,
                     color = Color.White,
                     textAlign = TextAlign.Center,
+                    overflow = TextOverflow.Ellipsis,
                     modifier = Modifier
                         .padding(4.dp)
                         .fillMaxWidth()

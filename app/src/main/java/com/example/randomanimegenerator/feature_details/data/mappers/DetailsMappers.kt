@@ -24,6 +24,7 @@ import com.example.randomanimegenerator.feature_generator.data.remote.anime_dto.
 import com.example.randomanimegenerator.feature_generator.data.remote.manga_dto.Author
 import com.example.randomanimegenerator.feature_generator.presentation.Type
 import com.example.randomanimegenerator.feature_generator.presentation.toTypeString
+import com.example.randomanimegenerator.feature_library.presentation.LibraryStatus
 import com.example.randomanimegenerator.feature_details.data.remote.dto.anime_dtos.anime_characters_dto.Data as AnimeCharactersData
 import com.example.randomanimegenerator.feature_details.data.remote.dto.anime_dtos.staff_dto.Data as StaffData
 import com.example.randomanimegenerator.feature_details.data.remote.dto.manga_dtos.manga_characters_dto.Data as MangaCharactersData
@@ -33,12 +34,13 @@ import com.example.randomanimegenerator.feature_generator.data.remote.manga_dto.
 import com.example.randomanimegenerator.feature_generator.data.remote.manga_dto.Genre as MangaGenre
 import com.example.randomanimegenerator.feature_generator.data.remote.manga_dto.Theme as MangaTheme
 
-fun AnimeDto.toMainInfoEntity(type: Type, isFavorite: Boolean): MainInfoEntity {
+fun AnimeDto.toMainInfoEntity(type: Type, isFavorite: Boolean, libraryId: Int?): MainInfoEntity {
     return MainInfoEntity(
+        id = libraryId,
         malId = this.data.mal_id,
         title = this.data.title,
         imageUrl = this.data.images.jpg.image_url,
-        synopsis = this.data.synopsis,
+        synopsis = this.data.synopsis ?: "There is no synopsis available at the moment",
         type = this.data.type,
         status = this.data.status,
         score = this.data.score,
@@ -56,19 +58,20 @@ fun AnimeDto.toMainInfoEntity(type: Type, isFavorite: Boolean): MainInfoEntity {
     )
 }
 
-fun MangaDto.toMainInfoEntity(type: Type, isFavorite: Boolean): MainInfoEntity {
+fun MangaDto.toMainInfoEntity(type: Type, isFavorite: Boolean, libraryId: Int?): MainInfoEntity {
     return MainInfoEntity(
+        id = libraryId,
         malId = this.data.mal_id,
         title = this.data.title,
         imageUrl = this.data.images.jpg.image_url,
-        synopsis = this.data.synopsis,
+        synopsis = this.data.synopsis ?: "There is no synopsis available at the moment",
         type = this.data.type,
         status = this.data.status,
         score = this.data.score,
         genres = this.data.genres.toMangaGenreModel().joinToString(separator = ", "),
         themes = this.data.themes.toMangaThemeModel().joinToString(separator = ", "),
         demographic = this.data.demographics.toMangaDemographicModel().joinToString(separator = ", "),
-        mangaAuthors = this.data.authors.toAuthorModel().joinToString(separator = ", "),
+        mangaAuthors = this.data.authors.toAuthorModel().joinToString(separator = "; "),
         mangaChapters = this.data.chapters,
         source = "",
         episodes = 0,
@@ -158,6 +161,10 @@ fun ReviewEntity.toReview(): Review {
     )
 }
 
+fun List<ReviewEntity>.toReviews(): List<Review> {
+    return this.map { it.toReview() }
+}
+
 // recommendations mappers
 
 fun RecommendationData.toRecommendationEntity(malId: Int, type: Type): RecommendationEntity {
@@ -165,7 +172,8 @@ fun RecommendationData.toRecommendationEntity(malId: Int, type: Type): Recommend
         malId = malId,
         type = type.toTypeString(),
         recommendationImage = this.entry.images.jpg.image_url,
-        recommendationTitle = this.entry.title
+        recommendationTitle = this.entry.title,
+        recommendationId = this.entry.mal_id
     )
 }
 
@@ -176,8 +184,13 @@ fun RecommendationsDto.toRecommendationsEntity(malId: Int, type: Type): List<Rec
 fun RecommendationEntity.toRecommendation(): Recommendation {
     return Recommendation(
         imageUrl = this.recommendationImage,
-        title = this.recommendationTitle
+        title = this.recommendationTitle,
+        malId = this.recommendationId
     )
+}
+
+fun List<RecommendationEntity>.toRecommendations(): List<Recommendation> {
+    return this.map { it.toRecommendation() }
 }
 
 // characters mappers
@@ -218,6 +231,10 @@ fun CharacterEntity.toCharacter(): Character {
     )
 }
 
+fun List<CharacterEntity>.toCharacters(): List<Character> {
+    return this.map { it.toCharacter() }
+}
+
 // staff mappers
 
 fun StaffData.toStaffEntity(malId: Int): StaffEntity {
@@ -239,5 +256,20 @@ fun StaffEntity.toStaff(): Staff {
         imageUrl = this.staffMemberImage,
         position = this.staffMemberPositions
     )
+}
+
+fun List<StaffEntity>.toListOfStaff(): List<Staff> {
+    return this.map { it.toStaff() }
+}
+
+fun LibraryStatus.toStatusString(): String {
+    return when(this) {
+        LibraryStatus.FINISHED -> "finished"
+        LibraryStatus.PLANNING -> "planning"
+        LibraryStatus.WATCHING -> "watching"
+        LibraryStatus.READING -> "reading"
+        LibraryStatus.PAUSED -> "paused"
+        LibraryStatus.ALL -> ""
+    }
 }
 

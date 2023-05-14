@@ -3,7 +3,7 @@ package com.example.randomanimegenerator.feature_details.presentation
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 
@@ -29,8 +30,8 @@ fun CharacterCard(
 ) {
     Card(
         modifier = modifier
-            .height(IntrinsicSize.Max)
             .width(90.dp)
+            .height(120.dp)
             .padding(4.dp)
             .clickable { },
         shape = MaterialTheme.shapes.small
@@ -43,7 +44,7 @@ fun CharacterCard(
                 model = imageUrl,
                 contentDescription = name,
                 modifier = Modifier
-                    .height(120.dp)
+                    .fillMaxHeight()
                     .align(Alignment.TopCenter),
                 contentScale = ContentScale.FillBounds
             )
@@ -65,6 +66,7 @@ fun CharacterCard(
                     maxLines = 2,
                     color = Color.White,
                     textAlign = TextAlign.Center,
+                    overflow = TextOverflow.Ellipsis,
                     modifier = Modifier
                         .padding(4.dp)
                         .fillMaxWidth()

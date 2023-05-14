@@ -6,12 +6,15 @@ import com.example.randomanimegenerator.feature_details.domain.model.Recommendat
 import com.example.randomanimegenerator.feature_details.domain.model.Review
 import com.example.randomanimegenerator.feature_details.domain.model.Staff
 import com.example.randomanimegenerator.feature_generator.presentation.Type
+import com.example.randomanimegenerator.feature_library.presentation.LibraryStatus
 
 data class DetailsState(
     val imageUrl: String = "",
     val malId: Int = 0,
     val title: String = "",
     val description: String = "",
+    val authors: String = "",
+    val studios: String = "",
     val characters: List<Character> = emptyList(),
     val reviews: List<Review> = emptyList(),
     val staff: List<Staff> = emptyList(),
@@ -21,6 +24,7 @@ data class DetailsState(
     val isLoading: Boolean = true,
     val getRecommendations: Boolean = true,
     val getStaff: Boolean = true,
-    val type: Type = Type.ANIME
+    val type: Type = Type.ANIME,
+    val libraryStatus: LibraryStatus = LibraryStatus.PLANNING
 )
 

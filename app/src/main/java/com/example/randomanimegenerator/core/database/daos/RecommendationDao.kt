@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Upsert
 import com.example.randomanimegenerator.core.database.entities.RecommendationEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface RecommendationDao {
@@ -16,4 +17,7 @@ interface RecommendationDao {
 
     @Query("SELECT * FROM recommendations_table WHERE mal_id = :malId AND type = :type")
     suspend fun getRecommendations(malId: Int, type: String): List<RecommendationEntity>
+
+    @Query("SELECT * FROM recommendations_table WHERE mal_id = :malId AND type = :type")
+    fun getRecommendationsAsFlow(malId: Int, type: String): Flow<List<RecommendationEntity>>
 }

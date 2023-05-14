@@ -27,5 +27,5 @@ data class MainInfoEntity(
     // library params
     @ColumnInfo("is_favorite") val isFavorite: Boolean = false,
     @ColumnInfo("library_type") val libraryType: String,
-    @ColumnInfo("library_status") val libraryStatus: String
+    @ColumnInfo("library_status") val libraryStatus: String = "planning"
 )

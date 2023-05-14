@@ -26,7 +26,6 @@ data class MainModel(
     private val animeStatusList = listOf(
         AdditionalInfo(statusName = "Format", status = type),
         AdditionalInfo(statusName = "Status", status = status),
-        AdditionalInfo(statusName = "Studios", status = studios),
         AdditionalInfo(statusName = "Source", status = source),
         AdditionalInfo(statusName = "Episodes", status = "$episodes"),
         AdditionalInfo(statusName = "Score", status = "$score"),
@@ -38,7 +37,6 @@ data class MainModel(
     private val mangaStatusList = listOf(
         AdditionalInfo(statusName = "Format", status = type),
         AdditionalInfo(statusName = "Status", status = status),
-        AdditionalInfo(statusName = "Authors", status = authors),
         AdditionalInfo(statusName = "Chapters", status = "$chapters"),
         AdditionalInfo(statusName = "Score", status = "$score"),
         AdditionalInfo(statusName = "Genres", status = genres),
