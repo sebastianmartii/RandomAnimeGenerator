@@ -16,4 +16,4 @@ Random Anime Generator made with Jikan v4 api providing unofficial MyAnimeList d
 - Title based search throu your favorites
 
 ## App Screenshots
-![Manga List Results](https://github.com/sebastianmartii/RandomAnimeGenerator/blob/master/Screenshots/Zrzut%20ekranu%202023-05-14%20184931.png)
+![Manga List Results](https://github.com/sebastianmartii/RandomAnimeGenerator/blob/master/Screenshots/Zrzut%20ekranu%202023-05-14%20184931.png)![Anime Single Result](https://github.com/sebastianmartii/RandomAnimeGenerator/blob/master/Screenshots/Zrzut%20ekranu%202023-05-14%20185013.png)
