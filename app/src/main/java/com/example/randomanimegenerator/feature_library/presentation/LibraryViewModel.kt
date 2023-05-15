@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.randomanimegenerator.feature_details.data.mappers.toStatusString
 import com.example.randomanimegenerator.feature_generator.presentation.toType
 import com.example.randomanimegenerator.feature_library.data.mappers.toLibraryModel
+import com.example.randomanimegenerator.feature_library.domain.model.LibraryFilter
 import com.example.randomanimegenerator.feature_library.domain.repository.LibraryRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -14,6 +15,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -23,31 +25,43 @@ class LibraryViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val _status = MutableStateFlow(LibraryStatus.ALL)
+    private val _libraryFilter = MutableStateFlow(LibraryFilter())
 
     val type = savedStateHandle.get<String>("type")
 
-    private val _libraryContent = _status.flatMapLatest { status ->
-        when(status) {
-            LibraryStatus.ALL -> repository.getAll(type!!)
-            else -> repository.getAllByStatus(type!!, status.toStatusString())
+    private val _libraryContent = _libraryFilter.flatMapLatest { filter ->
+        when(filter.libraryStatus) {
+            LibraryStatus.ALL -> repository.getAll(type!!, filter.librarySortType)
+            else -> repository.getAllByStatus(type!!, filter.libraryStatus.toStatusString(), filter.librarySortType)
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
 
     private val _state = MutableStateFlow(LibraryState())
-    val state = combine(_status, _libraryContent, _state) { status, content, state ->
+    val state = combine(_libraryFilter, _libraryContent, _state) { filter, content, state ->
         state.copy(
             content = content.map { it.toLibraryModel() },
             type = type!!.toType(),
-            libraryStatus = status
+            libraryStatus = filter.libraryStatus,
+            librarySortType = filter.librarySortType
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), LibraryState())
 
     fun onEvent(event: LibraryEvent) {
         when(event) {
             is LibraryEvent.ChangeStatus -> {
-                _status.value = event.status
+                _libraryFilter.update {
+                    it.copy(
+                        libraryStatus = event.status,
+                    )
+                }
+            }
+            is LibraryEvent.ChangeSortType -> {
+                _libraryFilter.update {
+                    it.copy(
+                        librarySortType = event.sortType
+                    )
+                }
             }
         }
     }

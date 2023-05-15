@@ -18,6 +18,7 @@ import com.example.randomanimegenerator.feature_library.presentation.LibraryScre
 import com.example.randomanimegenerator.feature_library.presentation.LibraryState
 import com.example.randomanimegenerator.feature_library.presentation.LibraryViewModel
 import com.example.randomanimegenerator.feature_library.presentation.animeStatusList
+import com.example.randomanimegenerator.feature_library.presentation.librarySortType
 import com.example.randomanimegenerator.feature_library.presentation.mangaStatusList
 
 fun NavGraphBuilder.bottomNavGraph(
@@ -52,6 +53,7 @@ fun NavGraphBuilder.bottomNavGraph(
                 paddingValues = paddingValues,
                 state = state,
                 statusList = animeStatusList,
+                sortList = librarySortType,
                 onEvent = viewModel::onEvent,
                 onNavigateToDetailsScreen = {
                     navController.navigate("details/$it/${viewModel.type}")
@@ -70,6 +72,7 @@ fun NavGraphBuilder.bottomNavGraph(
                 paddingValues = paddingValues,
                 state = state,
                 statusList = mangaStatusList,
+                sortList = librarySortType,
                 onEvent = viewModel::onEvent,
                 onNavigateToDetailsScreen = {
                     navController.navigate("details/$it/${viewModel.type}")

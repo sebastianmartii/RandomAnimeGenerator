@@ -47,6 +47,7 @@ import com.example.randomanimegenerator.feature_generator.presentation.toTypeStr
 fun LibraryScreen(
     state: LibraryState,
     statusList: List<LibraryStatus>,
+    sortList: List<LibrarySortType>,
     paddingValues: PaddingValues,
     modifier: Modifier = Modifier,
     onEvent: (LibraryEvent) -> Unit,
@@ -90,11 +91,20 @@ fun LibraryScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     statusList.onEach { item ->
-                        CustomFilterChip(
+                        CustomStatusFilterChip(
                             text = item,
                             selected = item.name == state.libraryStatus.name,
                             onSelect = {
                                 onEvent(LibraryEvent.ChangeStatus(it))
+                            }
+                        )
+                    }
+                    sortList.onEach { item ->
+                        CustomSortFilterChip(
+                            text = item,
+                            selected = item.name == state.librarySortType.name,
+                            onSelect = {
+                                onEvent(LibraryEvent.ChangeSortType(it))
                             }
                         )
                     }
@@ -170,10 +180,42 @@ private fun LibraryCard(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun CustomFilterChip(
+private fun CustomStatusFilterChip(
     text: LibraryStatus,
     selected: Boolean,
     onSelect: (LibraryStatus) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    FilterChip(
+        selected = selected,
+        onClick = { onSelect(text) },
+        label = { Text(text = text.name) },
+        leadingIcon = if (selected) {
+            {
+                Icon(
+                    imageVector = Icons.Filled.Done,
+                    contentDescription = null,
+                    modifier = Modifier.size(FilterChipDefaults.IconSize)
+                )
+            }
+        } else {
+            null
+        },
+        modifier = modifier.padding(
+            start = 4.dp,
+            top = 1.dp,
+            bottom = 1.dp,
+            end = 2.dp
+        )
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun CustomSortFilterChip(
+    text: LibrarySortType,
+    selected: Boolean,
+    onSelect: (LibrarySortType) -> Unit,
     modifier: Modifier = Modifier
 ) {
     FilterChip(
