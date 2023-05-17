@@ -34,7 +34,7 @@ import com.example.randomanimegenerator.feature_generator.data.remote.manga_dto.
 import com.example.randomanimegenerator.feature_generator.data.remote.manga_dto.Genre as MangaGenre
 import com.example.randomanimegenerator.feature_generator.data.remote.manga_dto.Theme as MangaTheme
 
-fun AnimeDto.toMainInfoEntity(type: Type, isFavorite: Boolean, libraryId: Int?): MainInfoEntity {
+fun AnimeDto.toMainInfoEntity(type: Type, isFavorite: Boolean, libraryId: Int?, status: String): MainInfoEntity {
     return MainInfoEntity(
         id = libraryId,
         malId = this.data.mal_id,
@@ -54,11 +54,11 @@ fun AnimeDto.toMainInfoEntity(type: Type, isFavorite: Boolean, libraryId: Int?):
         studios = this.data.studios.toStudioModel().joinToString(separator = ", "),
         isFavorite = isFavorite,
         libraryType = type.toTypeString(),
-        libraryStatus = "planned"
+        libraryStatus = status
     )
 }
 
-fun MangaDto.toMainInfoEntity(type: Type, isFavorite: Boolean, libraryId: Int?): MainInfoEntity {
+fun MangaDto.toMainInfoEntity(type: Type, isFavorite: Boolean, libraryId: Int?, status: String): MainInfoEntity {
     return MainInfoEntity(
         id = libraryId,
         malId = this.data.mal_id,
@@ -78,7 +78,7 @@ fun MangaDto.toMainInfoEntity(type: Type, isFavorite: Boolean, libraryId: Int?):
         studios = "",
         isFavorite = isFavorite,
         libraryType = type.toTypeString(),
-        libraryStatus = "planned"
+        libraryStatus = status
     )
 }
 
@@ -132,7 +132,8 @@ fun MainInfoEntity?.toMainModel(): MainModel{
         themes = this?.themes ?: "",
         demographic = this?.demographic ?: "",
         isLoading = false,
-        isFavorite = this?.isFavorite ?: false
+        isFavorite = this?.isFavorite ?: false,
+        libraryStatus = this?.libraryStatus?.toStatus() ?: LibraryStatus.PLANNING
     )
 }
 
@@ -270,6 +271,16 @@ fun LibraryStatus.toStatusString(): String {
         LibraryStatus.READING -> "reading"
         LibraryStatus.PAUSED -> "paused"
         LibraryStatus.ALL -> ""
+    }
+}
+
+fun String.toStatus(): LibraryStatus {
+    return when(this) {
+        "finished" -> LibraryStatus.FINISHED
+        "watching" -> LibraryStatus.WATCHING
+        "reading" -> LibraryStatus.READING
+        "paused" -> LibraryStatus.PAUSED
+        else -> LibraryStatus.PLANNING
     }
 }
 

@@ -16,7 +16,9 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
@@ -36,13 +38,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.randomanimegenerator.feature_generator.presentation.toTypeString
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LibraryScreen(
     state: LibraryState,
@@ -51,29 +54,27 @@ fun LibraryScreen(
     paddingValues: PaddingValues,
     modifier: Modifier = Modifier,
     onEvent: (LibraryEvent) -> Unit,
+    onSearchTextChanges: (String) -> Unit,
     onNavigateToDetailsScreen: (Int) -> Unit
 ) {
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = state.type.toTypeString(),
-                        style = MaterialTheme.typography.titleLarge
-                    )
-                },
-                actions = {
-                    IconButton(onClick = {  }) {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = "Search button"
-                        )
+            if (state.isSearching) {
+                SearchTopAppBar(
+                    searchText = state.searchText,
+                    onSearchTextChanges = onSearchTextChanges,
+                    onSearch = {
+                        onEvent(LibraryEvent.Search)
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp)
                 )
-            )
+            } else {
+                RegularTopAppBar(
+                    title = state.type.toTypeString(),
+                    onSearch = {
+                        onEvent(LibraryEvent.Search)
+                    }
+                )
+            }
         },
         modifier = modifier
             .padding(paddingValues)
@@ -206,6 +207,91 @@ private fun CustomStatusFilterChip(
             top = 1.dp,
             bottom = 1.dp,
             end = 2.dp
+        )
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun RegularTopAppBar(
+    title: String,
+    onSearch: () -> Unit
+) {
+    TopAppBar(
+        title = {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleLarge
+            )
+        },
+        actions = {
+            IconButton(onClick = onSearch) {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = "Search button"
+                )
+            }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp)
+        )
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SearchTopAppBar(
+    searchText: String,
+    onSearchTextChanges: (String) -> Unit,
+    onSearch: () -> Unit,
+) {
+    TopAppBar(
+        title = {
+            BasicTextField(
+                value = searchText,
+                onValueChange = {
+                    onSearchTextChanges(it)
+                },
+                enabled = true,
+                cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
+                textStyle = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.SemiBold),
+                decorationBox = { innerTextField ->
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 12.dp)
+                    ) {
+                        if (searchText.isBlank()) {
+                            Text(
+                                text = "Search...",
+                                fontWeight = FontWeight.Normal,
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                            )
+                        }
+                        innerTextField()
+                    }
+                }
+            )
+        },
+        navigationIcon = {
+            IconButton(onClick = onSearch) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = "Stop Searching"
+                )
+            }
+        },
+        actions = {
+            IconButton(onClick = onSearch) {
+                Icon(
+                    imageVector = Icons.Filled.Search,
+                    contentDescription = "Search button"
+                )
+            }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp)
         )
     )
 }

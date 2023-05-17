@@ -12,6 +12,7 @@ import com.example.randomanimegenerator.feature_details.data.mappers.toReview
 import com.example.randomanimegenerator.feature_details.data.mappers.toReviewsEntity
 import com.example.randomanimegenerator.feature_details.data.mappers.toStaff
 import com.example.randomanimegenerator.feature_details.data.mappers.toStaffEntity
+import com.example.randomanimegenerator.feature_details.data.mappers.toStatusString
 import com.example.randomanimegenerator.feature_details.data.remote.DetailsApi
 import com.example.randomanimegenerator.feature_details.domain.model.Character
 import com.example.randomanimegenerator.feature_details.domain.model.MainModel
@@ -21,6 +22,7 @@ import com.example.randomanimegenerator.feature_details.domain.model.Staff
 import com.example.randomanimegenerator.feature_details.domain.repository.DetailsRepository
 import com.example.randomanimegenerator.feature_generator.presentation.Type
 import com.example.randomanimegenerator.feature_generator.presentation.toTypeString
+import com.example.randomanimegenerator.feature_library.presentation.LibraryStatus
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
@@ -50,18 +52,24 @@ class DetailsRepositoryImpl(
                 null
             }
 
+            val libraryStatus = try {
+                dbInfo.libraryStatus
+            } catch (e: NullPointerException) {
+                LibraryStatus.PLANNING.toStatusString()
+            }
+
             try {
                 when (type) {
                     Type.ANIME -> {
                         val response = detailsApi.getAnime(id)
                         db.mainInfoDao.delete(id, type.toTypeString())
-                        db.mainInfoDao.insert(response.toMainInfoEntity(type, isFavorite, libraryId))
+                        db.mainInfoDao.insert(response.toMainInfoEntity(type, isFavorite, libraryId, libraryStatus))
                     }
 
                     Type.MANGA -> {
                         val response = detailsApi.getManga(id)
                         db.mainInfoDao.delete(id, type.toTypeString())
-                        db.mainInfoDao.insert(response.toMainInfoEntity(type, isFavorite, libraryId))
+                        db.mainInfoDao.insert(response.toMainInfoEntity(type, isFavorite, libraryId, libraryStatus))
                     }
                 }
             } catch (e: IOException) {

@@ -8,6 +8,7 @@ import com.example.randomanimegenerator.feature_details.data.mappers.toStatusStr
 import com.example.randomanimegenerator.feature_details.domain.repository.DetailsRepository
 import com.example.randomanimegenerator.feature_details.domain.use_cases.DetailsUseCases
 import com.example.randomanimegenerator.feature_generator.presentation.toType
+import com.example.randomanimegenerator.feature_library.presentation.LibraryStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
@@ -73,7 +74,8 @@ class DetailsViewModel @Inject constructor(
                                 description = result.data?.synopsis ?: "",
                                 additionalInfo = result.data?.statusList ?: emptyList(),
                                 isLoading = false,
-                                isFavorite = result.data?.isFavorite ?: false
+                                isFavorite = result.data?.isFavorite ?: false,
+                                libraryStatus = result.data?.libraryStatus ?: LibraryStatus.PLANNING
                             )
                         }
                         _channel.send(UiEvent.ShowSnackBar(message = result.message ?: "Error"))
@@ -90,7 +92,8 @@ class DetailsViewModel @Inject constructor(
                                 studios = result.data?.studios ?: "",
                                 additionalInfo = result.data?.statusList ?: emptyList(),
                                 isLoading = true,
-                                isFavorite = result.data?.isFavorite ?: false
+                                isFavorite = result.data?.isFavorite ?: false,
+                                libraryStatus = result.data?.libraryStatus ?: LibraryStatus.PLANNING
                             )
                         }
                     }
@@ -106,7 +109,8 @@ class DetailsViewModel @Inject constructor(
                                 studios = result.data?.studios ?: "",
                                 additionalInfo = result.data?.statusList ?: emptyList(),
                                 isLoading = false,
-                                isFavorite = result.data?.isFavorite ?: false
+                                isFavorite = result.data?.isFavorite ?: false,
+                                libraryStatus = result.data?.libraryStatus ?: LibraryStatus.PLANNING
                             )
                         }
                     }

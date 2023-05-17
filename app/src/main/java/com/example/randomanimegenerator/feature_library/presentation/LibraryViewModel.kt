@@ -10,6 +10,7 @@ import com.example.randomanimegenerator.feature_library.domain.model.LibraryFilt
 import com.example.randomanimegenerator.feature_library.domain.repository.LibraryRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -29,6 +30,9 @@ class LibraryViewModel @Inject constructor(
 
     val type = savedStateHandle.get<String>("type")
 
+    private val _searchText = MutableStateFlow("")
+    private val _isSearching = MutableStateFlow(false)
+
     private val _libraryContent = _libraryFilter.flatMapLatest { filter ->
         when(filter.libraryStatus) {
             LibraryStatus.ALL -> repository.getAll(type!!, filter.librarySortType)
@@ -36,14 +40,28 @@ class LibraryViewModel @Inject constructor(
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
+    private val _filteredContent = _searchText
+        .combine(_libraryContent) { queryText, content ->
+            if (queryText.isBlank()) {
+                content
+            } else {
+                delay(2000)
+                content.filter {
+                    it.title.contains(queryText, ignoreCase = true)
+                }
+            }
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), _libraryContent.value)
 
     private val _state = MutableStateFlow(LibraryState())
-    val state = combine(_libraryFilter, _libraryContent, _state) { filter, content, state ->
+    val state = combine(_libraryFilter, _filteredContent, _state, _isSearching, _searchText) { filter, content, state, isSearching, text ->
         state.copy(
             content = content.map { it.toLibraryModel() },
             type = type!!.toType(),
             libraryStatus = filter.libraryStatus,
-            librarySortType = filter.librarySortType
+            librarySortType = filter.librarySortType,
+            isSearching = isSearching,
+            searchText = text
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), LibraryState())
 
@@ -63,7 +81,14 @@ class LibraryViewModel @Inject constructor(
                     )
                 }
             }
+            LibraryEvent.Search -> {
+                _isSearching.update { !it }
+                _searchText.update { "" }
+            }
         }
     }
 
+    fun onSearchTextChanges(text: String) {
+        _searchText.update { text }
+    }
 }

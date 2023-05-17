@@ -1,5 +1,7 @@
 package com.example.randomanimegenerator.feature_details.domain.model
 
+import com.example.randomanimegenerator.feature_library.presentation.LibraryStatus
+
 data class MainModel(
     // manga only
     val authors: String,
@@ -20,7 +22,8 @@ data class MainModel(
     val themes: String,
     val demographic: String,
     val isLoading: Boolean,
-    val isFavorite: Boolean
+    val isFavorite: Boolean,
+    val libraryStatus: LibraryStatus
 ) {
 
     private val animeStatusList = listOf(
