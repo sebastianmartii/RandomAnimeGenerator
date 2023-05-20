@@ -2,6 +2,7 @@ package com.example.randomanimegenerator.feature_details.presentation
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -22,7 +24,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -63,6 +64,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Popup
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.randomanimegenerator.core.constants.animeDetailsStatus
@@ -86,13 +88,11 @@ fun DetailsScreen(
     state: DetailsState,
     snackBarFlow: Flow<DetailsViewModel.UiEvent>,
     navController: NavController,
+    scrollState: ScrollState,
+    snackBarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
     onEvent: (DetailsEvent) -> Unit,
 ) {
-    val scrollState = rememberScrollState()
-    val snackBarHostState = remember {
-        SnackbarHostState()
-    }
     LaunchedEffect(key1 = true) {
         snackBarFlow.collectLatest { event ->
             when(event) {
@@ -164,11 +164,18 @@ fun DetailsScreen(
                 title = state.title,
                 description = state.description,
                 isFavorite = state.isFavorite,
+                synopsisExpanded = state.synopsisExpanded,
                 authors = if (state.type == Type.ANIME) state.studios else state.authors,
                 statusList = if (state.type == Type.ANIME) animeDetailsStatus else mangaDetailStatus,
                 currentStatus = state.libraryStatus,
                 onStatusSelect = {
                     onEvent(DetailsEvent.SelectStatus(it))
+                },
+                onPopUpImage = {
+                    onEvent(DetailsEvent.PopUpImage)
+                },
+                onSynopsisExpand = {
+                    onEvent(DetailsEvent.ExpandSynopsis)
                 }
             )
             CharactersSection(
@@ -215,6 +222,20 @@ fun DetailsScreen(
     if (scrollState.isScrollInProgress && state.getStaff && state.type == Type.ANIME) {
         onEvent(DetailsEvent.GenerateStaff)
     }
+    if (state.showPopUp) {
+        Popup(
+            alignment = Alignment.Center,
+            onDismissRequest = {
+                onEvent(DetailsEvent.PopUpImage)
+            }
+        ) {
+            AsyncImage(
+                model = state.largeImageUrl.ifBlank { state.imageUrl },
+                contentDescription = "PopUp Image",
+                modifier = Modifier.fillMaxHeight(0.6f)
+            )
+        }
+    }
 }
 
 
@@ -227,12 +248,12 @@ private fun MainInfoSection(
     statusList: List<LibraryStatus>,
     currentStatus: LibraryStatus,
     isFavorite: Boolean,
+    synopsisExpanded: Boolean,
     onStatusSelect: (LibraryStatus) -> Unit,
+    onPopUpImage: () -> Unit,
+    onSynopsisExpand: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var synopsisExpanded by remember {
-        mutableStateOf(false)
-    }
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -257,6 +278,9 @@ private fun MainInfoSection(
                         .height(180.dp)
                         .aspectRatio(2f / 3f)
                         .padding(end = 8.dp)
+                        .clickable {
+                            onPopUpImage()
+                        }
                 )
                 Column(
                     modifier = Modifier
@@ -287,7 +311,7 @@ private fun MainInfoSection(
                                 .padding(8.dp)
                         )
                         Icon(
-                            imageVector = if (synopsisExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                            imageVector = Icons.Default.ExpandMore,
                             contentDescription = "expand for more synopsis info",
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -301,7 +325,7 @@ private fun MainInfoSection(
                                     )
                                 )
                                 .clickable {
-                                    synopsisExpanded = !synopsisExpanded
+                                    onSynopsisExpand()
                                 }
                         )
                     }
@@ -325,12 +349,12 @@ private fun MainInfoSection(
                             .padding(8.dp)
                     )
                     Icon(
-                        imageVector = if (synopsisExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                        imageVector =  Icons.Default.ExpandLess,
                         contentDescription = "expand for more synopsis info",
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
-                                synopsisExpanded = !synopsisExpanded
+                                onSynopsisExpand()
                             }
                         )
                     }

@@ -10,7 +10,6 @@ import com.example.randomanimegenerator.feature_library.domain.model.LibraryFilt
 import com.example.randomanimegenerator.feature_library.domain.repository.LibraryRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -45,7 +44,6 @@ class LibraryViewModel @Inject constructor(
             if (queryText.isBlank()) {
                 content
             } else {
-                delay(2000)
                 content.filter {
                     it.title.contains(queryText, ignoreCase = true)
                 }
@@ -83,6 +81,9 @@ class LibraryViewModel @Inject constructor(
             }
             LibraryEvent.Search -> {
                 _isSearching.update { !it }
+                _searchText.update { "" }
+            }
+            LibraryEvent.ClearTextField -> {
                 _searchText.update { "" }
             }
         }

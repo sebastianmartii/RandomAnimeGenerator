@@ -14,6 +14,7 @@ data class MainModel(
     val malId: Int,
     val title: String,
     val imageUrl: String,
+    val largeImageUrl: String,
     val synopsis: String,
     val type: String,
     val status: String,

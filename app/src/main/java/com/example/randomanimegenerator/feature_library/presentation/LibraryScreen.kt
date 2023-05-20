@@ -16,9 +16,9 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
@@ -28,19 +28,23 @@ import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
@@ -54,6 +58,7 @@ fun LibraryScreen(
     paddingValues: PaddingValues,
     modifier: Modifier = Modifier,
     onEvent: (LibraryEvent) -> Unit,
+    focusRequester: FocusRequester,
     onSearchTextChanges: (String) -> Unit,
     onNavigateToDetailsScreen: (Int) -> Unit
 ) {
@@ -65,7 +70,11 @@ fun LibraryScreen(
                     onSearchTextChanges = onSearchTextChanges,
                     onSearch = {
                         onEvent(LibraryEvent.Search)
-                    }
+                    },
+                    onClearTextField = {
+                        onEvent(LibraryEvent.ClearTextField)
+                    },
+                    focusRequester = focusRequester
                 )
             } else {
                 RegularTopAppBar(
@@ -244,34 +253,44 @@ private fun SearchTopAppBar(
     searchText: String,
     onSearchTextChanges: (String) -> Unit,
     onSearch: () -> Unit,
+    onClearTextField: () -> Unit,
+    focusRequester: FocusRequester
 ) {
+    LaunchedEffect(key1 = Unit) {
+        focusRequester.requestFocus()
+    }
     TopAppBar(
         title = {
-            BasicTextField(
+            OutlinedTextField(
                 value = searchText,
                 onValueChange = {
                     onSearchTextChanges(it)
                 },
-                enabled = true,
-                cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
-                textStyle = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.SemiBold),
-                decorationBox = { innerTextField ->
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 12.dp)
-                    ) {
-                        if (searchText.isBlank()) {
-                            Text(
-                                text = "Search...",
-                                fontWeight = FontWeight.Normal,
-                                style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                            )
-                        }
-                        innerTextField()
+                textStyle = MaterialTheme.typography.titleMedium,
+                placeholder = {
+                    Text(
+                        text = "Search...",
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.alpha(0.7f)
+                    )
+                },
+                trailingIcon = {
+                    IconButton(onClick = onClearTextField) {
+                        Icon(
+                            imageVector = Icons.Default.Cancel,
+                            contentDescription = "Clear Text Field"
+                        )
                     }
-                }
+                },
+                shape = MaterialTheme.shapes.large,
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedContainerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),
+                    disabledBorderColor = Color.Transparent,
+                    errorBorderColor = Color.Transparent,
+                    focusedBorderColor = Color.Transparent,
+                    unfocusedBorderColor = Color.Transparent
+                ),
+                modifier = Modifier.focusRequester(focusRequester)
             )
         },
         navigationIcon = {

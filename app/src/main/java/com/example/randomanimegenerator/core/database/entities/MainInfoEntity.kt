@@ -10,6 +10,7 @@ data class MainInfoEntity(
     @ColumnInfo("mal_id") val malId: Int,
     val title: String,
     @ColumnInfo("image_url") val imageUrl: String,
+    @ColumnInfo("large_image_url") val largeImageUrl: String,
     val synopsis: String,
     val type: String,
     val status: String,

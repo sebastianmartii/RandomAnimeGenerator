@@ -69,6 +69,7 @@ class DetailsViewModel @Inject constructor(
                                 title = result.data?.title ?: "",
                                 malId = result.data?.malId ?: 0,
                                 imageUrl = result.data?.imageUrl ?: "",
+                                largeImageUrl = result.data?.largeImageUrl ?: "",
                                 authors = result.data?.authors ?: "",
                                 studios = result.data?.studios ?: "",
                                 description = result.data?.synopsis ?: "",
@@ -87,6 +88,7 @@ class DetailsViewModel @Inject constructor(
                                 title = result.data?.title ?: "",
                                 malId = result.data?.malId ?: 0,
                                 imageUrl = result.data?.imageUrl ?: "",
+                                largeImageUrl = result.data?.largeImageUrl ?: "",
                                 description = result.data?.synopsis ?: "",
                                 authors = result.data?.authors ?: "",
                                 studios = result.data?.studios ?: "",
@@ -104,6 +106,7 @@ class DetailsViewModel @Inject constructor(
                                 title = result.data?.title ?: "",
                                 malId = result.data?.malId ?: 0,
                                 imageUrl = result.data?.imageUrl ?: "",
+                                largeImageUrl = result.data?.largeImageUrl ?: "",
                                 description = result.data?.synopsis ?: "",
                                 authors = result.data?.authors ?: "",
                                 studios = result.data?.studios ?: "",
@@ -320,6 +323,20 @@ class DetailsViewModel @Inject constructor(
             is DetailsEvent.NavigateToRecommendation -> {
                 viewModelScope.launch {
                     _channel.send(UiEvent.NavigateToDestination("${event.destination}/${event.malId}/$type"))
+                }
+            }
+            DetailsEvent.PopUpImage -> {
+                _state.update {
+                    it.copy(
+                        showPopUp = !_state.value.showPopUp
+                    )
+                }
+            }
+            DetailsEvent.ExpandSynopsis -> {
+                _state.update {
+                    it.copy(
+                        synopsisExpanded = !_state.value.synopsisExpanded
+                    )
                 }
             }
         }

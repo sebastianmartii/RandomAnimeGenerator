@@ -2,6 +2,8 @@ package com.example.randomanimegenerator.core.navigation
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.focus.FocusRequester
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
@@ -47,6 +49,9 @@ fun NavGraphBuilder.bottomNavGraph(
                 navArgument(name = "type") { type = NavType.StringType}
             )
         ) {
+            val focusRequester = remember {
+                FocusRequester()
+            }
             val viewModel = hiltViewModel<LibraryViewModel>()
             val state by viewModel.state.collectAsStateWithLifecycle(initialValue = LibraryState())
             LibraryScreen(
@@ -56,6 +61,7 @@ fun NavGraphBuilder.bottomNavGraph(
                 sortList = librarySortType,
                 onEvent = viewModel::onEvent,
                 onSearchTextChanges = viewModel::onSearchTextChanges,
+                focusRequester = focusRequester,
                 onNavigateToDetailsScreen = {
                     navController.navigate("details/$it/${viewModel.type}")
                 }
@@ -67,6 +73,9 @@ fun NavGraphBuilder.bottomNavGraph(
                 navArgument(name = "type") { type = NavType.StringType}
             )
         ) {
+            val focusRequester = remember {
+                FocusRequester()
+            }
             val viewModel = hiltViewModel<LibraryViewModel>()
             val state by viewModel.state.collectAsStateWithLifecycle(initialValue = LibraryState())
             LibraryScreen(
@@ -76,6 +85,7 @@ fun NavGraphBuilder.bottomNavGraph(
                 sortList = librarySortType,
                 onEvent = viewModel::onEvent,
                 onSearchTextChanges = viewModel::onSearchTextChanges,
+                focusRequester = focusRequester,
                 onNavigateToDetailsScreen = {
                     navController.navigate("details/$it/${viewModel.type}")
                 }

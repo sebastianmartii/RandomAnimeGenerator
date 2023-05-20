@@ -11,4 +11,6 @@ sealed interface DetailsEvent {
     data class NavigateToSingleReview(val destination: String, val author: String, val score: Int, val review: String) : DetailsEvent
     data class NavigateToRecommendation(val destination: String, val malId: Int) : DetailsEvent
     object NavigateBack : DetailsEvent
+    object PopUpImage : DetailsEvent
+    object ExpandSynopsis : DetailsEvent
 }

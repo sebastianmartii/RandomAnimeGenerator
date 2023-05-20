@@ -1,7 +1,10 @@
 package com.example.randomanimegenerator.core.navigation
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
@@ -38,6 +41,10 @@ fun NavGraphBuilder.detailsNavGraph(
                 navArgument(name = "type") { type = NavType.StringType }
             )
         ) {
+            val scrollState = rememberScrollState()
+            val snackBarHostState = remember {
+                SnackbarHostState()
+            }
             val viewModel = hiltViewModel<DetailsViewModel>()
             val state by viewModel.state.collectAsStateWithLifecycle(DetailsState())
             DetailsScreen(
@@ -46,6 +53,8 @@ fun NavGraphBuilder.detailsNavGraph(
                 snackBarFlow = viewModel.eventFlow,
                 navController = navController,
                 onEvent = viewModel::onEvent,
+                scrollState = scrollState,
+                snackBarHostState = snackBarHostState,
             )
         }
         composable(

@@ -4,4 +4,5 @@ sealed interface LibraryEvent {
     data class ChangeStatus(val status: LibraryStatus) : LibraryEvent
     data class ChangeSortType(val sortType: LibrarySortType) : LibraryEvent
     object Search : LibraryEvent
+    object ClearTextField : LibraryEvent
 }

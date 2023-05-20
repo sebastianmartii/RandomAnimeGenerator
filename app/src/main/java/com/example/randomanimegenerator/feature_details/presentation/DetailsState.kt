@@ -10,6 +10,7 @@ import com.example.randomanimegenerator.feature_library.presentation.LibraryStat
 
 data class DetailsState(
     val imageUrl: String = "",
+    val largeImageUrl: String = "",
     val malId: Int = 0,
     val title: String = "",
     val description: String = "",
@@ -25,6 +26,8 @@ data class DetailsState(
     val getRecommendations: Boolean = true,
     val getStaff: Boolean = true,
     val type: Type = Type.ANIME,
-    val libraryStatus: LibraryStatus = LibraryStatus.PLANNING
+    val libraryStatus: LibraryStatus = LibraryStatus.PLANNING,
+    val showPopUp: Boolean = false,
+    val synopsisExpanded: Boolean = false
 )
 
