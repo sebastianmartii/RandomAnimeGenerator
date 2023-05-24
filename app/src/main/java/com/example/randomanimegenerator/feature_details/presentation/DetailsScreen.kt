@@ -364,9 +364,11 @@ private fun MainInfoSection(
     AnimatedVisibility(visible = isFavorite) {
         Row(
             modifier = Modifier
+                .fillMaxWidth()
                 .padding(horizontal = 4.dp)
                 .height(IntrinsicSize.Min),
-            verticalAlignment = Alignment.Top
+            verticalAlignment = Alignment.Top,
+            horizontalArrangement = Arrangement.Start
         ) {
             statusList.onEach { status ->
                 CustomFilterChip(
@@ -552,8 +554,8 @@ private fun StaffSection(
         FlowRow(
             modifier = Modifier
                 .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start,
+            verticalArrangement = Arrangement.Center,
             maxItemsInEachRow = 2
         ) {
             staff.onEach { staffMember ->

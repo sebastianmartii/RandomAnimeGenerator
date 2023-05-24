@@ -7,7 +7,8 @@ import com.example.randomanimegenerator.feature_details.data.mappers.toStatusStr
 import com.example.randomanimegenerator.feature_generator.presentation.toType
 import com.example.randomanimegenerator.feature_library.data.mappers.toLibraryModel
 import com.example.randomanimegenerator.feature_library.domain.model.LibraryFilter
-import com.example.randomanimegenerator.feature_library.domain.repository.LibraryRepository
+import com.example.randomanimegenerator.feature_library.domain.use_case.GetAllByStatusUseCase
+import com.example.randomanimegenerator.feature_library.domain.use_case.GetAllUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +22,8 @@ import javax.inject.Inject
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class LibraryViewModel @Inject constructor(
-    private val repository: LibraryRepository,
+    private val getAllUseCase: GetAllUseCase,
+    private val getAllByStatusUseCase: GetAllByStatusUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -34,8 +36,8 @@ class LibraryViewModel @Inject constructor(
 
     private val _libraryContent = _libraryFilter.flatMapLatest { filter ->
         when(filter.libraryStatus) {
-            LibraryStatus.ALL -> repository.getAll(type!!, filter.librarySortType)
-            else -> repository.getAllByStatus(type!!, filter.libraryStatus.toStatusString(), filter.librarySortType)
+            LibraryStatus.ALL -> getAllUseCase(type!!, filter.librarySortType)
+            else -> getAllByStatusUseCase(type!!, filter.libraryStatus.toStatusString(), filter.librarySortType)
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 

@@ -15,7 +15,8 @@ import com.example.randomanimegenerator.core.database.entities.StaffEntity
 
 @Database(
     entities = [MainInfoEntity::class, CharacterEntity::class, RecommendationEntity::class, ReviewEntity::class, StaffEntity::class],
-    version = 1
+    version = 1,
+    exportSchema = false
 )
 abstract class RandomAnimeGeneratorDb : RoomDatabase() {
 

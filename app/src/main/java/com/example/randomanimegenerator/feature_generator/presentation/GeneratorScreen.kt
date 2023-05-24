@@ -1,7 +1,6 @@
 package com.example.randomanimegenerator.feature_generator.presentation
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -21,7 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
-@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GeneratorScreen(
     paddingValues: PaddingValues,
@@ -48,7 +47,7 @@ fun GeneratorScreen(
                         IconButton(
                             onClick = { onEvent(GeneratorEvent.EditGeneratorParams) },
                             modifier = Modifier
-                                .tooltipAnchor()
+                                .tooltipTrigger()
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Edit,
@@ -63,7 +62,8 @@ fun GeneratorScreen(
                     ){
                         IconButton(
                             onClick = { onEvent(GeneratorEvent.Generate(state)) },
-                            modifier = Modifier.tooltipAnchor()
+                            modifier = Modifier
+                                .tooltipTrigger()
                         ) {
                             Icon(
                                 imageVector = Icons.Default.PlayArrow,

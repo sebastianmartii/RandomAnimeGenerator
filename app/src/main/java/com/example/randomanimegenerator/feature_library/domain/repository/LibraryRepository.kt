@@ -1,12 +1,16 @@
 package com.example.randomanimegenerator.feature_library.domain.repository
 
 import com.example.randomanimegenerator.core.database.entities.MainInfoEntity
-import com.example.randomanimegenerator.feature_library.presentation.LibrarySortType
 import kotlinx.coroutines.flow.Flow
 
 interface LibraryRepository {
 
-    fun getAll(type: String, sortType: LibrarySortType): Flow<List<MainInfoEntity>>
-
-    fun getAllByStatus(type: String, libraryStatus: String, sortType: LibrarySortType): Flow<List<MainInfoEntity>>
+    fun getAllAZ(type: String): Flow<List<MainInfoEntity>>
+    fun getAllZA(type: String): Flow<List<MainInfoEntity>>
+    fun getAllNewest(type: String): Flow<List<MainInfoEntity>>
+    fun getAllOldest(type: String): Flow<List<MainInfoEntity>>
+    fun getAllByStatusAZ(type: String, status: String): Flow<List<MainInfoEntity>>
+    fun getAllByStatusZA(type: String, status: String): Flow<List<MainInfoEntity>>
+    fun getAllByStatusNewest(type: String, status: String): Flow<List<MainInfoEntity>>
+    fun getAllByStatusOldest(type: String, status: String): Flow<List<MainInfoEntity>>
 }
