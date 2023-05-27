@@ -59,7 +59,6 @@ fun LibraryScreen(
     modifier: Modifier = Modifier,
     onEvent: (LibraryEvent) -> Unit,
     focusRequester: FocusRequester,
-    onSearchTextChanges: (String) -> Unit,
     onNavigateToDetailsScreen: (Int) -> Unit
 ) {
     Scaffold(
@@ -67,7 +66,9 @@ fun LibraryScreen(
             if (state.isSearching) {
                 SearchTopAppBar(
                     searchText = state.searchText,
-                    onSearchTextChanges = onSearchTextChanges,
+                    onSearchTextChanges = {
+                        onEvent(LibraryEvent.ChangeSearchText(it))
+                    },
                     onSearch = {
                         onEvent(LibraryEvent.Search)
                     },

@@ -88,10 +88,9 @@ class LibraryViewModel @Inject constructor(
             LibraryEvent.ClearTextField -> {
                 _searchText.update { "" }
             }
+            is LibraryEvent.ChangeSearchText -> {
+                _searchText.update { event.query }
+            }
         }
-    }
-
-    fun onSearchTextChanges(text: String) {
-        _searchText.update { text }
     }
 }

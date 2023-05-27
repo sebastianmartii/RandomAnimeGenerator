@@ -60,7 +60,6 @@ fun NavGraphBuilder.bottomNavGraph(
                 statusList = animeStatusList,
                 sortList = librarySortType,
                 onEvent = viewModel::onEvent,
-                onSearchTextChanges = viewModel::onSearchTextChanges,
                 focusRequester = focusRequester,
                 onNavigateToDetailsScreen = {
                     navController.navigate("details/$it/${viewModel.type}")
@@ -84,7 +83,6 @@ fun NavGraphBuilder.bottomNavGraph(
                 statusList = mangaStatusList,
                 sortList = librarySortType,
                 onEvent = viewModel::onEvent,
-                onSearchTextChanges = viewModel::onSearchTextChanges,
                 focusRequester = focusRequester,
                 onNavigateToDetailsScreen = {
                     navController.navigate("details/$it/${viewModel.type}")
