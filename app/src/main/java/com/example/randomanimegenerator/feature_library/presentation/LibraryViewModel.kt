@@ -13,6 +13,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
@@ -28,11 +29,14 @@ class LibraryViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _libraryFilter = MutableStateFlow(LibraryFilter())
+    val libraryFilter = _libraryFilter.asStateFlow()
 
     val type = savedStateHandle.get<String>("type")
 
     private val _searchText = MutableStateFlow("")
+    val searchText = _searchText.asStateFlow()
     private val _isSearching = MutableStateFlow(false)
+    val isSearching = _isSearching.asStateFlow()
 
     private val _libraryContent = _libraryFilter.flatMapLatest { filter ->
         when(filter.libraryStatus) {

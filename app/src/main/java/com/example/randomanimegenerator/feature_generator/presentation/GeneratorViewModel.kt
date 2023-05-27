@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -23,9 +24,11 @@ class GeneratorViewModel @Inject constructor(
     fun onEvent(event: GeneratorEvent) {
         when(event) {
             is GeneratorEvent.EditGeneratorParams -> {
-                _state.value = state.value.copy(
-                    editGeneratingParams = true
-                )
+                _state.update {
+                    it.copy(
+                        editGeneratingParams = true
+                    )
+                }
             }
             is GeneratorEvent.Generate -> {
                 viewModelScope.launch {
@@ -69,19 +72,25 @@ class GeneratorViewModel @Inject constructor(
                 }
             }
             is GeneratorEvent.SetAmount -> {
-                _state.value = state.value.copy(
-                    amountSelected = event.amount
-                )
+                _state.update {
+                    it.copy(
+                        amountSelected = event.amount
+                    )
+                }
             }
             is GeneratorEvent.SetScore -> {
-                _state.value = state.value.copy(
-                    scoreSelected = event.score
-                )
+                _state.update {
+                    it.copy(
+                        scoreSelected = event.score
+                    )
+                }
             }
             is GeneratorEvent.SetType -> {
-                _state.value = state.value.copy(
-                    typeSelected = event.type
-                )
+                _state.update {
+                    it.copy(
+                        typeSelected = event.type
+                    )
+                }
             }
         }
     }
