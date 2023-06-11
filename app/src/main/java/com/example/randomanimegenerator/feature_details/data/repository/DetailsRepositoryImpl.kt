@@ -62,19 +62,39 @@ class DetailsRepositoryImpl(
                 when (type) {
                     Type.ANIME -> {
                         val response = detailsApi.getAnime(id)
-                        db.mainInfoDao.delete(id, type.toTypeString())
-                        db.mainInfoDao.insert(response.toMainInfoEntity(type, isFavorite, libraryId, libraryStatus))
+                        if (response.isSuccessful) {
+                            db.mainInfoDao.delete(id, type.toTypeString())
+                            db.mainInfoDao.insert(
+                                response.body()!!.toMainInfoEntity(
+                                    type,
+                                    isFavorite,
+                                    libraryId,
+                                    libraryStatus
+                                )
+                            )
+                        }
                     }
 
                     Type.MANGA -> {
                         val response = detailsApi.getManga(id)
-                        db.mainInfoDao.delete(id, type.toTypeString())
-                        db.mainInfoDao.insert(response.toMainInfoEntity(type, isFavorite, libraryId, libraryStatus))
+                        if (response.isSuccessful) {
+                            db.mainInfoDao.delete(id, type.toTypeString())
+                            db.mainInfoDao.insert(
+                                response.body()!!.toMainInfoEntity(
+                                    type,
+                                    isFavorite,
+                                    libraryId,
+                                    libraryStatus
+                                )
+                            )
+                        }
                     }
                 }
             } catch (e: IOException) {
                 emit(Resource.Error(message = "$e"))
             } catch (e: HttpException) {
+                emit(Resource.Error(message = "$e"))
+            } catch (e: NullPointerException) {
                 emit(Resource.Error(message = "$e"))
             }
 
@@ -93,11 +113,15 @@ class DetailsRepositoryImpl(
                 Type.ANIME -> detailsApi.getAnimeReviews(id)
                 Type.MANGA -> detailsApi.getMangaReviews(id)
             }
-            db.reviewDao.deleteReviews(id, type.toTypeString())
-            db.reviewDao.upsertReviews(response.toReviewsEntity(id, type))
+            if (response.isSuccessful) {
+                db.reviewDao.deleteReviews(id, type.toTypeString())
+                db.reviewDao.upsertReviews(response.body()!!.toReviewsEntity(id, type))
+            }
         } catch (e: IOException) {
             emit(Resource.Error(message = "$e"))
         } catch (e: HttpException) {
+            emit(Resource.Error(message = "$e"))
+        } catch (e: NullPointerException) {
             emit(Resource.Error(message = "$e"))
         }
 
@@ -117,16 +141,20 @@ class DetailsRepositoryImpl(
                     Type.ANIME -> detailsApi.getAnimeRecommendations(id)
                     Type.MANGA -> detailsApi.getMangaRecommendations(id)
                 }
-                db.recommendationDao.deleteRecommendations(id, type.toTypeString())
-                db.recommendationDao.upsertRecommendations(
-                    response.toRecommendationsEntity(
-                        id,
-                        type
+                if (response.isSuccessful) {
+                    db.recommendationDao.deleteRecommendations(id, type.toTypeString())
+                    db.recommendationDao.upsertRecommendations(
+                        response.body()!!.toRecommendationsEntity(
+                            id,
+                            type
+                        )
                     )
-                )
+                }
             } catch (e: IOException) {
                 emit(Resource.Error(message = "$e"))
             } catch (e: HttpException) {
+                emit(Resource.Error(message = "$e"))
+            } catch (e: NullPointerException) {
                 emit(Resource.Error(message = "$e"))
             }
 
@@ -145,19 +173,25 @@ class DetailsRepositoryImpl(
             when (type) {
                 Type.ANIME -> {
                     val response = detailsApi.getAnimeCharacters(id)
-                    db.characterDao.deleteCharacters(id, type.toTypeString())
-                    db.characterDao.upsertCharacters(response.toCharactersEntity(id, type))
+                    if (response.isSuccessful) {
+                        db.characterDao.deleteCharacters(id, type.toTypeString())
+                        db.characterDao.upsertCharacters(response.body()!!.toCharactersEntity(id, type))
+                    }
                 }
 
                 Type.MANGA -> {
                     val response = detailsApi.getMangaCharacters(id)
-                    db.characterDao.deleteCharacters(id, type.toTypeString())
-                    db.characterDao.upsertCharacters(response.toCharactersEntity(id, type))
+                    if (response.isSuccessful) {
+                        db.characterDao.deleteCharacters(id, type.toTypeString())
+                        db.characterDao.upsertCharacters(response.body()!!.toCharactersEntity(id, type))
+                    }
                 }
             }
         } catch (e: IOException) {
             emit(Resource.Error(message = "$e"))
         } catch (e: HttpException) {
+            emit(Resource.Error(message = "$e"))
+        } catch (e: NullPointerException) {
             emit(Resource.Error(message = "$e"))
         }
 
@@ -174,11 +208,15 @@ class DetailsRepositoryImpl(
 
         try {
             val response = detailsApi.getAnimeStaff(id)
-            db.staffDao.deleteStaff(id)
-            db.staffDao.upsertStaff(response.toStaffEntity(id))
+            if (response.isSuccessful) {
+                db.staffDao.deleteStaff(id)
+                db.staffDao.upsertStaff(response.body()!!.toStaffEntity(id))
+            }
         } catch (e: IOException) {
             emit(Resource.Error(message = "$e"))
         } catch (e: HttpException) {
+            emit(Resource.Error(message = "$e"))
+        } catch (e: NullPointerException) {
             emit(Resource.Error(message = "$e"))
         }
 

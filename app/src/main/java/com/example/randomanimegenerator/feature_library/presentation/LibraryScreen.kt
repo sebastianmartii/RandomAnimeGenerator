@@ -51,7 +51,7 @@ import coil.compose.AsyncImage
 import com.example.randomanimegenerator.feature_generator.presentation.toTypeString
 
 @Composable
-fun LibraryScreen(
+fun AnimeLibraryScreen(
     state: LibraryState,
     statusList: List<LibraryStatus>,
     sortList: List<LibrarySortType>,
@@ -59,7 +59,53 @@ fun LibraryScreen(
     modifier: Modifier = Modifier,
     onEvent: (LibraryEvent) -> Unit,
     focusRequester: FocusRequester,
-    onNavigateToDetailsScreen: (Int) -> Unit
+    onNavigateToDetailsScreen: (id: Int, type: String) -> Unit
+) {
+    LibraryScreen(
+        state = state,
+        statusList = statusList,
+        sortList = sortList,
+        paddingValues = paddingValues,
+        onEvent = onEvent,
+        focusRequester = focusRequester,
+        onNavigateToDetailsScreen = onNavigateToDetailsScreen,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun MangaLibraryScreen(
+    state: LibraryState,
+    statusList: List<LibraryStatus>,
+    sortList: List<LibrarySortType>,
+    paddingValues: PaddingValues,
+    modifier: Modifier = Modifier,
+    onEvent: (LibraryEvent) -> Unit,
+    focusRequester: FocusRequester,
+    onNavigateToDetailsScreen: (id: Int, type: String) -> Unit
+) {
+    LibraryScreen(
+        state = state,
+        statusList = statusList,
+        sortList = sortList,
+        paddingValues = paddingValues,
+        onEvent = onEvent,
+        focusRequester = focusRequester,
+        onNavigateToDetailsScreen = onNavigateToDetailsScreen,
+        modifier = modifier
+    )
+}
+
+@Composable
+private fun LibraryScreen(
+    state: LibraryState,
+    statusList: List<LibraryStatus>,
+    sortList: List<LibrarySortType>,
+    paddingValues: PaddingValues,
+    modifier: Modifier = Modifier,
+    onEvent: (LibraryEvent) -> Unit,
+    focusRequester: FocusRequester,
+    onNavigateToDetailsScreen: (id: Int, type: String) -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -126,7 +172,7 @@ fun LibraryScreen(
                     title = it.title,
                     imageUrl = it.imageUrl,
                     modifier = Modifier.clickable {
-                        onNavigateToDetailsScreen(it.malId)
+                        onNavigateToDetailsScreen(it.malId, state.type.toTypeString())
                     }
                 )
             }
@@ -157,7 +203,7 @@ private fun LibraryCard(
                 model = imageUrl,
                 contentDescription = title,
                 modifier = Modifier
-                    .height(160.dp)
+                    .height(190.dp)
                     .align(Alignment.TopCenter),
                 contentScale = ContentScale.FillBounds
             )

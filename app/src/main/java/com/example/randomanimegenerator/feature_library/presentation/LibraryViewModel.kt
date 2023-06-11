@@ -1,10 +1,10 @@
 package com.example.randomanimegenerator.feature_library.presentation
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.randomanimegenerator.feature_details.data.mappers.toStatusString
-import com.example.randomanimegenerator.feature_generator.presentation.toType
+import com.example.randomanimegenerator.feature_generator.presentation.Type
+import com.example.randomanimegenerator.feature_generator.presentation.toTypeString
 import com.example.randomanimegenerator.feature_library.data.mappers.toLibraryModel
 import com.example.randomanimegenerator.feature_library.domain.model.LibraryFilter
 import com.example.randomanimegenerator.feature_library.domain.use_case.GetAllByStatusUseCase
@@ -25,13 +25,12 @@ import javax.inject.Inject
 class LibraryViewModel @Inject constructor(
     private val getAllUseCase: GetAllUseCase,
     private val getAllByStatusUseCase: GetAllByStatusUseCase,
-    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val _libraryFilter = MutableStateFlow(LibraryFilter())
     val libraryFilter = _libraryFilter.asStateFlow()
 
-    val type = savedStateHandle.get<String>("type")
+    val type = MutableStateFlow(Type.ANIME)
 
     private val _searchText = MutableStateFlow("")
     val searchText = _searchText.asStateFlow()
@@ -40,8 +39,8 @@ class LibraryViewModel @Inject constructor(
 
     private val _libraryContent = _libraryFilter.flatMapLatest { filter ->
         when(filter.libraryStatus) {
-            LibraryStatus.ALL -> getAllUseCase(type!!, filter.librarySortType)
-            else -> getAllByStatusUseCase(type!!, filter.libraryStatus.toStatusString(), filter.librarySortType)
+            LibraryStatus.ALL -> getAllUseCase(type.value.toTypeString(), filter.librarySortType)
+            else -> getAllByStatusUseCase(type.value.toTypeString(), filter.libraryStatus.toStatusString(), filter.librarySortType)
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
@@ -61,7 +60,7 @@ class LibraryViewModel @Inject constructor(
     val state = combine(_libraryFilter, _filteredContent, _state, _isSearching, _searchText) { filter, content, state, isSearching, text ->
         state.copy(
             content = content.map { it.toLibraryModel() },
-            type = type!!.toType(),
+            type = type.value,
             libraryStatus = filter.libraryStatus,
             librarySortType = filter.librarySortType,
             isSearching = isSearching,
@@ -94,6 +93,9 @@ class LibraryViewModel @Inject constructor(
             }
             is LibraryEvent.ChangeSearchText -> {
                 _searchText.update { event.query }
+            }
+            is LibraryEvent.SetType -> {
+                type.value = event.type
             }
         }
     }

@@ -31,8 +31,8 @@ fun RecommendationCard(
 ) {
     Card(
         modifier = modifier
-            .height(120.dp)
-            .width(90.dp)
+            .height(150.dp)
+            .width(110.dp)
             .padding(4.dp)
             .clickable {
                 onNavigateToRecommendation(recommendation.malId)

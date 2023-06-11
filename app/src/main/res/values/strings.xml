@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">RandomAnimeGenerator</string>
+    <string name="client_server_id">723573282308-9ncta9k3fijoo4nmc8c17p077q9nhef2.apps.googleusercontent.com</string>
+    <string name="nothing_to_display_text">
+        Nothing\n
+        to\n
+        Display
+    </string>
+    <string name="see_more_text">
+        See\n
+        More
+    </string>
 </resources>

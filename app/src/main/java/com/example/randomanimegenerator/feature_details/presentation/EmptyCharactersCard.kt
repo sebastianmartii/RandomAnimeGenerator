@@ -14,8 +14,10 @@ import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.randomanimegenerator.R
 import com.example.randomanimegenerator.feature_details.domain.model.Character
 
 @Composable
@@ -37,22 +39,23 @@ fun EmptyCharactersCard(
                 .fillMaxSize()
                 .padding(
                     top = 16.dp,
+                    bottom = 16.dp,
                     start = 4.dp,
                     end = 4.dp
                 ),
-            verticalArrangement = Arrangement.Top,
+            verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             if (characters.isEmpty()) {
                 Text(
-                    text = "No Characters to display",
+                    text = stringResource(id = R.string.nothing_to_display_text),
                     style = MaterialTheme.typography.bodySmall,
                     textAlign = TextAlign.Center
                 )
             } else {
                 Text(
-                    text = "No more Characters to display",
-                    style = MaterialTheme.typography.bodySmall,
+                    text = stringResource(id = R.string.see_more_text),
+                    style = MaterialTheme.typography.titleMedium,
                     textAlign = TextAlign.Center
                 )
             }

@@ -27,7 +27,7 @@ fun StaffCard(
 ) {
     Row(
         modifier = modifier
-            .fillMaxWidth()
+            .fillMaxWidth(0.5f)
             .padding(
                 start = 8.dp,
                 top = 8.dp

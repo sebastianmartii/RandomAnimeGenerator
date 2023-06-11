@@ -2,14 +2,16 @@ package com.example.randomanimegenerator.feature_details.presentation
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.FlowColumn
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -22,8 +24,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -69,6 +70,8 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.randomanimegenerator.core.constants.animeDetailsStatus
 import com.example.randomanimegenerator.core.constants.mangaDetailStatus
+import com.example.randomanimegenerator.core.util.ShimmerContent
+import com.example.randomanimegenerator.core.util.shimmerEffect
 import com.example.randomanimegenerator.feature_details.domain.model.AdditionalInfo
 import com.example.randomanimegenerator.feature_details.domain.model.Character
 import com.example.randomanimegenerator.feature_details.domain.model.Recommendation
@@ -164,6 +167,7 @@ fun DetailsScreen(
                 title = state.title,
                 description = state.description,
                 isFavorite = state.isFavorite,
+                result = state.mainInfoResult,
                 synopsisExpanded = state.synopsisExpanded,
                 authors = if (state.type == Type.ANIME) state.studios else state.authors,
                 statusList = if (state.type == Type.ANIME) animeDetailsStatus else mangaDetailStatus,
@@ -180,12 +184,14 @@ fun DetailsScreen(
             )
             CharactersSection(
                 characters = state.characters,
+                result = state.charactersResult,
                 onNavigateToCharactersScreen = { onEvent(DetailsEvent.NavigateToDestination("characters")) }
             )
             Spacer(modifier = Modifier.height(8.dp))
             StatsAndReviewsSection(
                 additionalInfo = state.additionalInfo,
                 reviews = state.reviews,
+                result = state.reviewsResult,
                 onNavigateToReviewScreen = { onEvent(DetailsEvent.NavigateToDestination("reviews")) },
                 onNavigateToSingleReview = { review ->
                     onEvent(DetailsEvent.NavigateToSingleReview(
@@ -197,15 +203,17 @@ fun DetailsScreen(
                 }
             )
             Spacer(modifier = Modifier.height(8.dp))
-            if (state.type == Type.ANIME && state.staff.isNotEmpty()) {
+            if (state.type == Type.ANIME) {
                 StaffSection(
                     staff = state.staff,
-                    onNavigateToStaffScreen = { onEvent(DetailsEvent.NavigateToDestination("staff")) }
+                    result = state.staffResult,
+                    onNavigateToStaffScreen = { onEvent(DetailsEvent.NavigateToDestination("staff"))}
                 )
-                Spacer(modifier = Modifier.height(8.dp))
             }
+            Spacer(modifier = Modifier.height(8.dp))
             RecommendationsSection(
                 recommendations = state.recommendation,
+                result = state.recommendationsResult,
                 onNavigateToRecommendationsScreen = {
                     onEvent(DetailsEvent.NavigateToDestination("recommendations"))
                 },
@@ -216,11 +224,8 @@ fun DetailsScreen(
             Spacer(modifier = Modifier.height(4.dp))
         }
     }
-    if (scrollState.isScrollInProgress && state.getRecommendations) {
-        onEvent(DetailsEvent.GenerateRecommendations)
-    }
-    if (scrollState.isScrollInProgress && state.getStaff && state.type == Type.ANIME) {
-        onEvent(DetailsEvent.GenerateStaff)
+    if (scrollState.isScrollInProgress && state.getRecommendationsAndStaff) {
+        onEvent(DetailsEvent.GenerateRecommendationsAndStaff(state.type))
     }
     if (state.showPopUp) {
         Popup(
@@ -248,6 +253,7 @@ private fun MainInfoSection(
     statusList: List<LibraryStatus>,
     currentStatus: LibraryStatus,
     isFavorite: Boolean,
+    result: Result,
     synopsisExpanded: Boolean,
     onStatusSelect: (LibraryStatus) -> Unit,
     onPopUpImage: () -> Unit,
@@ -281,6 +287,7 @@ private fun MainInfoSection(
                         .clickable {
                             onPopUpImage()
                         }
+                        .then(if (result == Result.LOADING) Modifier.shimmerEffect() else Modifier)
                 )
                 Column(
                     modifier = Modifier
@@ -290,12 +297,15 @@ private fun MainInfoSection(
                 ) {
                     Text(
                         text = title,
-                        style = MaterialTheme.typography.titleMedium.copy(fontStyle = FontStyle.Italic)
+                        style = MaterialTheme.typography.titleMedium.copy(fontStyle = FontStyle.Italic),
+                        modifier = Modifier.then(if (result == Result.LOADING) Modifier.shimmerEffect() else Modifier)
+
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = authors,
-                        style = MaterialTheme.typography.labelMedium
+                        style = MaterialTheme.typography.labelMedium,
+                        modifier = Modifier.then(if (result == Result.LOADING) Modifier.shimmerEffect() else Modifier)
                     )
                 }
             }
@@ -386,49 +396,79 @@ private fun MainInfoSection(
 @Composable
 private fun CharactersSection(
     characters: List<Character>,
+    result: Result,
     modifier: Modifier = Modifier,
     onNavigateToCharactersScreen: () -> Unit
 ) {
-    Box(modifier = Modifier.fillMaxWidth()) {
+    Column(
+        modifier = modifier
+            .padding(horizontal = 4.dp)
+    ) {
         Text(
             text = "Characters",
-            style = MaterialTheme.typography.titleSmall,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.End,
+            style = MaterialTheme.typography.titleMedium.copy(
+                fontWeight = FontWeight.SemiBold,
+            ),
             modifier = Modifier
-                .align(Alignment.CenterEnd)
-                .padding(horizontal = 12.dp)
-                .alpha(0.7f)
-                .clickable {
-                    onNavigateToCharactersScreen()
-                }
+                .alpha(0.8f)
+                .padding(4.dp)
         )
-    }
-    Surface(
-        modifier = modifier
-            .padding(horizontal = 2.dp)
-            .height(120.dp),
-        shape = MaterialTheme.shapes.small,
-        color = MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp)
-    ) {
-        LazyRow(
-            modifier = Modifier.fillMaxSize(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            items(characters) { character ->
-                if(characters.indexOf(character) < 7){
-                    CharacterCard(
-                        name = character.name,
-                        imageUrl = character.imageUrl
-                    )
+        ShimmerContent(
+            result = result,
+            contentAfterLoading = {
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .horizontalScroll(rememberScrollState()),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    characters.onEach { character ->
+                        if (characters.indexOf(character) < 7) {
+                            CharacterCard(
+                                name = character.name,
+                                imageUrl = character.imageUrl,
+                            )
+                        }
+                    }
+                    if (characters.size > 7 || characters.isEmpty()) {
+                        EmptyCharactersCard(
+                            characters = characters,
+                            modifier = Modifier.then(
+                                if (characters.isEmpty()) Modifier else Modifier.clickable {
+                                    onNavigateToCharactersScreen()
+                                }
+                            )
+                        )
+                    }
                 }
-            }
-            if (characters.size < 5) {
-                item { 
+            },
+            loadingContent = {
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .horizontalScroll(rememberScrollState()),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    (1..5).onEach {
+                        LoadingRecommendationAndCharacterCard(
+                            modifier = Modifier
+                                .height(120.dp)
+                                .width(90.dp)
+                        )
+                    }
+                }
+            },
+            errorContent = {
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .horizontalScroll(rememberScrollState()),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     EmptyCharactersCard(characters = characters)
                 }
             }
-        }
+        )
     }
 }
 
@@ -436,6 +476,7 @@ private fun CharactersSection(
 private fun StatsAndReviewsSection(
     additionalInfo: List<AdditionalInfo>,
     reviews: List<Review>,
+    result: Result,
     modifier: Modifier = Modifier,
     onNavigateToReviewScreen: () -> Unit,
     onNavigateToSingleReview: (SingleReview) -> Unit
@@ -456,7 +497,7 @@ private fun StatsAndReviewsSection(
             style = MaterialTheme.typography.titleSmall,
             fontWeight = FontWeight.Normal,
             modifier = Modifier
-                .alpha(0.7f)
+                .alpha(0.8f)
         )
         Text(
             text = "Reviews",
@@ -464,7 +505,7 @@ private fun StatsAndReviewsSection(
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.End,
             modifier = Modifier
-                .alpha(0.7f)
+                .alpha(0.8f)
                 .clickable {
                     onNavigateToReviewScreen()
                 }
@@ -485,8 +526,9 @@ private fun StatsAndReviewsSection(
             color = MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp)
         ) {
             Column(
-                modifier = Modifier.padding(start = 2.dp, top = 4.dp),
-            ) {
+                modifier = Modifier
+                    .padding(start = 2.dp, top = 4.dp),
+                ) {
                 additionalInfo.onEach { info ->
                     if (info.status.length > 1){
                         CustomStatusBox(
@@ -498,28 +540,53 @@ private fun StatsAndReviewsSection(
             }
         }
         Spacer(modifier = Modifier.width(8.dp))
-        Column(
-            modifier = Modifier
-                .weight(4f)
-                .height(reviewsColumnHeight)
-        ) {
-            if (reviews.isEmpty()) {
-                EmptyReviewsCard()
-            } else {
-                reviews.onEach { review ->
-                    if (reviews.indexOf(review) < 3) {
-                        ReviewCard(
-                            userName = review.userName,
-                            score = review.score,
-                            review = review.review,
-                            onNavigateToSingleReview = {
-                                onNavigateToSingleReview(it)
-                            }
-                        )
+        ShimmerContent(
+            result = result,
+            contentAfterLoading = {
+                Column(
+                    modifier = Modifier
+                        .weight(4f)
+                        .height(reviewsColumnHeight)
+                ) {
+                    reviews.onEach { review ->
+                        if (reviews.indexOf(review) < 3) {
+                            ReviewCard(
+                                userName = review.userName,
+                                score = review.score,
+                                review = review.review,
+                                onNavigateToSingleReview = {
+                                    onNavigateToSingleReview(it)
+                                },
+                                modifier = Modifier.then(if (reviews.indexOf(review) < 2) Modifier.padding(bottom = 8.dp) else Modifier)
+                            )
+                        }
+                    }
+                    if (reviews.isEmpty()) {
+                        EmptyReviewsCard()
                     }
                 }
+            },
+            loadingContent = {
+                Column(
+                    modifier = Modifier
+                        .weight(4f)
+                        .height(reviewsColumnHeight)
+                ) {
+                    (1..3).onEach {
+                        LoadingReviewCard()
+                    }
+                }
+            },
+            errorContent = {
+                Column(
+                    modifier = Modifier
+                        .weight(4f)
+                        .height(reviewsColumnHeight)
+                ) {
+                    EmptyReviewsCard()
+                }
             }
-        }
+        )
     }
 }
 
@@ -527,47 +594,70 @@ private fun StatsAndReviewsSection(
 @Composable
 private fun StaffSection(
     staff: List<Staff>,
+    result: Result,
     modifier: Modifier = Modifier,
     onNavigateToStaffScreen: () -> Unit
 ) {
-    Box(modifier = Modifier.fillMaxWidth()) {
+    Column(
+        modifier = modifier.padding(horizontal = 4.dp)
+    ) {
         Text(
             text = "Staff",
-            style = MaterialTheme.typography.titleSmall,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.End,
+            style = MaterialTheme.typography.titleMedium.copy(
+                fontWeight = FontWeight.SemiBold,
+            ),
             modifier = Modifier
-                .alpha(0.7f)
-                .align(Alignment.CenterEnd)
-                .padding(horizontal = 16.dp)
-                .clickable {
-                    onNavigateToStaffScreen()
-                }
+                .alpha(0.8f)
+                .padding(4.dp)
         )
-    }
-    Surface(
-        modifier = modifier
-            .padding(horizontal = 12.dp),
-        shape = MaterialTheme.shapes.extraSmall,
-        color = MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp)
-    ) {
-        FlowRow(
-            modifier = Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.Start,
-            verticalArrangement = Arrangement.Center,
-            maxItemsInEachRow = 2
+        Surface(
+            shape = MaterialTheme.shapes.small,
+            color = MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp),
+            modifier = Modifier.padding(horizontal = 4.dp)
         ) {
-            staff.onEach { staffMember ->
-                if (staff.indexOf(staffMember) < 4){
-                    StaffCard(
-                        name = staffMember.name,
-                        imageUrl = staffMember.imageUrl,
-                        positions = staffMember.position,
-                        modifier = Modifier.weight(2f)
-                    )
+            ShimmerContent(
+                result = result,
+                contentAfterLoading = { 
+                    FlowColumn(
+                        maxItemsInEachColumn = 4,
+                        modifier = Modifier.padding(4.dp),
+                        verticalArrangement = Arrangement.Top,
+                        horizontalArrangement = Arrangement.Start
+                    ) {
+                        staff.onEach { staffMember -> 
+                            if (staff.indexOf(staffMember) < 7) {
+                                StaffCard(
+                                    name = staffMember.name,
+                                    imageUrl = staffMember.imageUrl,
+                                    positions = staffMember.position
+                                )
+                            }
+                        }
+                        if (staff.size > 7 || staff.isEmpty()) {
+                            StaffCard(
+                                name = "See More",
+                                imageUrl = "https://cdn.myanimelist.net/images/questionmark_23.gif?s=f7dcbc4a4603d18356d3dfef8abd655c",
+                                positions = "",
+                                modifier = Modifier.clickable {
+                                    onNavigateToStaffScreen()
+                                }
+                            )
+                        }
+                    }
+                },
+                loadingContent = {
+                    FlowColumn(
+                        maxItemsInEachColumn = 4,
+                        modifier = Modifier.padding(4.dp),
+                    ) {
+                        (1..8).onEach {
+                            LoadingStaffCard(modifier = Modifier.fillMaxWidth(0.5f))
+                        }
+                    }
+                },
+                errorContent = {
                 }
-            }
+            )
         }
     }
 }
@@ -575,51 +665,83 @@ private fun StaffSection(
 @Composable
 private fun RecommendationsSection(
     recommendations: List<Recommendation>,
+    result: Result,
     modifier: Modifier = Modifier,
     onNavigateToRecommendationsScreen: () -> Unit,
     onNavigateToRecommendation: (Int) -> Unit
 ) {
-    Box(modifier = Modifier.fillMaxWidth()) {
+    Column(
+        modifier = modifier
+            .padding(horizontal = 4.dp)
+    ) {
         Text(
             text = "Recommendations",
-            style = MaterialTheme.typography.titleSmall,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.End,
+            style = MaterialTheme.typography.titleMedium.copy(
+                fontWeight = FontWeight.SemiBold,
+            ),
             modifier = Modifier
-                .alpha(0.7f)
-                .align(Alignment.CenterEnd)
-                .padding(horizontal = 12.dp)
-                .clickable {
-                    onNavigateToRecommendationsScreen()
-                }
+                .alpha(0.8f)
+                .padding(4.dp)
         )
-    }
-    Surface(
-        modifier = modifier
-            .padding(horizontal = 4.dp),
-        shape = MaterialTheme.shapes.small,
-        color = MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp)
-    ) {
-        LazyRow(
-            modifier = Modifier.fillMaxSize(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            items(recommendations) { recommendation ->
-                if(recommendations.indexOf(recommendation) < 5){
-                    RecommendationCard(
-                        recommendation = recommendation,
-                        onNavigateToRecommendation = {
-                            onNavigateToRecommendation(it)
+        ShimmerContent(
+            result = result,
+            contentAfterLoading = {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(IntrinsicSize.Max)
+                        .horizontalScroll(rememberScrollState()),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    recommendations.onEach { recommendation ->
+                        if (recommendations.indexOf(recommendation) < 7) {
+                            RecommendationCard(
+                                recommendation = recommendation,
+                                onNavigateToRecommendation = {
+                                    onNavigateToRecommendation(it)
+                                }
+                            )
                         }
-                    )
+                    }
+                    if (recommendations.size > 7 || recommendations.isEmpty()) {
+                        EmptyRecommendationsCard(
+                            recommendations = recommendations,
+                            modifier = Modifier.then(
+                                if (recommendations.isEmpty()) Modifier else Modifier.clickable {
+                                    onNavigateToRecommendationsScreen()
+                                }
+                            )
+                        )
+                    }
+                 }
+            },
+            loadingContent = {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(IntrinsicSize.Max)
+                        .horizontalScroll(rememberScrollState()),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    (1..4).onEach {
+                        LoadingRecommendationAndCharacterCard(modifier = Modifier
+                            .height(150.dp)
+                            .width(110.dp))
+                    }
                 }
-            }
-            if (recommendations.size < 5) {
-                item { 
+            },
+            errorContent = {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(IntrinsicSize.Max)
+                        .horizontalScroll(rememberScrollState()),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     EmptyRecommendationsCard(recommendations = recommendations)
                 }
             }
-        }
+        )
     }
 }
 
@@ -647,4 +769,92 @@ private fun CustomFilterChip(
         ),
         shape = MaterialTheme.shapes.medium,
     )
+}
+
+@Composable
+fun LoadingReviewCard(
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier
+            .height(200.dp)
+            .padding(bottom = 8.dp),
+        shape = MaterialTheme.shapes.small,
+        border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp)
+        )
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .shimmerEffect()
+        )
+    }
+}
+
+@Composable
+fun LoadingRecommendationAndCharacterCard(
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier
+            .padding(4.dp),
+        shape = MaterialTheme.shapes.small,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp)
+        )
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .shimmerEffect()
+        )
+    }
+}
+
+@Composable
+fun LoadingStaffCard(
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(
+                start = 8.dp,
+                top = 8.dp
+            ),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceAround
+    ) {
+        Box(
+            modifier = Modifier
+                .clip(MaterialTheme.shapes.small)
+                .height(100.dp)
+                .aspectRatio(2f / 3f)
+                .padding(end = 4.dp)
+                .shimmerEffect()
+        )
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.SpaceAround,
+            horizontalAlignment = Alignment.Start
+        ) {
+            Text(
+                text = "",
+                style = MaterialTheme.typography.titleSmall,
+                modifier = Modifier
+                    .fillMaxWidth(0.7f)
+                    .shimmerEffect()
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "",
+                style = MaterialTheme.typography.labelMedium,
+                modifier = Modifier
+                    .fillMaxWidth(0.5f)
+                    .shimmerEffect()
+            )
+        }
+    }
 }

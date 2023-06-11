@@ -10,6 +10,7 @@ import com.example.randomanimegenerator.feature_details.domain.use_cases.GetInfo
 import com.example.randomanimegenerator.feature_details.domain.use_cases.GetRecommendationsUseCase
 import com.example.randomanimegenerator.feature_details.domain.use_cases.GetReviewsUseCase
 import com.example.randomanimegenerator.feature_details.domain.use_cases.GetStaffUseCase
+import com.example.randomanimegenerator.feature_generator.presentation.Type
 import com.example.randomanimegenerator.feature_library.presentation.LibraryStatus
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -123,23 +124,14 @@ class DetailsViewModelTest {
     }
 
     @Test
-    fun `Get recommendations, recommendations retrieved properly`() = runTest {
-        viewModel.onEvent(DetailsEvent.GenerateRecommendations)
+    fun `Get recommendations and staff, staff and recommendations retrieved properly`() = runTest {
+        viewModel.onEvent(DetailsEvent.GenerateRecommendationsAndStaff(Type.ANIME))
         viewModel.state.test {
             val emission = awaitItem()
-            assertThat(emission.getRecommendations).isFalse()
+            assertThat(emission.getRecommendationsAndStaff).isFalse()
             for (i in 0..emission.recommendation.size - 2) {
                 assertThat(emission.recommendation[i].malId).isEqualTo(0)
             }
-        }
-    }
-
-    @Test
-    fun `Get staff, staff retrieved properly`() = runTest {
-        viewModel.onEvent(DetailsEvent.GenerateStaff)
-        viewModel.state.test {
-            val emission = awaitItem()
-            assertThat(emission.getStaff).isFalse()
             for (i in 0 until emission.staff.size) {
                 assertThat(emission.staff[i].position).isEqualTo("0")
             }

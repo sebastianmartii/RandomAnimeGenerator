@@ -14,7 +14,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.randomanimegenerator.R
 
 @Composable
 fun EmptyReviewsCard(
@@ -37,8 +40,8 @@ fun EmptyReviewsCard(
             contentAlignment = Alignment.TopCenter
         ) {
             Text(
-                text = "No Reviews to display",
-                style = MaterialTheme.typography.bodyLarge,
+                text = stringResource(id = R.string.nothing_to_display_text),
+                style = MaterialTheme.typography.bodyLarge.copy(textAlign = TextAlign.Center),
                 modifier = Modifier.alpha(0.8f)
             )
         }

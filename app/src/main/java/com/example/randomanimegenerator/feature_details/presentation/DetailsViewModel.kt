@@ -7,11 +7,13 @@ import com.example.randomanimegenerator.core.util.Resource
 import com.example.randomanimegenerator.feature_details.data.mappers.toStatusString
 import com.example.randomanimegenerator.feature_details.domain.repository.DetailsRepository
 import com.example.randomanimegenerator.feature_details.domain.use_cases.DetailsUseCases
+import com.example.randomanimegenerator.feature_generator.presentation.Type
 import com.example.randomanimegenerator.feature_generator.presentation.toType
 import com.example.randomanimegenerator.feature_library.presentation.LibraryStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
@@ -20,6 +22,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 
 @HiltViewModel
 class DetailsViewModel @Inject constructor(
@@ -75,6 +78,7 @@ class DetailsViewModel @Inject constructor(
                                 description = result.data?.synopsis ?: "",
                                 additionalInfo = result.data?.statusList ?: emptyList(),
                                 isLoading = false,
+                                mainInfoResult = Result.ERROR,
                                 isFavorite = result.data?.isFavorite ?: false,
                                 libraryStatus = result.data?.libraryStatus ?: LibraryStatus.PLANNING
                             )
@@ -94,6 +98,7 @@ class DetailsViewModel @Inject constructor(
                                 studios = result.data?.studios ?: "",
                                 additionalInfo = result.data?.statusList ?: emptyList(),
                                 isLoading = true,
+                                mainInfoResult = Result.LOADING,
                                 isFavorite = result.data?.isFavorite ?: false,
                                 libraryStatus = result.data?.libraryStatus ?: LibraryStatus.PLANNING
                             )
@@ -112,6 +117,7 @@ class DetailsViewModel @Inject constructor(
                                 studios = result.data?.studios ?: "",
                                 additionalInfo = result.data?.statusList ?: emptyList(),
                                 isLoading = false,
+                                mainInfoResult = Result.SUCCESS,
                                 isFavorite = result.data?.isFavorite ?: false,
                                 libraryStatus = result.data?.libraryStatus ?: LibraryStatus.PLANNING
                             )
@@ -125,8 +131,9 @@ class DetailsViewModel @Inject constructor(
                         _state.update {
                             it.copy(
                                 characters = result.data ?: emptyList(),
-                                isLoading = false
-                            )
+                                isLoading = false,
+                                charactersResult = Result.ERROR,
+                                )
                         }
                         _channel.send(UiEvent.ShowSnackBar(message = result.message ?: "Error"))
                     }
@@ -135,7 +142,8 @@ class DetailsViewModel @Inject constructor(
                         _state.update {
                             it.copy(
                                 characters = result.data ?: emptyList(),
-                                isLoading = true
+                                isLoading = true,
+                                charactersResult = Result.LOADING,
                             )
                         }
                     }
@@ -144,7 +152,8 @@ class DetailsViewModel @Inject constructor(
                         _state.update {
                             it.copy(
                                 characters = result.data ?: emptyList(),
-                                isLoading = false
+                                isLoading = false,
+                                charactersResult = Result.SUCCESS,
                             )
                         }
                     }
@@ -156,7 +165,8 @@ class DetailsViewModel @Inject constructor(
                         _state.update {
                             it.copy(
                                 reviews = result.data ?: emptyList(),
-                                isLoading = false
+                                isLoading = false,
+                                reviewsResult = Result.ERROR,
                             )
                         }
                         _channel.send(UiEvent.ShowSnackBar(message = result.message ?: "Error"))
@@ -166,7 +176,8 @@ class DetailsViewModel @Inject constructor(
                         _state.update {
                             it.copy(
                                 reviews = result.data ?: emptyList(),
-                                isLoading = true
+                                isLoading = true,
+                                reviewsResult = Result.LOADING,
                             )
                         }
                     }
@@ -175,7 +186,8 @@ class DetailsViewModel @Inject constructor(
                         _state.update {
                             it.copy(
                                 reviews = result.data ?: emptyList(),
-                                isLoading = false
+                                isLoading = false,
+                                reviewsResult = Result.SUCCESS,
                             )
                         }
                     }
@@ -196,7 +208,7 @@ class DetailsViewModel @Inject constructor(
                     repo.updateLibraryStatus(id!!, type!!, event.status.toStatusString())
                 }
             }
-            is DetailsEvent.AddOrRemoveFromFavorites -> {
+            is DetailsEvent. AddOrRemoveFromFavorites -> {
                 _state.update {
                     it.copy(
                         isFavorite = !event.isFavorite
@@ -215,54 +227,15 @@ class DetailsViewModel @Inject constructor(
                     }
                 }
             }
-            is DetailsEvent.GenerateRecommendations -> {
+            is DetailsEvent.GenerateRecommendationsAndStaff -> {
                 viewModelScope.launch {
-                    val recommendations = async {
-                        useCases.getRecommendationsUseCase(id!!, type!!.toType()).onEach { result ->
-                            when (result) {
-                                is Resource.Error -> {
-                                    _state.update {
-                                        it.copy(
-                                            recommendation = result.data ?: emptyList(),
-                                            isLoading = false,
-                                            getRecommendations = false
-                                        )
-                                    }
-                                    _channel.send(
-                                        UiEvent.ShowSnackBar(
-                                            message = result.message ?: "Error"
-                                        )
-                                    )
-                                }
-
-                                is Resource.Loading -> {
-                                    _state.update {
-                                        it.copy(
-                                            recommendation = result.data ?: emptyList(),
-                                            isLoading = true,
-                                            getRecommendations = false
-                                        )
-                                    }
-                                }
-
-                                is Resource.Success -> {
-                                    _state.update {
-                                        it.copy(
-                                            recommendation = result.data ?: emptyList(),
-                                            isLoading = false,
-                                            getRecommendations = false
-                                        )
-                                    }
-                                }
-                            }
-                        }.launchIn(this)
+                    _state.update {
+                        it.copy(
+                            getRecommendationsAndStaff = false
+                        )
                     }
-                    recommendations.await()
-                }
-            }
-            is DetailsEvent.GenerateStaff -> {
-                viewModelScope.launch {
-                    val staff = async {
+                    if (event.type == Type.ANIME) {
+                        delay(1.seconds)
                         useCases.getStaffUseCase(id!!).onEach { result ->
                             when (result) {
                                 is Resource.Error -> {
@@ -270,7 +243,7 @@ class DetailsViewModel @Inject constructor(
                                         it.copy(
                                             staff = result.data ?: emptyList(),
                                             isLoading = false,
-                                            getStaff = false
+                                            staffResult = Result.ERROR,
                                         )
                                     }
                                     _channel.send(
@@ -285,7 +258,7 @@ class DetailsViewModel @Inject constructor(
                                         it.copy(
                                             staff = result.data ?: emptyList(),
                                             isLoading = true,
-                                            getStaff = false
+                                            staffResult = Result.LOADING,
                                         )
                                     }
                                 }
@@ -295,14 +268,52 @@ class DetailsViewModel @Inject constructor(
                                         it.copy(
                                             staff = result.data ?: emptyList(),
                                             isLoading = false,
-                                            getStaff = false
+                                            staffResult = Result.SUCCESS,
                                         )
                                     }
                                 }
                             }
                         }.launchIn(this)
                     }
-                    staff.await()
+                    delay(1.seconds)
+                    useCases.getRecommendationsUseCase(id!!, type!!.toType()).onEach { result ->
+                        when (result) {
+                            is Resource.Error -> {
+                                _state.update {
+                                    it.copy(
+                                        recommendation = result.data ?: emptyList(),
+                                        isLoading = false,
+                                        recommendationsResult = Result.ERROR,
+                                    )
+                                }
+                                _channel.send(
+                                    UiEvent.ShowSnackBar(
+                                        message = result.message ?: "Error"
+                                    )
+                                )
+                            }
+
+                            is Resource.Loading -> {
+                                _state.update {
+                                    it.copy(
+                                        recommendation = result.data ?: emptyList(),
+                                        isLoading = true,
+                                        recommendationsResult = Result.LOADING,
+                                    )
+                                }
+                            }
+
+                            is Resource.Success -> {
+                                _state.update {
+                                    it.copy(
+                                        recommendation = result.data ?: emptyList(),
+                                        isLoading = false,
+                                        recommendationsResult = Result.SUCCESS,
+                                    )
+                                }
+                            }
+                        }
+                    }.launchIn(this)
                 }
             }
             is DetailsEvent.NavigateBack -> {

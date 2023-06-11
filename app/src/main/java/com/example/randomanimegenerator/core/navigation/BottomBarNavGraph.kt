@@ -1,6 +1,7 @@
 package com.example.randomanimegenerator.core.navigation
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.focus.FocusRequester
@@ -8,24 +9,25 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.example.randomanimegenerator.feature_generator.presentation.GeneratorScreen
 import com.example.randomanimegenerator.feature_generator.presentation.GeneratorState
 import com.example.randomanimegenerator.feature_generator.presentation.GeneratorViewModel
+import com.example.randomanimegenerator.feature_generator.presentation.Type
 import com.example.randomanimegenerator.feature_generator.presentation.toTypeString
-import com.example.randomanimegenerator.feature_library.presentation.LibraryScreen
+import com.example.randomanimegenerator.feature_library.presentation.AnimeLibraryScreen
+import com.example.randomanimegenerator.feature_library.presentation.LibraryEvent
 import com.example.randomanimegenerator.feature_library.presentation.LibraryState
 import com.example.randomanimegenerator.feature_library.presentation.LibraryViewModel
+import com.example.randomanimegenerator.feature_library.presentation.MangaLibraryScreen
 import com.example.randomanimegenerator.feature_library.presentation.animeStatusList
 import com.example.randomanimegenerator.feature_library.presentation.librarySortType
 import com.example.randomanimegenerator.feature_library.presentation.mangaStatusList
 
 fun NavGraphBuilder.bottomNavGraph(
     navController: NavHostController,
-    paddingValues: PaddingValues
+    paddingValues: PaddingValues,
 ) {
     navigation(
         startDestination = Destinations.Generator.route,
@@ -45,47 +47,51 @@ fun NavGraphBuilder.bottomNavGraph(
         }
         composable(
             route = Destinations.AnimeLibrary.route,
-            arguments = listOf(
-                navArgument(name = "type") { type = NavType.StringType}
-            )
         ) {
             val focusRequester = remember {
                 FocusRequester()
             }
             val viewModel = hiltViewModel<LibraryViewModel>()
             val state by viewModel.state.collectAsStateWithLifecycle(initialValue = LibraryState())
-            LibraryScreen(
+
+            LaunchedEffect(key1 = true) {
+                viewModel.onEvent(LibraryEvent.SetType(Type.ANIME))
+            }
+
+            AnimeLibraryScreen(
                 paddingValues = paddingValues,
                 state = state,
                 statusList = animeStatusList,
                 sortList = librarySortType,
                 onEvent = viewModel::onEvent,
                 focusRequester = focusRequester,
-                onNavigateToDetailsScreen = {
-                    navController.navigate("details/$it/${viewModel.type}")
+                onNavigateToDetailsScreen = { id, type ->
+                    navController.navigate("details/$id/$type")
                 }
             )
         }
         composable(
             route = Destinations.MangaLibrary.route,
-            arguments = listOf(
-                navArgument(name = "type") { type = NavType.StringType}
-            )
         ) {
             val focusRequester = remember {
                 FocusRequester()
             }
             val viewModel = hiltViewModel<LibraryViewModel>()
             val state by viewModel.state.collectAsStateWithLifecycle(initialValue = LibraryState())
-            LibraryScreen(
+
+            LaunchedEffect(key1 = true) {
+                viewModel.onEvent(LibraryEvent.SetType(Type.MANGA))
+            }
+
+            MangaLibraryScreen(
                 paddingValues = paddingValues,
                 state = state,
                 statusList = mangaStatusList,
                 sortList = librarySortType,
                 onEvent = viewModel::onEvent,
                 focusRequester = focusRequester,
-                onNavigateToDetailsScreen = {
-                    navController.navigate("details/$it/${viewModel.type}")
+                onNavigateToDetailsScreen = { id, type ->
+                    navController.navigate("details/$id/$type")
                 }
             )
         }

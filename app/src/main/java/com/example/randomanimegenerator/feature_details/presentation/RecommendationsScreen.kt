@@ -65,7 +65,7 @@ fun RecommendationsScreen(
                     onNavigateToRecommendation = {
                         onNavigateToRecommendation(it)
                     },
-                    modifier = Modifier.height(180.dp)
+                    modifier = Modifier.height(200.dp)
                 )
             }
         }

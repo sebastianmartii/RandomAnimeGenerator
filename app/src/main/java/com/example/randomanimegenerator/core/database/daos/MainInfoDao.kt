@@ -39,6 +39,9 @@ interface MainInfoDao {
     @Query("SELECT * FROM library_table WHERE library_type = :type AND is_favorite = 1 AND library_status = :libraryStatus ORDER BY title DESC")
     fun getAllByStatusZA(type: String, libraryStatus: String): Flow<List<MainInfoEntity>>
 
+    @Query("SELECT library_status FROM library_table WHERE library_type = :type AND is_favorite = 1")
+    fun getEntriesCount(type: String): Flow<List<String>>
+
     @Query("SELECT * FROM library_table WHERE mal_id = :malId AND library_type = :type")
     suspend fun getOne(malId: Int, type: String): MainInfoEntity
 

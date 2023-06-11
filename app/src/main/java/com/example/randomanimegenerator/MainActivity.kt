@@ -9,11 +9,21 @@ import androidx.navigation.compose.rememberNavController
 import com.example.randomanimegenerator.core.constants.navigationItems
 import com.example.randomanimegenerator.core.navigation.BottomNavigationBar
 import com.example.randomanimegenerator.core.navigation.Navigation
+import com.example.randomanimegenerator.feature_profile.presentation.AuthenticationClient
 import com.example.randomanimegenerator.ui.theme.RandomAnimeGeneratorTheme
+import com.google.android.gms.auth.api.identity.Identity
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    private val authClient by lazy {
+        AuthenticationClient(
+            context = applicationContext,
+            oneTapClient = Identity.getSignInClient(applicationContext)
+        )
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -36,7 +46,8 @@ class MainActivity : ComponentActivity() {
                 ) {
                     Navigation(
                         navController = navController,
-                        paddingValues = it
+                        paddingValues = it,
+                        authenticationClient = authClient
                     )
                 }
             }

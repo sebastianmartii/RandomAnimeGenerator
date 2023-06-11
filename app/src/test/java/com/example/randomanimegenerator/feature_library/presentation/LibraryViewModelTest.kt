@@ -1,9 +1,6 @@
 package com.example.randomanimegenerator.feature_library.presentation
 
-import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
-import com.example.randomanimegenerator.feature_generator.presentation.Type
-import com.example.randomanimegenerator.feature_generator.presentation.toTypeString
 import com.example.randomanimegenerator.feature_library.data.repository.FakeLibraryRepository
 import com.example.randomanimegenerator.feature_library.domain.use_case.GetAllByStatusUseCase
 import com.example.randomanimegenerator.feature_library.domain.use_case.GetAllUseCase
@@ -18,14 +15,10 @@ class LibraryViewModelTest {
 
     private lateinit var repo: FakeLibraryRepository
     private lateinit var viewModel: LibraryViewModel
-    private val savedStateHandle = SavedStateHandle().apply {
-        set("type", Type.ANIME.toTypeString())
-    }
-
     @Before
     fun setUp() {
         repo = FakeLibraryRepository()
-        viewModel = LibraryViewModel(GetAllUseCase(repo), GetAllByStatusUseCase(repo), savedStateHandle)
+        viewModel = LibraryViewModel(GetAllUseCase(repo), GetAllByStatusUseCase(repo))
     }
 
     @Test

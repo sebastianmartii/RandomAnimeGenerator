@@ -1,7 +1,6 @@
 package com.example.randomanimegenerator.feature_details.presentation
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -32,8 +31,7 @@ fun CharacterCard(
         modifier = modifier
             .width(90.dp)
             .height(120.dp)
-            .padding(4.dp)
-            .clickable { },
+            .padding(4.dp),
         shape = MaterialTheme.shapes.small
     ) {
         Box(

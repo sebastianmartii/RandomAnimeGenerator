@@ -23,11 +23,18 @@ data class DetailsState(
     val additionalInfo: List<AdditionalInfo> = emptyList(),
     val isFavorite: Boolean = false,
     val isLoading: Boolean = true,
-    val getRecommendations: Boolean = true,
-    val getStaff: Boolean = true,
+    val mainInfoResult: Result = Result.LOADING,
+    val charactersResult: Result = Result.LOADING,
+    val reviewsResult: Result = Result.LOADING,
+    val staffResult: Result = Result.LOADING,
+    val recommendationsResult: Result = Result.LOADING,
+    val getRecommendationsAndStaff: Boolean = true,
     val type: Type = Type.ANIME,
     val libraryStatus: LibraryStatus = LibraryStatus.PLANNING,
     val showPopUp: Boolean = false,
     val synopsisExpanded: Boolean = false
 )
 
+enum class Result {
+    SUCCESS, LOADING, ERROR
+}

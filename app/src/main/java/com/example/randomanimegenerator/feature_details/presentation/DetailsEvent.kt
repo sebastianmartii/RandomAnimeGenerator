@@ -1,10 +1,10 @@
 package com.example.randomanimegenerator.feature_details.presentation
 
+import com.example.randomanimegenerator.feature_generator.presentation.Type
 import com.example.randomanimegenerator.feature_library.presentation.LibraryStatus
 
 sealed interface DetailsEvent {
-    object GenerateStaff : DetailsEvent
-    object GenerateRecommendations : DetailsEvent
+    data class GenerateRecommendationsAndStaff(val type: Type) : DetailsEvent
     data class AddOrRemoveFromFavorites(val isFavorite: Boolean) : DetailsEvent
     data class SelectStatus(val status: LibraryStatus) : DetailsEvent
     data class NavigateToDestination(val destination: String) : DetailsEvent

@@ -1,6 +1,7 @@
 package com.example.randomanimegenerator.core.constants
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material.icons.filled.PlayCircle
@@ -28,13 +29,18 @@ val navigationItems = listOf(
     ),
     BottomNavItem(
         name = "Anime",
-        route = "anime/Anime",
+        route = Destinations.AnimeLibrary.route,
         icon = Icons.Default.Movie
     ),
     BottomNavItem(
         name = "Manga",
-        route = "manga/Manga",
+        route = Destinations.MangaLibrary.route,
         icon = Icons.Default.Book
+    ),
+    BottomNavItem(
+        name = "Profile",
+        route = Destinations.Profile.route,
+        icon = Icons.Default.AccountCircle
     )
 )
 
