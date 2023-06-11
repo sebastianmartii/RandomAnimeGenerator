@@ -6,12 +6,14 @@ Random Anime Generator made with Jikan v4 api providing unofficial MyAnimeList d
 - Spectate generated media details
 - Store your favorites in library and filter them by your progress
 - Title based search throu your favorites
+- Create profile using your google account or with email and password
 
 ## Used libraries
 - Room
 - Retrofit
 - Coil
 - Dagger-Hilt
+- FireBase
 
 ## App Screenshots
 ![Manga List Results](https://github.com/sebastianmartii/RandomAnimeGenerator/blob/master/Screenshots/Zrzut%20ekranu%202023-05-14%20184931.png)
