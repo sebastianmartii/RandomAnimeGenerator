@@ -26,6 +26,8 @@ class GeneratorRepositoryImpl(
             emit(Resource.Error(message = "error"))
         } catch (e: HttpException) {
             emit(Resource.Error(message = "error"))
+        } catch (e: NullPointerException) {
+            emit(Resource.Error(message = "$e"))
         }
     }
 
@@ -41,6 +43,8 @@ class GeneratorRepositoryImpl(
             emit(Resource.Error(message = "error"))
         } catch (e: HttpException) {
             emit(Resource.Error(message = "error"))
+        } catch (e: NullPointerException) {
+            emit(Resource.Error(message = "$e"))
         }
     }
 }
