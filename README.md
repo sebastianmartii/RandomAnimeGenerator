@@ -1,12 +1,12 @@
 # RandomAnimeGenerator
-Random Anime Generator made with Jikan v4 api providing unofficial MyAnimeList database, Material 3 Design and Jetpack Compose for UI, MVVM architecture, DI, RESTful Api, Asynchronous programming with Kotlin Coroutines and Flows
+Random Anime Generator made with Jikan v4 api providing unofficial MyAnimeList database, Material 3 Design and Jetpack Compose for UI, MVVM architecture, DI, RESTful Api, Asynchronous programming with Kotlin Coroutines and Flows and Firebase Authentication
 
 ## Features
 - Generate random anime or manga based on selected parameters
 - Spectate generated media details
 - Store your favorites in library and filter them by your progress
 - Title based search throu your favorites
-- Create profile using your google account or with email and password
+- Create profile with your google account or with an email and password
 
 ## Used libraries
 - Room
