@@ -5,6 +5,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import com.example.randomanimegenerator.R
 
 @Composable
 fun SignOutDialog(
@@ -17,7 +19,7 @@ fun SignOutDialog(
             onDismissRequest = closeDialog,
             text = {
                 Text(
-                    text = "Are you sure you want to sign out?",
+                    text = stringResource(id = R.string.sign_out_dialog_text),
                     style = MaterialTheme.typography.titleMedium
                 )
             },
@@ -26,12 +28,12 @@ fun SignOutDialog(
                     closeDialog()
                     onSignOut()
                 }) {
-                    Text(text = "Confirm")
+                    Text(text = stringResource(id = R.string.confirm_text))
                 }
             },
             dismissButton = {
                 TextButton(onClick = closeDialog) {
-                    Text(text = "Dismiss")
+                    Text(text = stringResource(id = R.string.dismiss_text))
                 }
             }
         )

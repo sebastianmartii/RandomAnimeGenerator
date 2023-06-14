@@ -133,7 +133,7 @@ class DetailsViewModel @Inject constructor(
                                 characters = result.data ?: emptyList(),
                                 isLoading = false,
                                 charactersResult = Result.ERROR,
-                                )
+                            )
                         }
                         _channel.send(UiEvent.ShowSnackBar(message = result.message ?: "Error"))
                     }
@@ -197,7 +197,7 @@ class DetailsViewModel @Inject constructor(
     }
 
     fun onEvent(event: DetailsEvent) {
-        when(event) {
+        when (event) {
             is DetailsEvent.SelectStatus -> {
                 _state.update {
                     it.copy(
@@ -208,18 +208,20 @@ class DetailsViewModel @Inject constructor(
                     repo.updateLibraryStatus(id!!, type!!, event.status.toStatusString())
                 }
             }
-            is DetailsEvent. AddOrRemoveFromFavorites -> {
+
+            is DetailsEvent.AddOrRemoveFromFavorites -> {
                 _state.update {
                     it.copy(
                         isFavorite = !event.isFavorite
                     )
                 }
                 viewModelScope.launch {
-                    when(event.isFavorite) {
+                    when (event.isFavorite) {
                         true -> {
                             repo.addOrRemoveFromFavorites(id!!, type!!, false)
                             _channel.send(UiEvent.ShowSnackBar("Entry has been deleted from favorites"))
                         }
+
                         false -> {
                             repo.addOrRemoveFromFavorites(id!!, type!!, true)
                             _channel.send(UiEvent.ShowSnackBar("Entry has been added to favorites"))
@@ -227,6 +229,7 @@ class DetailsViewModel @Inject constructor(
                     }
                 }
             }
+
             is DetailsEvent.GenerateRecommendationsAndStaff -> {
                 viewModelScope.launch {
                     _state.update {
@@ -316,26 +319,31 @@ class DetailsViewModel @Inject constructor(
                     }.launchIn(this)
                 }
             }
+
             is DetailsEvent.NavigateBack -> {
                 viewModelScope.launch {
                     _channel.send(UiEvent.NavigateBack)
                 }
             }
+
             is DetailsEvent.NavigateToDestination -> {
                 viewModelScope.launch {
                     _channel.send(UiEvent.NavigateToDestination("${event.destination}/$id/$type"))
                 }
             }
+
             is DetailsEvent.NavigateToSingleReview -> {
                 viewModelScope.launch {
                     _channel.send(UiEvent.NavigateToDestination("${event.destination}/${event.author}/${event.score}/${event.review}"))
                 }
             }
+
             is DetailsEvent.NavigateToRecommendation -> {
                 viewModelScope.launch {
                     _channel.send(UiEvent.NavigateToDestination("${event.destination}/${event.malId}/$type"))
                 }
             }
+
             DetailsEvent.PopUpImage -> {
                 _state.update {
                     it.copy(
@@ -343,6 +351,7 @@ class DetailsViewModel @Inject constructor(
                     )
                 }
             }
+
             DetailsEvent.ExpandSynopsis -> {
                 _state.update {
                     it.copy(

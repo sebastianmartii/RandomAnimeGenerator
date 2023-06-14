@@ -22,7 +22,7 @@ class GeneratorViewModel @Inject constructor(
     val state = _state.asStateFlow()
 
     fun onEvent(event: GeneratorEvent) {
-        when(event) {
+        when (event) {
             is GeneratorEvent.EditGeneratorParams -> {
                 _state.update {
                     it.copy(
@@ -30,14 +30,18 @@ class GeneratorViewModel @Inject constructor(
                     )
                 }
             }
+
             is GeneratorEvent.Generate -> {
                 viewModelScope.launch {
-                    generateContentUseCase(type = event.state.typeSelected, minScore = event.state.scoreSelected.toInt()).onEach { result ->
-                        when(result) {
+                    generateContentUseCase(
+                        type = event.state.typeSelected,
+                        minScore = event.state.scoreSelected.toInt()
+                    ).onEach { result ->
+                        when (result) {
                             is Resource.Error -> {
                                 _state.value = state.value.copy(
                                     listOfItems = if (event.state.amountSelected == Amount.ONE) {
-                                        result.data?.shuffled()?.subList(0,1) ?: emptyList()
+                                        result.data?.shuffled()?.subList(0, 1) ?: emptyList()
                                     } else {
                                         result.data ?: emptyList()
                                     },
@@ -45,10 +49,11 @@ class GeneratorViewModel @Inject constructor(
                                     editGeneratingParams = false
                                 )
                             }
+
                             is Resource.Loading -> {
                                 _state.value = state.value.copy(
                                     listOfItems = if (event.state.amountSelected == Amount.ONE) {
-                                        result.data?.shuffled()?.subList(0,1) ?: emptyList()
+                                        result.data?.shuffled()?.subList(0, 1) ?: emptyList()
                                     } else {
                                         result.data ?: emptyList()
                                     },
@@ -56,10 +61,11 @@ class GeneratorViewModel @Inject constructor(
                                     editGeneratingParams = false
                                 )
                             }
+
                             is Resource.Success -> {
                                 _state.value = state.value.copy(
                                     listOfItems = if (event.state.amountSelected == Amount.ONE) {
-                                        result.data?.shuffled()?.subList(0,1) ?: emptyList()
+                                        result.data?.shuffled()?.subList(0, 1) ?: emptyList()
                                     } else {
                                         result.data ?: emptyList()
                                     },
@@ -71,6 +77,7 @@ class GeneratorViewModel @Inject constructor(
                     }.launchIn(this)
                 }
             }
+
             is GeneratorEvent.SetAmount -> {
                 _state.update {
                     it.copy(
@@ -78,6 +85,7 @@ class GeneratorViewModel @Inject constructor(
                     )
                 }
             }
+
             is GeneratorEvent.SetScore -> {
                 _state.update {
                     it.copy(
@@ -85,6 +93,7 @@ class GeneratorViewModel @Inject constructor(
                     )
                 }
             }
+
             is GeneratorEvent.SetType -> {
                 _state.update {
                     it.copy(

@@ -33,7 +33,6 @@ import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -59,6 +58,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -68,6 +68,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.example.randomanimegenerator.R
 import com.example.randomanimegenerator.core.constants.animeDetailsStatus
 import com.example.randomanimegenerator.core.constants.mangaDetailStatus
 import com.example.randomanimegenerator.core.util.ShimmerContent
@@ -98,13 +99,15 @@ fun DetailsScreen(
 ) {
     LaunchedEffect(key1 = true) {
         snackBarFlow.collectLatest { event ->
-            when(event) {
+            when (event) {
                 is DetailsViewModel.UiEvent.NavigateBack -> {
                     navController.popBackStack()
                 }
+
                 is DetailsViewModel.UiEvent.NavigateToDestination -> {
                     navController.navigate(route = event.destinationRoute)
                 }
+
                 is DetailsViewModel.UiEvent.ShowSnackBar -> {
                     snackBarHostState.showSnackbar(event.message)
                 }
@@ -119,7 +122,7 @@ fun DetailsScreen(
                     IconButton(onClick = { onEvent(DetailsEvent.NavigateBack) }) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
-                            contentDescription = "Back Action Button"
+                            contentDescription = stringResource(id = R.string.back_action_button_text)
                         )
                     }
                 },
@@ -135,13 +138,7 @@ fun DetailsScreen(
                     IconButton(onClick = { onEvent(DetailsEvent.AddOrRemoveFromFavorites(state.isFavorite)) }) {
                         Icon(
                             imageVector = if (state.isFavorite) Icons.Filled.Favorite else Icons.Default.FavoriteBorder,
-                            contentDescription = "Add to library"
-                        )
-                    }
-                    IconButton(onClick = {  }) {
-                        Icon(
-                            imageVector = Icons.Default.MoreVert,
-                            contentDescription = "See more options"
+                            contentDescription = stringResource(id = R.string.add_to_library_text)
                         )
                     }
                 },
@@ -194,12 +191,14 @@ fun DetailsScreen(
                 result = state.reviewsResult,
                 onNavigateToReviewScreen = { onEvent(DetailsEvent.NavigateToDestination("reviews")) },
                 onNavigateToSingleReview = { review ->
-                    onEvent(DetailsEvent.NavigateToSingleReview(
-                        destination = "review",
-                        author = review.author,
-                        score = review.score,
-                        review = review.review
-                    ))
+                    onEvent(
+                        DetailsEvent.NavigateToSingleReview(
+                            destination = "review",
+                            author = review.author,
+                            score = review.score,
+                            review = review.review
+                        )
+                    )
                 }
             )
             Spacer(modifier = Modifier.height(8.dp))
@@ -207,7 +206,7 @@ fun DetailsScreen(
                 StaffSection(
                     staff = state.staff,
                     result = state.staffResult,
-                    onNavigateToStaffScreen = { onEvent(DetailsEvent.NavigateToDestination("staff"))}
+                    onNavigateToStaffScreen = { onEvent(DetailsEvent.NavigateToDestination("staff")) }
                 )
             }
             Spacer(modifier = Modifier.height(8.dp))
@@ -236,7 +235,7 @@ fun DetailsScreen(
         ) {
             AsyncImage(
                 model = state.largeImageUrl.ifBlank { state.imageUrl },
-                contentDescription = "PopUp Image",
+                contentDescription = stringResource(id = R.string.pop_up_image_text),
                 modifier = Modifier.fillMaxHeight(0.6f)
             )
         }
@@ -265,7 +264,10 @@ private fun MainInfoSection(
             .fillMaxWidth()
             .animateContentSize()
             .then(if (synopsisExpanded) Modifier.wrapContentHeight() else Modifier.height(250.dp)),
-        shape = MaterialTheme.shapes.small.copy(topStart = CornerSize(0.dp), topEnd = CornerSize(0.dp)),
+        shape = MaterialTheme.shapes.small.copy(
+            topStart = CornerSize(0.dp),
+            topEnd = CornerSize(0.dp)
+        ),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp)
         )
@@ -278,7 +280,7 @@ private fun MainInfoSection(
             ) {
                 AsyncImage(
                     model = imageUrl,
-                    contentDescription = "main image",
+                    contentDescription = stringResource(id = R.string.cover_image_text),
                     modifier = Modifier
                         .clip(MaterialTheme.shapes.small)
                         .height(180.dp)
@@ -322,7 +324,7 @@ private fun MainInfoSection(
                         )
                         Icon(
                             imageVector = Icons.Default.ExpandMore,
-                            contentDescription = "expand for more synopsis info",
+                            contentDescription = stringResource(id = R.string.expand_more_text),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .align(Alignment.BottomCenter)
@@ -340,6 +342,7 @@ private fun MainInfoSection(
                         )
                     }
                 }
+
                 !synopsisExpanded && description.length < 200 -> {
                     Text(
                         text = description,
@@ -349,6 +352,7 @@ private fun MainInfoSection(
                             .padding(8.dp)
                     )
                 }
+
                 synopsisExpanded && description.length > 200 -> {
                     Text(
                         text = description,
@@ -359,18 +363,18 @@ private fun MainInfoSection(
                             .padding(8.dp)
                     )
                     Icon(
-                        imageVector =  Icons.Default.ExpandLess,
-                        contentDescription = "expand for more synopsis info",
+                        imageVector = Icons.Default.ExpandLess,
+                        contentDescription = stringResource(id = R.string.expand_less_text),
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
                                 onSynopsisExpand()
                             }
-                        )
-                    }
+                    )
                 }
             }
         }
+    }
     AnimatedVisibility(visible = isFavorite) {
         Row(
             modifier = Modifier
@@ -405,7 +409,7 @@ private fun CharactersSection(
             .padding(horizontal = 4.dp)
     ) {
         Text(
-            text = "Characters",
+            text = stringResource(id = R.string.characters_text),
             style = MaterialTheme.typography.titleMedium.copy(
                 fontWeight = FontWeight.SemiBold,
             ),
@@ -493,14 +497,14 @@ private fun StatsAndReviewsSection(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            text = "More Stats",
+            text = stringResource(id = R.string.more_stats_text),
             style = MaterialTheme.typography.titleSmall,
             fontWeight = FontWeight.Normal,
             modifier = Modifier
                 .alpha(0.8f)
         )
         Text(
-            text = "Reviews",
+            text = stringResource(id = R.string.reviews_text),
             style = MaterialTheme.typography.titleSmall,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.End,
@@ -528,9 +532,9 @@ private fun StatsAndReviewsSection(
             Column(
                 modifier = Modifier
                     .padding(start = 2.dp, top = 4.dp),
-                ) {
+            ) {
                 additionalInfo.onEach { info ->
-                    if (info.status.length > 1){
+                    if (info.status.length > 1) {
                         CustomStatusBox(
                             statusName = info.statusName,
                             status = info.status
@@ -557,7 +561,11 @@ private fun StatsAndReviewsSection(
                                 onNavigateToSingleReview = {
                                     onNavigateToSingleReview(it)
                                 },
-                                modifier = Modifier.then(if (reviews.indexOf(review) < 2) Modifier.padding(bottom = 8.dp) else Modifier)
+                                modifier = Modifier.then(
+                                    if (reviews.indexOf(review) < 2) Modifier.padding(
+                                        bottom = 8.dp
+                                    ) else Modifier
+                                )
                             )
                         }
                     }
@@ -602,7 +610,7 @@ private fun StaffSection(
         modifier = modifier.padding(horizontal = 4.dp)
     ) {
         Text(
-            text = "Staff",
+            text = stringResource(id = R.string.staff_text),
             style = MaterialTheme.typography.titleMedium.copy(
                 fontWeight = FontWeight.SemiBold,
             ),
@@ -617,14 +625,14 @@ private fun StaffSection(
         ) {
             ShimmerContent(
                 result = result,
-                contentAfterLoading = { 
+                contentAfterLoading = {
                     FlowColumn(
                         maxItemsInEachColumn = 4,
                         modifier = Modifier.padding(4.dp),
                         verticalArrangement = Arrangement.Top,
                         horizontalArrangement = Arrangement.Start
                     ) {
-                        staff.onEach { staffMember -> 
+                        staff.onEach { staffMember ->
                             if (staff.indexOf(staffMember) < 7) {
                                 StaffCard(
                                     name = staffMember.name,
@@ -635,8 +643,8 @@ private fun StaffSection(
                         }
                         if (staff.size > 7 || staff.isEmpty()) {
                             StaffCard(
-                                name = "See More",
-                                imageUrl = "https://cdn.myanimelist.net/images/questionmark_23.gif?s=f7dcbc4a4603d18356d3dfef8abd655c",
+                                name = stringResource(id = R.string.see_more_label_text),
+                                imageUrl = stringResource(id = R.string.question_mark_staff_image_url),
                                 positions = "",
                                 modifier = Modifier.clickable {
                                     onNavigateToStaffScreen()
@@ -655,8 +663,7 @@ private fun StaffSection(
                         }
                     }
                 },
-                errorContent = {
-                }
+                errorContent = {}
             )
         }
     }
@@ -675,7 +682,7 @@ private fun RecommendationsSection(
             .padding(horizontal = 4.dp)
     ) {
         Text(
-            text = "Recommendations",
+            text = stringResource(id = R.string.recommendations_text),
             style = MaterialTheme.typography.titleMedium.copy(
                 fontWeight = FontWeight.SemiBold,
             ),
@@ -713,7 +720,7 @@ private fun RecommendationsSection(
                             )
                         )
                     }
-                 }
+                }
             },
             loadingContent = {
                 Row(
@@ -724,9 +731,11 @@ private fun RecommendationsSection(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     (1..4).onEach {
-                        LoadingRecommendationAndCharacterCard(modifier = Modifier
-                            .height(150.dp)
-                            .width(110.dp))
+                        LoadingRecommendationAndCharacterCard(
+                            modifier = Modifier
+                                .height(150.dp)
+                                .width(110.dp)
+                        )
                     }
                 }
             },
@@ -760,7 +769,10 @@ private fun CustomFilterChip(
         label = {
             Text(
                 text = text.name,
-                style = MaterialTheme.typography.titleSmall.copy(fontSize = 10.sp, fontWeight = FontWeight.SemiBold)
+                style = MaterialTheme.typography.titleSmall.copy(
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
             )
         },
         modifier = modifier.padding(
@@ -780,7 +792,10 @@ fun LoadingReviewCard(
             .height(200.dp)
             .padding(bottom = 8.dp),
         shape = MaterialTheme.shapes.small,
-        border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)),
+        border = BorderStroke(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)
+        ),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp)
         )

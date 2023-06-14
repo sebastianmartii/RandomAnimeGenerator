@@ -18,7 +18,9 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.randomanimegenerator.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -34,14 +36,14 @@ fun GeneratorScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Random Anime Generator",
+                        text = stringResource(id = R.string.random_anime_generator_text),
                         style = MaterialTheme.typography.titleLarge
                     )
                 },
                 actions = {
                     PlainTooltipBox(
-                        tooltip = { 
-                            Text(text = "Edit")
+                        tooltip = {
+                            Text(text = stringResource(id = R.string.edit_text))
                         }
                     ) {
                         IconButton(
@@ -51,15 +53,15 @@ fun GeneratorScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Edit,
-                                contentDescription = "edit"
+                                contentDescription = stringResource(id = R.string.edit_text)
                             )
                         }
                     }
                     PlainTooltipBox(
                         tooltip = {
-                            Text(text = "Generate")
+                            Text(text = stringResource(id = R.string.generate_text))
                         }
-                    ){
+                    ) {
                         IconButton(
                             onClick = { onEvent(GeneratorEvent.Generate(state)) },
                             modifier = Modifier
@@ -67,7 +69,7 @@ fun GeneratorScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.PlayArrow,
-                                contentDescription = "generate"
+                                contentDescription = stringResource(id = R.string.generate_text)
                             )
                         }
                     }
@@ -78,7 +80,7 @@ fun GeneratorScreen(
             )
         },
         modifier = modifier.padding(paddingValues)
-    ) {values ->
+    ) { values ->
         AnimatedContent(targetState = state.editGeneratingParams) {
             when (it) {
                 false -> {
@@ -88,6 +90,7 @@ fun GeneratorScreen(
                         onDetailsNavigate = onDetailsNavigate
                     )
                 }
+
                 true -> {
                     GeneratorSettings(
                         paddingValues = values,

@@ -45,9 +45,11 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.example.randomanimegenerator.R
 import com.example.randomanimegenerator.feature_generator.presentation.toTypeString
 
 @Composable
@@ -134,7 +136,7 @@ private fun LibraryScreen(
         },
         modifier = modifier
             .padding(paddingValues)
-    ) {values ->
+    ) { values ->
         LazyVerticalGrid(
             columns = GridCells.Fixed(3),
             modifier = Modifier
@@ -181,8 +183,6 @@ private fun LibraryScreen(
 }
 
 
-
-
 @Composable
 private fun LibraryCard(
     title: String,
@@ -197,7 +197,7 @@ private fun LibraryCard(
     ) {
         Box(
             modifier = Modifier
-            .fillMaxWidth()
+                .fillMaxWidth()
         ) {
             AsyncImage(
                 model = imageUrl,
@@ -218,7 +218,7 @@ private fun LibraryCard(
                             )
                         )
                     )
-            ){
+            ) {
                 Text(
                     text = title,
                     style = MaterialTheme.typography.titleSmall,
@@ -284,7 +284,7 @@ private fun RegularTopAppBar(
             IconButton(onClick = onSearch) {
                 Icon(
                     imageVector = Icons.Default.Search,
-                    contentDescription = "Search button"
+                    contentDescription = stringResource(id = R.string.search_button_text)
                 )
             }
         },
@@ -316,7 +316,7 @@ private fun SearchTopAppBar(
                 textStyle = MaterialTheme.typography.titleMedium,
                 placeholder = {
                     Text(
-                        text = "Search...",
+                        text = stringResource(id = R.string.ellipsis_search_text),
                         style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier.alpha(0.7f)
                     )
@@ -325,7 +325,7 @@ private fun SearchTopAppBar(
                     IconButton(onClick = onClearTextField) {
                         Icon(
                             imageVector = Icons.Default.Cancel,
-                            contentDescription = "Clear Text Field"
+                            contentDescription = stringResource(id = R.string.clear_text_field_text)
                         )
                     }
                 },
@@ -344,7 +344,7 @@ private fun SearchTopAppBar(
             IconButton(onClick = onSearch) {
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
-                    contentDescription = "Stop Searching"
+                    contentDescription = stringResource(id = R.string.stop_searching_text)
                 )
             }
         },
@@ -352,7 +352,7 @@ private fun SearchTopAppBar(
             IconButton(onClick = onSearch) {
                 Icon(
                     imageVector = Icons.Filled.Search,
-                    contentDescription = "Search button"
+                    contentDescription = stringResource(id = R.string.search_button_text)
                 )
             }
         },

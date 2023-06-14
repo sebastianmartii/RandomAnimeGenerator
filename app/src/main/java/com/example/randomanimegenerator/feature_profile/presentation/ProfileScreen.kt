@@ -30,11 +30,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.example.randomanimegenerator.R
 import com.example.randomanimegenerator.feature_generator.presentation.Type
 import com.example.randomanimegenerator.feature_generator.presentation.toTypeString
 
@@ -52,7 +54,7 @@ fun ProfileScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Profile",
+                        text = stringResource(id = R.string.profile_text),
                         style = MaterialTheme.typography.titleLarge
                     )
                 },
@@ -60,7 +62,7 @@ fun ProfileScreen(
                     IconButton(onClick = { onEvent(ProfileEvent.OpenSignOutDialog) }) {
                         Icon(
                             imageVector = Icons.Default.Logout,
-                            contentDescription = "sign out"
+                            contentDescription = stringResource(id = R.string.sign_out_text)
                         )
                     }
                 },
@@ -80,14 +82,14 @@ fun ProfileScreen(
         ) {
             AsyncImage(
                 model = state.profilePictureUrl,
-                contentDescription = "profile picture",
+                contentDescription = stringResource(id = R.string.profile_picture_text),
                 modifier = Modifier
                     .padding(bottom = 16.dp)
                     .size(120.dp)
                     .clip(MaterialTheme.shapes.extraLarge.copy(CornerSize(64.dp)))
             )
             Text(
-                text = state.userName?.ifBlank { "UserName" } ?: "UserName",
+                text = state.userName?.ifBlank { stringResource(id = R.string.user_name_text) } ?: stringResource(id = R.string.user_name_text),
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.clickable {
                     onEvent(ProfileEvent.OpenChangeUserNameDialog)

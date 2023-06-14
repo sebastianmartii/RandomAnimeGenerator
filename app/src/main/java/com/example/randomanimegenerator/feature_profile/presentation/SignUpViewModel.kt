@@ -19,14 +19,14 @@ class SignUpViewModel @Inject constructor(
     private val authenticationClient: AuthenticationClient
 ) : ViewModel() {
 
-    private val _channel = Channel<UiEvent>()
+    private val _channel = Channel<ProfileFeatureUiEvent>()
     val eventFlow = _channel.receiveAsFlow()
 
     private val _state = MutableStateFlow(SignInState())
     val state = _state.asStateFlow()
 
     fun onEvent(event: SignUpEvent) {
-        when(event) {
+        when (event) {
             is SignUpEvent.SetEmail -> {
                 _state.update {
                     it.copy(
@@ -34,6 +34,7 @@ class SignUpViewModel @Inject constructor(
                     )
                 }
             }
+
             is SignUpEvent.SetPassword -> {
                 _state.update {
                     it.copy(
@@ -41,10 +42,11 @@ class SignUpViewModel @Inject constructor(
                     )
                 }
             }
+
             is SignUpEvent.SignUpWithEmailAndPassword -> {
                 viewModelScope.launch {
                     if (!event.email.isEmailValid() || !event.password.isPasswordValid()) {
-                        _channel.send(UiEvent.ShowSnackBar("Provided email or/and password are invalid"))
+                        _channel.send(ProfileFeatureUiEvent.ShowSnackBar("Provided email or/and password are invalid"))
                         return@launch
                     }
                     authenticationClient.signUpWithEmailAndPassword(event.email, event.password)
@@ -54,7 +56,8 @@ class SignUpViewModel @Inject constructor(
                         )
                     }
                     delay(1000L)
-                    val signUpResult = authenticationClient.signInWithEmailAndPassword(event.email, event.password)
+                    val signUpResult =
+                        authenticationClient.signInWithEmailAndPassword(event.email, event.password)
                     onEvent(SignUpEvent.OnSignUpResult(signUpResult))
                 }
             }
@@ -64,14 +67,22 @@ class SignUpViewModel @Inject constructor(
                     it.copy(
                         isSignInSuccessful = event.result.data != null,
                         errorMessage = event.result.errorMessage,
-                        isLoading = event.result.isLoading
+                        isLoading = event.result.data != null
+                    )
+                }
+                viewModelScope.launch {
+                    _channel.send(
+                        ProfileFeatureUiEvent.ShowSnackBar(
+                            "SignUp was not successful, " +
+                                    "please go over your credentials and try again."
+                        )
                     )
                 }
             }
-        }
-    }
 
-    sealed class UiEvent {
-        data class ShowSnackBar(val message: String) : UiEvent()
+            SignUpEvent.ResetState -> {
+                _state.update { SignInState() }
+            }
+        }
     }
 }

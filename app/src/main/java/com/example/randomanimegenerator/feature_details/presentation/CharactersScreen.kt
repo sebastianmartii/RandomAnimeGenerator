@@ -27,9 +27,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.example.randomanimegenerator.R
 import com.example.randomanimegenerator.feature_details.domain.model.Character
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -45,7 +47,7 @@ fun CharactersScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Characters",
+                        text = stringResource(id = R.string.characters_text),
                         style = MaterialTheme.typography.titleLarge
                     )
                 },
@@ -53,7 +55,7 @@ fun CharactersScreen(
                     IconButton(onClick = { onNavigateBack() }) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
-                            contentDescription = "Back Action Button"
+                            contentDescription = stringResource(id = R.string.back_action_button_text)
                         )
                     }
                 },
@@ -68,7 +70,7 @@ fun CharactersScreen(
             columns = GridCells.Fixed(2),
             modifier = Modifier.padding(values)
         ) {
-            items(characterList) {character ->
+            items(characterList) { character ->
                 CharacterItem(
                     imageUrl = character.imageUrl,
                     name = character.name,

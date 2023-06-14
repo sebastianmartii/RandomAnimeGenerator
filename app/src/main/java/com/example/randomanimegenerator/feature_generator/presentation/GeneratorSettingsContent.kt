@@ -8,8 +8,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.randomanimegenerator.R
 import com.example.randomanimegenerator.core.constants.listOfAmounts
 import com.example.randomanimegenerator.core.constants.listOfScores
 import com.example.randomanimegenerator.core.constants.listOfTypes
@@ -32,37 +34,37 @@ fun GeneratorSettings(
                 .fillMaxWidth()
                 .height(140.dp)
         ) {
-           Icon(
-               imageVector = Icons.Default.Tune,
-               contentDescription = "Leading Icon",
-               modifier = Modifier
-                   .size(80.dp)
-                   .align(Alignment.Center),
-           )
+            Icon(
+                imageVector = Icons.Default.Tune,
+                contentDescription = stringResource(id = R.string.leading_icon_text),
+                modifier = Modifier
+                    .size(80.dp)
+                    .align(Alignment.Center),
+            )
         }
         ChipGroup(
-            chipGroupTitle = "Type",
+            chipGroupTitle = stringResource(id = R.string.type_text),
             selected = state.typeSelected.toTypeString(),
             listOfItems = listOfTypes,
-            hint = "Choose what type you want to generate",
+            hint = stringResource(id = R.string.type_hint_text),
             onSelect = {
                 onEvent(GeneratorEvent.SetType(it.toType()))
             }
         )
         ChipGroup(
-            chipGroupTitle = "Minimum Score",
+            chipGroupTitle = stringResource(id = R.string.minimum_score_text),
             selected = state.scoreSelected,
             listOfItems = listOfScores,
-            hint = "Choose what score items will start at",
+            hint = stringResource(id = R.string.score_hint_text),
             onSelect = {
                 onEvent(GeneratorEvent.SetScore(it))
             }
         )
         ChipGroup(
-            chipGroupTitle = "Generated Amount",
+            chipGroupTitle = stringResource(id = R.string.generated_amount_text),
             selected = state.amountSelected.toAmountString(),
             listOfItems = listOfAmounts,
-            hint = "Choose what amount should be generated",
+            hint = stringResource(id = R.string.amount_hint_text),
             onSelect = {
                 onEvent(GeneratorEvent.SetAmount(it.toAmount()))
             }
@@ -117,7 +119,6 @@ private fun ChipGroup(
         }
     }
 }
-
 
 
 @OptIn(ExperimentalMaterial3Api::class)

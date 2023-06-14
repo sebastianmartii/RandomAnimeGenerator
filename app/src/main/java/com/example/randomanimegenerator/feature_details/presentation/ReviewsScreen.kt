@@ -18,7 +18,9 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.randomanimegenerator.R
 import com.example.randomanimegenerator.feature_details.domain.model.Review
 import com.example.randomanimegenerator.feature_details.domain.model.SingleReview
 
@@ -36,7 +38,7 @@ fun ReviewsScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Reviews",
+                        text = stringResource(id = R.string.reviews_text),
                         style = MaterialTheme.typography.titleLarge
                     )
                 },
@@ -44,7 +46,7 @@ fun ReviewsScreen(
                     IconButton(onClick = { onNavigateBack() }) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
-                            contentDescription = "Back Action Button"
+                            contentDescription = stringResource(id = R.string.back_action_button_text)
                         )
                     }
                 },
@@ -66,7 +68,7 @@ fun ReviewsScreen(
                     },
                     modifier = Modifier
                         .height(260.dp)
-                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                        .padding(horizontal = 8.dp, vertical = 8.dp)
                 )
             }
         }

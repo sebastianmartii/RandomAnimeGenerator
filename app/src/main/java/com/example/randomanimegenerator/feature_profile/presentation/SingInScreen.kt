@@ -17,35 +17,53 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import com.example.randomanimegenerator.R
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignInScreen(
     state: SignInState,
+    eventFlow: Flow<ProfileFeatureUiEvent>,
     paddingValues: PaddingValues,
+    snackBarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
     onEvent: (SignInEvent) -> Unit,
     onSignInWithGoogle: () -> Unit,
     onNavigateToSignUpScreen: () -> Unit
 ) {
+    LaunchedEffect(key1 = true) {
+        eventFlow.collectLatest { event ->
+            when (event) {
+                is ProfileFeatureUiEvent.ShowSnackBar -> {
+                    snackBarHostState.showSnackbar(message = event.message)
+                }
+            }
+        }
+    }
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     Text(
-                        text = "Sign in",
+                        text = stringResource(id = R.string.sign_in_text),
                         style = MaterialTheme.typography.titleLarge
                     )
                 },
@@ -53,6 +71,9 @@ fun SignInScreen(
                     containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp)
                 )
             )
+        },
+        snackbarHost = {
+            SnackbarHost(hostState = snackBarHostState)
         },
         modifier = modifier.padding(paddingValues)
     ) { values ->
@@ -76,10 +97,10 @@ fun SignInScreen(
                         onEvent(SignInEvent.SetEmail(email))
                     },
                     label = {
-                        Text(text = "E-mail")
+                        Text(text = stringResource(id = R.string.email_text))
                     },
                     placeholder = {
-                        Text(text = "E-mail")
+                        Text(text = stringResource(id = R.string.email_text))
                     },
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -90,24 +111,31 @@ fun SignInScreen(
                         onEvent(SignInEvent.SetPassword(password))
                     },
                     label = {
-                        Text(text = "Password")
+                        Text(text = stringResource(id = R.string.password_text))
                     },
                     placeholder = {
-                        Text(text = "Password")
+                        Text(text = stringResource(id = R.string.password_text))
                     },
                     visualTransformation = PasswordVisualTransformation(),
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Button(
-                    onClick = { onEvent(SignInEvent.SignInWithEmailAndPassword(state.email, state.password)) },
+                    onClick = {
+                        onEvent(
+                            SignInEvent.SignInWithEmailAndPassword(
+                                state.email,
+                                state.password
+                            )
+                        )
+                    },
                     shape = MaterialTheme.shapes.small,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 ) {
                     Text(
-                        text = "Sing in",
+                        text = stringResource(id = R.string.sign_in_text),
                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth()
@@ -118,15 +146,15 @@ fun SignInScreen(
                     shape = MaterialTheme.shapes.small,
                 ) {
                     Text(
-                        text = "Sing in with Google",
+                        text = stringResource(id = R.string.sign_in_with_google_text),
                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
-                Row(modifier = Modifier.fillMaxWidth()){
+                Row(modifier = Modifier.fillMaxWidth()) {
                     Text(
-                        text = "Sign up",
+                        text = stringResource(id = R.string.sign_up_text),
                         style = MaterialTheme.typography.labelMedium.copy(
                             fontWeight = FontWeight.Light,
                             textDecoration = TextDecoration.Underline

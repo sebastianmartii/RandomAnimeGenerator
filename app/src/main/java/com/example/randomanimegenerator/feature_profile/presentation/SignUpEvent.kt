@@ -5,4 +5,5 @@ sealed interface SignUpEvent {
     data class OnSignUpResult(val result: SignInResult) : SignUpEvent
     data class SetEmail(val email: String) : SignUpEvent
     data class SetPassword(val password: String) : SignUpEvent
+    object ResetState : SignUpEvent
 }

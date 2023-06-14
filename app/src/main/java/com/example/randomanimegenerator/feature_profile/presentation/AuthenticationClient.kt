@@ -112,7 +112,6 @@ class AuthenticationClient(
                     )
                 },
                 errorMessage = null,
-                isLoading = false
             )
         } catch (e: Exception) {
             e.printStackTrace()
@@ -120,7 +119,6 @@ class AuthenticationClient(
             SignInResult(
                 data = null,
                 errorMessage = e.message,
-                isLoading = false
             )
         }
     }

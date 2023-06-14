@@ -38,9 +38,13 @@ class LibraryViewModel @Inject constructor(
     val isSearching = _isSearching.asStateFlow()
 
     private val _libraryContent = _libraryFilter.flatMapLatest { filter ->
-        when(filter.libraryStatus) {
+        when (filter.libraryStatus) {
             LibraryStatus.ALL -> getAllUseCase(type.value.toTypeString(), filter.librarySortType)
-            else -> getAllByStatusUseCase(type.value.toTypeString(), filter.libraryStatus.toStatusString(), filter.librarySortType)
+            else -> getAllByStatusUseCase(
+                type.value.toTypeString(),
+                filter.libraryStatus.toStatusString(),
+                filter.librarySortType
+            )
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
@@ -57,7 +61,13 @@ class LibraryViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), _libraryContent.value)
 
     private val _state = MutableStateFlow(LibraryState())
-    val state = combine(_libraryFilter, _filteredContent, _state, _isSearching, _searchText) { filter, content, state, isSearching, text ->
+    val state = combine(
+        _libraryFilter,
+        _filteredContent,
+        _state,
+        _isSearching,
+        _searchText
+    ) { filter, content, state, isSearching, text ->
         state.copy(
             content = content.map { it.toLibraryModel() },
             type = type.value,
@@ -69,7 +79,7 @@ class LibraryViewModel @Inject constructor(
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), LibraryState())
 
     fun onEvent(event: LibraryEvent) {
-        when(event) {
+        when (event) {
             is LibraryEvent.ChangeStatus -> {
                 _libraryFilter.update {
                     it.copy(
@@ -77,6 +87,7 @@ class LibraryViewModel @Inject constructor(
                     )
                 }
             }
+
             is LibraryEvent.ChangeSortType -> {
                 _libraryFilter.update {
                     it.copy(
@@ -84,16 +95,20 @@ class LibraryViewModel @Inject constructor(
                     )
                 }
             }
+
             LibraryEvent.Search -> {
                 _isSearching.update { !it }
                 _searchText.update { "" }
             }
+
             LibraryEvent.ClearTextField -> {
                 _searchText.update { "" }
             }
+
             is LibraryEvent.ChangeSearchText -> {
                 _searchText.update { event.query }
             }
+
             is LibraryEvent.SetType -> {
                 type.value = event.type
             }

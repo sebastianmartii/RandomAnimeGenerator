@@ -1,9 +1,5 @@
 package com.example.randomanimegenerator.feature_generator.domain.model
 
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
-
-@Parcelize
 data class GeneratorModel(
     val titleEng: String = "",
     val titleJap: String? = "",
@@ -27,4 +23,4 @@ data class GeneratorModel(
     val volumes: Int? = 0,
     val libraryStatus: String = "planned",
     val libraryType: String = "Anime"
-) : Parcelable
+)

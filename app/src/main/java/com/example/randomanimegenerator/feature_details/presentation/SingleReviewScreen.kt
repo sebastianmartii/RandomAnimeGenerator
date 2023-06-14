@@ -25,9 +25,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.randomanimegenerator.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,7 +46,7 @@ fun SingleReviewScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Review",
+                        text = stringResource(id = R.string.review_text),
                         style = MaterialTheme.typography.titleLarge
                     )
                 },
@@ -52,7 +54,7 @@ fun SingleReviewScreen(
                     IconButton(onClick = { onNavigateBack() }) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back Action Button"
+                            contentDescription = stringResource(id = R.string.back_action_button_text)
                         )
                     }
                 },

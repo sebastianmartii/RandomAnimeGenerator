@@ -23,6 +23,7 @@ import com.example.randomanimegenerator.feature_profile.presentation.SignInEvent
 import com.example.randomanimegenerator.feature_profile.presentation.SignInScreen
 import com.example.randomanimegenerator.feature_profile.presentation.SignInState
 import com.example.randomanimegenerator.feature_profile.presentation.SignInViewModel
+import com.example.randomanimegenerator.feature_profile.presentation.SignUpEvent
 import com.example.randomanimegenerator.feature_profile.presentation.SignUpScreen
 import com.example.randomanimegenerator.feature_profile.presentation.SignUpViewModel
 import kotlinx.coroutines.runBlocking
@@ -41,6 +42,10 @@ fun NavGraphBuilder.profileNavGraph(
         ) {
             val viewModel = hiltViewModel<SignInViewModel>()
             val state by viewModel.state.collectAsStateWithLifecycle(SignInState())
+
+            val snackBarHostState = remember {
+                SnackbarHostState()
+            }
 
             val launcher = rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.StartIntentSenderForResult(),
@@ -65,8 +70,10 @@ fun NavGraphBuilder.profileNavGraph(
 
             SignInScreen(
                 state = state,
+                eventFlow = viewModel.eventFlow,
                 paddingValues = paddingValues,
                 onEvent = viewModel::onEvent,
+                snackBarHostState = snackBarHostState,
                 onSignInWithGoogle = {
                     runBlocking {
                         val signInIntendSender = authenticationClient.signIn()
@@ -106,6 +113,13 @@ fun NavGraphBuilder.profileNavGraph(
         composable(route = Destinations.SignUp.route) {
             val viewModel = hiltViewModel<SignUpViewModel>()
             val state by viewModel.state.collectAsStateWithLifecycle(SignInState())
+
+            LaunchedEffect(key1 = state.isSignInSuccessful) {
+                if (state.isSignInSuccessful) {
+                    navController.navigate(Destinations.Profile.route)
+                    viewModel.onEvent(SignUpEvent.ResetState)
+                }
+            }
 
             val snackBarHostState = remember {
                 SnackbarHostState()

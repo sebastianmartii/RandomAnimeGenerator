@@ -35,8 +35,7 @@ fun CharacterCard(
         shape = MaterialTheme.shapes.small
     ) {
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
+            modifier = Modifier.fillMaxWidth()
         ) {
             AsyncImage(
                 model = imageUrl,
@@ -52,8 +51,7 @@ fun CharacterCard(
                     .background(
                         brush = Brush.verticalGradient(
                             listOf(
-                                Color.Transparent,
-                                Color.Black
+                                Color.Transparent, Color.Black
                             )
                         )
                     )

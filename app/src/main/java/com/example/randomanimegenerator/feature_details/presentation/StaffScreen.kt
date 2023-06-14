@@ -18,7 +18,9 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.randomanimegenerator.R
 import com.example.randomanimegenerator.feature_details.domain.model.Staff
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -34,7 +36,7 @@ fun StaffScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Staff",
+                        text = stringResource(id = R.string.staff_text),
                         style = MaterialTheme.typography.titleSmall
                     )
                 },
@@ -42,7 +44,7 @@ fun StaffScreen(
                     IconButton(onClick = { onNavigateBack() }) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
-                            contentDescription = "Back Action Button"
+                            contentDescription = stringResource(id = R.string.back_action_button_text)
                         )
                     }
                 },

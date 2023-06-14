@@ -26,9 +26,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.example.randomanimegenerator.R
 import com.example.randomanimegenerator.feature_generator.domain.model.GeneratorModel
 
 @Composable
@@ -47,14 +49,14 @@ fun GeneratedContent(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Generate Random Anime",
+                    text = stringResource(id = R.string.random_anime_generator_text),
                     style = MaterialTheme.typography.headlineSmall,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.alpha(0.6f)
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "Or Change Generating Settings By Pressing The Edit Button",
+                    text = stringResource(id = R.string.generator_hint_text),
                     style = MaterialTheme.typography.labelSmall,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.alpha(0.4f)

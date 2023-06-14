@@ -19,7 +19,9 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.randomanimegenerator.R
 import com.example.randomanimegenerator.feature_details.domain.model.Recommendation
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -36,7 +38,7 @@ fun RecommendationsScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Recommendations",
+                        text = stringResource(id = R.string.recommendations_text),
                         style = MaterialTheme.typography.titleLarge
                     )
                 },
@@ -44,7 +46,7 @@ fun RecommendationsScreen(
                     IconButton(onClick = { onNavigateBack() }) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
-                            contentDescription = "Back Action Button"
+                            contentDescription = stringResource(id = R.string.back_action_button_text)
                         )
                     }
                 },

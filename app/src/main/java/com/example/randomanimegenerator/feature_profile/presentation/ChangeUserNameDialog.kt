@@ -9,6 +9,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.*
+import androidx.compose.ui.res.stringResource
+import com.example.randomanimegenerator.R
 
 @Composable
 fun ChangeUserNameDialog(
@@ -24,7 +26,7 @@ fun ChangeUserNameDialog(
             onDismissRequest = closeDialog,
             title = {
                 Text(
-                    text = "Input new username",
+                    text = stringResource(id = R.string.input_new_user_name_text),
                     style = MaterialTheme.typography.titleMedium
                 )
             },
@@ -41,12 +43,12 @@ fun ChangeUserNameDialog(
                     closeDialog()
                     changeUserName(newUserName)
                 }) {
-                    Text(text = "Confirm")
+                    Text(text = stringResource(id = R.string.confirm_text))
                 }
             },
             dismissButton = {
                 TextButton(onClick = closeDialog) {
-                    Text(text = "Dismiss")
+                    Text(text = stringResource(id = R.string.dismiss_text))
                 }
             }
         )

@@ -10,4 +10,46 @@
         See\n
         More
     </string>
+    <string name="see_more_label_text">See More</string>
+    <string name="characters_text">Characters</string>
+    <string name="back_action_button_text">Back Action Button</string>
+    <string name="add_to_library_text">Add to library</string>
+    <string name="pop_up_image_text">PopUp Image</string>
+    <string name="cover_image_text">Cover Image</string>
+    <string name="expand_more_text">Expand More</string>
+    <string name="expand_less_text">Expand Less</string>
+    <string name="more_stats_text">More Stats</string>
+    <string name="reviews_text">Reviews</string>
+    <string name="review_text">Review</string>
+    <string name="staff_text">Staff</string>
+    <string name="question_mark_staff_image_url">https://cdn.myanimelist.net/images/questionmark_23.gif?s=f7dcbc4a4603d18356d3dfef8abd655c</string>
+    <string name="recommendations_text">Recommendations</string>
+    <string name="leading_icon_text">Leading Icon</string>
+    <string name="type_text">Type</string>
+    <string name="minimum_score_text">Minimum Score</string>
+    <string name="generated_amount_text">Generated Amount</string>
+    <string name="type_hint_text">Choose what type you want to generate</string>
+    <string name="score_hint_text">Choose what score items will start at</string>
+    <string name="amount_hint_text">Choose what amount should be generated</string>
+    <string name="generate_text">Generate</string>
+    <string name="edit_text">Edit</string>
+    <string name="random_anime_generator_text">Random Anime Generator</string>
+    <string name="generator_hint_text">Or Change Generating Settings By Pressing The Edit Button</string>
+    <string name="search_button_text">Search Button</string>
+    <string name="ellipsis_search_text">Search…</string>
+    <string name="clear_text_field_text">Clear Text Field</string>
+    <string name="stop_searching_text">Stop Searching</string>
+    <string name="confirm_text">Confirm</string>
+    <string name="dismiss_text">Dismiss</string>
+    <string name="sign_in_text">Sign In</string>
+    <string name="sign_up_text">Sign Up</string>
+    <string name="email_text">E-mail</string>
+    <string name="password_text">Password</string>
+    <string name="sign_in_with_google_text">Sign In with Google</string>
+    <string name="sign_out_dialog_text">Are you sure you want to sign out?</string>
+    <string name="sign_out_text">Sign Out</string>
+    <string name="profile_text">Profile</string>
+    <string name="profile_picture_text">Profile Picture</string>
+    <string name="user_name_text">UserName</string>
+    <string name="input_new_user_name_text">Input new username</string>
 </resources>

@@ -1,4 +1,3 @@
-
 package com.example.randomanimegenerator.feature_profile.presentation
 
 import androidx.compose.foundation.layout.Arrangement
@@ -31,10 +30,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.randomanimegenerator.R
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 
@@ -42,7 +43,7 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun SignUpScreen(
     state: SignInState,
-    eventFlow: Flow<SignUpViewModel.UiEvent>,
+    eventFlow: Flow<ProfileFeatureUiEvent>,
     modifier: Modifier = Modifier,
     paddingValues: PaddingValues,
     snackBarHostState: SnackbarHostState,
@@ -51,8 +52,8 @@ fun SignUpScreen(
 ) {
     LaunchedEffect(key1 = true) {
         eventFlow.collectLatest { event ->
-            when(event) {
-                is SignUpViewModel.UiEvent.ShowSnackBar -> {
+            when (event) {
+                is ProfileFeatureUiEvent.ShowSnackBar -> {
                     snackBarHostState.showSnackbar(message = event.message)
                 }
             }
@@ -63,7 +64,7 @@ fun SignUpScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Sign up",
+                        text = stringResource(id = R.string.sign_up_text),
                         style = MaterialTheme.typography.titleLarge
                     )
                 },
@@ -71,7 +72,7 @@ fun SignUpScreen(
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "navigate back"
+                            contentDescription = stringResource(id = R.string.back_action_button_text)
                         )
                     }
                 },
@@ -107,10 +108,10 @@ fun SignUpScreen(
                         onEvent(SignUpEvent.SetEmail(email))
                     },
                     label = {
-                        Text(text = "E-mail")
+                        Text(text = stringResource(id = R.string.email_text))
                     },
                     placeholder = {
-                        Text(text = "E-mail")
+                        Text(text = stringResource(id = R.string.email_text))
                     },
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -121,10 +122,10 @@ fun SignUpScreen(
                         onEvent(SignUpEvent.SetPassword(password))
                     },
                     label = {
-                        Text(text = "Password")
+                        Text(text = stringResource(id = R.string.password_text))
                     },
                     placeholder = {
-                        Text(text = "Password")
+                        Text(text = stringResource(id = R.string.password_text))
                     },
                     visualTransformation = PasswordVisualTransformation(),
                     modifier = Modifier.fillMaxWidth()
@@ -139,7 +140,7 @@ fun SignUpScreen(
                     )
                 ) {
                     Text(
-                        text = "Sing up",
+                        text = stringResource(id = R.string.sign_up_text),
                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth()
