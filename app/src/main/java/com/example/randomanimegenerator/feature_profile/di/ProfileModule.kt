@@ -3,6 +3,10 @@ package com.example.randomanimegenerator.feature_profile.di
 import android.content.Context
 import com.example.randomanimegenerator.core.database.RandomAnimeGeneratorDb
 import com.example.randomanimegenerator.core.database.daos.MainInfoDao
+import com.example.randomanimegenerator.core.database.daos.UserDao
+import com.example.randomanimegenerator.feature_profile.data.repository.ProfileRepositoryImpl
+import com.example.randomanimegenerator.feature_profile.domain.repository.ProfileRepository
+import com.example.randomanimegenerator.feature_profile.domain.use_cases.GetEntriesCountUseCase
 import com.example.randomanimegenerator.feature_profile.presentation.AuthenticationClient
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.auth.api.identity.SignInClient
@@ -16,6 +20,32 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object ProfileModule {
+
+    @Provides
+    @Singleton
+    fun provideGetEntriesCountUseCase(
+        repo: ProfileRepository
+    ): GetEntriesCountUseCase {
+        return GetEntriesCountUseCase(repo)
+    }
+
+    @Provides
+    @Singleton
+    fun provideProfileRepository(
+        mainInfoDao: MainInfoDao,
+        userDao: UserDao,
+        authenticationClient: AuthenticationClient
+    ): ProfileRepository {
+        return ProfileRepositoryImpl(mainInfoDao, userDao, authenticationClient)
+    }
+
+    @Provides
+    @Singleton
+    fun provideUserDao(
+        db: RandomAnimeGeneratorDb
+    ): UserDao {
+        return db.userDao
+    }
 
     @Provides
     @Singleton

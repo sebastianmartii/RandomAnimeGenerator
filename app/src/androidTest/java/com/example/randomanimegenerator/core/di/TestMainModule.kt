@@ -23,5 +23,5 @@ object TestMainModule {
     ) = Room.inMemoryDatabaseBuilder(
             context,
             RandomAnimeGeneratorDb::class.java
-        ).allowMainThreadQueries().build()
+        ).allowMainThreadQueries().addMigrations(RandomAnimeGeneratorDb.MIGRATION_1_2).build()
 }

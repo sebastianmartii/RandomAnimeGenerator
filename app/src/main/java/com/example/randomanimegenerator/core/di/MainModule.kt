@@ -23,6 +23,6 @@ class MainModule {
             context = context,
             RandomAnimeGeneratorDb::class.java,
             "random_anime_generator_db"
-        ).build()
+        ).addMigrations(RandomAnimeGeneratorDb.MIGRATION_1_2).build()
     }
 }
