@@ -3,6 +3,7 @@ package com.example.randomanimegenerator.core.navigation
 import android.app.Activity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.SnackbarHostState
@@ -16,6 +17,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.example.randomanimegenerator.feature_profile.presentation.AuthenticationClient
+import com.example.randomanimegenerator.feature_profile.presentation.ProfileEvent
 import com.example.randomanimegenerator.feature_profile.presentation.ProfileScreen
 import com.example.randomanimegenerator.feature_profile.presentation.ProfileState
 import com.example.randomanimegenerator.feature_profile.presentation.ProfileViewModel
@@ -35,7 +37,7 @@ fun NavGraphBuilder.profileNavGraph(
 ) {
     navigation(
         route = Destinations.ProfileNavGraph.route,
-        startDestination = Destinations.Profile.route
+        startDestination = Destinations.SignIn.route
     ) {
         composable(
             route = Destinations.SignIn.route
@@ -101,12 +103,27 @@ fun NavGraphBuilder.profileNavGraph(
                 }
             }
 
+            val launcher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.PickVisualMedia(),
+                onResult = {
+                    if (it == null) {
+                        return@rememberLauncherForActivityResult
+                    }
+                    viewModel.onEvent(ProfileEvent.ChangeProfilePicture(it.toString()))
+                }
+            )
+
             ProfileScreen(
                 paddingValues = paddingValues,
                 state = state,
                 onEvent = viewModel::onEvent,
                 onNavigateToSignInScreen = {
                     navController.navigate(Destinations.SignIn.route)
+                },
+                onProfilePictureChange = {
+                    launcher.launch(
+                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                    )
                 }
             )
         }

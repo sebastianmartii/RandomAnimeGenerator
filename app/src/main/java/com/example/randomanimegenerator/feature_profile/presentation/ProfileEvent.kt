@@ -7,4 +7,5 @@ sealed interface ProfileEvent {
     object CloseChangeUserNameDialog : ProfileEvent
     object OpenChangeUserNameDialog : ProfileEvent
     data class ChangeUserName(val newUserName: String) : ProfileEvent
+    data class ChangeProfilePicture(val newProfilePictureUrl: String) : ProfileEvent
 }

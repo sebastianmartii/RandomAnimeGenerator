@@ -2,34 +2,56 @@ package com.example.randomanimegenerator.feature_profile.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.randomanimegenerator.core.database.daos.MainInfoDao
+import com.example.randomanimegenerator.core.database.daos.UserDao
 import com.example.randomanimegenerator.feature_details.data.mappers.toStatusString
 import com.example.randomanimegenerator.feature_generator.presentation.Type
 import com.example.randomanimegenerator.feature_generator.presentation.toTypeString
 import com.example.randomanimegenerator.feature_library.presentation.LibraryStatus
+import com.example.randomanimegenerator.feature_profile.data.mappers.toUserData
+import com.example.randomanimegenerator.feature_profile.domain.repository.ProfileRepository
+import com.example.randomanimegenerator.feature_profile.domain.use_cases.GetEntriesCountUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val authenticationClient: AuthenticationClient,
-    mainInfoDao: MainInfoDao
+    private val repo: ProfileRepository,
+    userDao: UserDao,
+    getEntriesCountUseCase: GetEntriesCountUseCase,
 ) : ViewModel() {
 
-    private val _animeEntriesCount = mainInfoDao.getEntriesCount(Type.ANIME.toTypeString())
-    private val _mangaEntriesCount = mainInfoDao.getEntriesCount(Type.MANGA.toTypeString())
+    private val _animeEntriesCount = getEntriesCountUseCase(Type.ANIME.toTypeString())
+    private val _mangaEntriesCount = getEntriesCountUseCase(Type.MANGA.toTypeString())
+
+    private val _userUID = authenticationClient.getSignedInUser()?.userId
+    private val _currentUser = userDao.getUser(_userUID ?: "").flatMapLatest {
+        flow {
+            emit(it.toUserData())
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
     private val _state = MutableStateFlow(ProfileState())
     val state = combine(
         _state,
+        _currentUser,
         _animeEntriesCount,
         _mangaEntriesCount
-    ) { state, animeEntriesCount, mangaEntriesCount ->
+    ) { state, user, animeEntriesCount, mangaEntriesCount ->
         state.copy(
+            userUID = user?.userId ?: "",
+            userName = user?.userName ?: "",
+            profilePictureUrl = user?.profilePictureUrl ?: "",
             animeEntriesCount = listOf(
                 EntriesCount(LibraryStatus.ALL, animeEntriesCount.size),
                 EntriesCount(
@@ -77,19 +99,7 @@ class ProfileViewModel @Inject constructor(
                 ),
             ),
         )
-    }
-
-    init {
-        authenticationClient.getSignedInUser().run {
-            _state.update {
-                it.copy(
-                    profilePictureUrl = this?.profilePictureUrl
-                        ?: "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
-                    userName = this?.userName
-                )
-            }
-        }
-    }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ProfileState())
 
     fun onEvent(event: ProfileEvent) {
         when (event) {
@@ -116,10 +126,8 @@ class ProfileViewModel @Inject constructor(
             }
 
             is ProfileEvent.ChangeUserName -> {
-                _state.update {
-                    it.copy(
-                        userName = event.newUserName
-                    )
+                viewModelScope.launch {
+                    repo.changeUserName(_userUID!!, event.newUserName)
                 }
             }
 
@@ -135,6 +143,15 @@ class ProfileViewModel @Inject constructor(
                 _state.update {
                     it.copy(
                         openChangeUserNameDialog = true
+                    )
+                }
+            }
+
+            is ProfileEvent.ChangeProfilePicture -> {
+                viewModelScope.launch {
+                    repo.changeProfilePicture(
+                        _userUID!!,
+                        event.newProfilePictureUrl
                     )
                 }
             }
