@@ -88,8 +88,8 @@ fun ProfileScreen(
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .padding(bottom = 16.dp)
-                    .size(200.dp)
-                    .clip(MaterialTheme.shapes.extraLarge.copy(CornerSize(64.dp)))
+                    .size(180.dp)
+                    .clip(MaterialTheme.shapes.extraLarge.copy(CornerSize(128.dp)))
                     .clickable {
                         onProfilePictureChange()
                     }

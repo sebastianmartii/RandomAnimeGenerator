@@ -1,6 +1,7 @@
 package com.example.randomanimegenerator.core.navigation
 
 import android.app.Activity
+import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.PickVisualMediaRequest
@@ -10,6 +11,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
@@ -97,6 +99,8 @@ fun NavGraphBuilder.profileNavGraph(
             val viewModel = hiltViewModel<ProfileViewModel>()
             val state by viewModel.state.collectAsStateWithLifecycle(ProfileState())
 
+            val context = LocalContext.current
+
             LaunchedEffect(key1 = Unit) {
                 if (authenticationClient.getSignedInUser() == null) {
                     navController.navigate(Destinations.SignIn.route)
@@ -109,6 +113,7 @@ fun NavGraphBuilder.profileNavGraph(
                     if (it == null) {
                         return@rememberLauncherForActivityResult
                     }
+                    context.contentResolver.takePersistableUriPermission(it, Intent.FLAG_GRANT_READ_URI_PERMISSION)
                     viewModel.onEvent(ProfileEvent.ChangeProfilePicture(it.toString()))
                 }
             )
