@@ -53,18 +53,18 @@ interface UserFavoritesDao {
     fun getAllOldest(type: String, userUID: String): Flow<List<UserFavoritesEntity>>
 
     @Query("SELECT * FROM user_favorites_table " +
-            "WHERE entry_type = :type AND user_uid = :userUID AND entry_status = :status ORDER BY title ASC")
-    fun getAllByStatusAZ(type: String, userUID: String, status: String): Flow<List<UserFavoritesEntity>>
+            "WHERE entry_type = :type AND entry_status = :status AND user_uid = :userUID ORDER BY title ASC")
+    fun getAllByStatusAZ(type: String, status: String, userUID: String): Flow<List<UserFavoritesEntity>>
 
     @Query("SELECT * FROM user_favorites_table " +
-            "WHERE entry_type = :type AND user_uid = :userUID AND entry_status = :status  ORDER BY title DESC")
-    fun getAllByStatusZA(type: String, userUID: String, status: String): Flow<List<UserFavoritesEntity>>
+            "WHERE entry_type = :type AND entry_status = :status AND user_uid = :userUID ORDER BY title DESC")
+    fun getAllByStatusZA(type: String, status: String, userUID: String): Flow<List<UserFavoritesEntity>>
 
     @Query("SELECT * FROM user_favorites_table " +
-            "WHERE entry_type = :type AND user_uid = :userUID AND entry_status = :status  ORDER BY id DESC")
-    fun getAllByStatusNewest(type: String, userUID: String, status: String): Flow<List<UserFavoritesEntity>>
+            "WHERE entry_type = :type AND entry_status = :status AND user_uid = :userUID ORDER BY id DESC")
+    fun getAllByStatusNewest(type: String, status: String, userUID: String): Flow<List<UserFavoritesEntity>>
 
     @Query("SELECT * FROM user_favorites_table " +
-            "WHERE entry_type = :type AND user_uid = :userUID AND entry_status = :status  ORDER BY id ASC")
-    fun getAllByStatusOldest(type: String, userUID: String, status: String): Flow<List<UserFavoritesEntity>>
+            "WHERE entry_type = :type AND entry_status = :status AND user_uid = :userUID ORDER BY id ASC")
+    fun getAllByStatusOldest(type: String, status: String, userUID: String): Flow<List<UserFavoritesEntity>>
 }

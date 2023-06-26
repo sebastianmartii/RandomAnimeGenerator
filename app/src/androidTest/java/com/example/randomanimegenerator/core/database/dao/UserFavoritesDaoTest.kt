@@ -230,9 +230,21 @@ class UserFavoritesDaoTest {
         dao.addToUserFavorites(userFavorite2)
         dao.addToUserFavorites(userFavorite3)
         dao.addToUserFavorites(userFavorite4)
-        val returnedUserFavorites = dao.getAllByStatusZA("", "uid1", "planning").first()
-        for (i in 0..returnedUserFavorites.size - 2) {
-            assertThat(returnedUserFavorites[i].title).isGreaterThan(returnedUserFavorites[i+1].title)
+        val returnedUserFavoritesZA = dao.getAllByStatusZA("", "uid1", "planning").first()
+        val returnedUserFavoritesAZ = dao.getAllByStatusAZ("", "uid1", "planning").first()
+        val returnedUserFavoritesNewest = dao.getAllByStatusNewest("", "uid1", "planning").first()
+        val returnedUserFavoritesOldest = dao.getAllByStatusOldest("", "uid1", "planning").first()
+        for (i in 0..returnedUserFavoritesZA.size - 2) {
+            assertThat(returnedUserFavoritesZA[i].title).isGreaterThan(returnedUserFavoritesZA[i+1].title)
+        }
+        for (i in 0..returnedUserFavoritesAZ.size - 2) {
+            assertThat(returnedUserFavoritesAZ[i].title).isLessThan(returnedUserFavoritesAZ[i+1].title)
+        }
+        for (i in 0..returnedUserFavoritesNewest.size - 2) {
+            assertThat(returnedUserFavoritesNewest[i].id).isGreaterThan(returnedUserFavoritesNewest[i+1].id)
+        }
+        for (i in 0..returnedUserFavoritesOldest.size - 2) {
+            assertThat(returnedUserFavoritesOldest[i].id).isLessThan(returnedUserFavoritesOldest[i+1].id)
         }
     }
 }
