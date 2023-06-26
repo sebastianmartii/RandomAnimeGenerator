@@ -11,6 +11,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface DetailsRepository {
 
+    fun getStatus(id: Int, type: String, userUID: String): Flow<String>
+
     fun getInfo(id: Int, type: Type): Flow<Resource<MainModel>>
 
     fun getReviews(id: Int, type: Type): Flow<Resource<List<Review>>>
@@ -21,7 +23,11 @@ interface DetailsRepository {
 
     fun getStaff(id: Int): Flow<Resource<List<Staff>>>
 
-    suspend fun addOrRemoveFromFavorites(malId: Int, type: String, isFavorite: Boolean)
+    suspend fun removeFromUserFavorites(malId: Int, type: String, userUID: String)
+    
+    suspend fun addToUserFavorites(malId: Int, type: String, userUID: String, status: String, entryId: Int, title: String, imageUrl: String)
 
-    suspend fun updateLibraryStatus(malId: Int, type: String, libraryStatus: String)
+    suspend fun isEntryUserFavorite(malId: Int, type: String, userUID: String): Boolean
+            
+    suspend fun updateLibraryStatus(malId: Int, type: String, libraryStatus: String, userUID: String)
 }

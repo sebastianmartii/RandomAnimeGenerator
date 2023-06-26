@@ -34,7 +34,7 @@ import com.example.randomanimegenerator.feature_generator.data.remote.manga_dto.
 import com.example.randomanimegenerator.feature_generator.data.remote.manga_dto.Genre as MangaGenre
 import com.example.randomanimegenerator.feature_generator.data.remote.manga_dto.Theme as MangaTheme
 
-fun AnimeDto.toMainInfoEntity(type: Type, isFavorite: Boolean, libraryId: Int?, status: String): MainInfoEntity {
+fun AnimeDto.toMainInfoEntity(type: Type, libraryId: Int?): MainInfoEntity {
     return MainInfoEntity(
         id = libraryId,
         malId = this.data.mal_id,
@@ -53,13 +53,11 @@ fun AnimeDto.toMainInfoEntity(type: Type, isFavorite: Boolean, libraryId: Int?, 
         source = this.data.source,
         episodes = this.data.episodes,
         studios = this.data.studios.toStudioModel().joinToString(separator = ", "),
-        isFavorite = isFavorite,
         libraryType = type.toTypeString(),
-        libraryStatus = status
     )
 }
 
-fun MangaDto.toMainInfoEntity(type: Type, isFavorite: Boolean, libraryId: Int?, status: String): MainInfoEntity {
+fun MangaDto.toMainInfoEntity(type: Type, libraryId: Int?): MainInfoEntity {
     return MainInfoEntity(
         id = libraryId,
         malId = this.data.mal_id,
@@ -78,9 +76,7 @@ fun MangaDto.toMainInfoEntity(type: Type, isFavorite: Boolean, libraryId: Int?, 
         source = "",
         episodes = 0,
         studios = "",
-        isFavorite = isFavorite,
         libraryType = type.toTypeString(),
-        libraryStatus = status
     )
 }
 
@@ -116,13 +112,14 @@ fun List<Author>.toAuthorModel(): List<String> {
     return this.map { it.name }
 }
 
-fun MainInfoEntity?.toMainModel(): MainModel{
+fun MainInfoEntity?.toMainModel(): MainModel {
     return MainModel(
         authors = this?.mangaAuthors ?: "",
         chapters = this?.mangaChapters ?: 0,
         source = this?.source ?: "",
         episodes = this?.episodes ?: 0,
         studios = this?.studios ?: "",
+        entryId = this?.id ?: 0,
         malId = this?.malId ?: 0,
         title = this?.title ?: "",
         imageUrl = this?.imageUrl ?: "",
@@ -135,8 +132,6 @@ fun MainInfoEntity?.toMainModel(): MainModel{
         themes = this?.themes ?: "",
         demographic = this?.demographic ?: "",
         isLoading = false,
-        isFavorite = this?.isFavorite ?: false,
-        libraryStatus = this?.libraryStatus?.toStatus() ?: LibraryStatus.PLANNING
     )
 }
 
@@ -277,7 +272,7 @@ fun LibraryStatus.toStatusString(): String {
     }
 }
 
-fun String.toStatus(): LibraryStatus {
+fun String?.toStatus(): LibraryStatus {
     return when(this) {
         "finished" -> LibraryStatus.FINISHED
         "watching" -> LibraryStatus.WATCHING

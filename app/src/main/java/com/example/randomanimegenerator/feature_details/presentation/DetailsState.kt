@@ -32,7 +32,8 @@ data class DetailsState(
     val type: Type = Type.ANIME,
     val libraryStatus: LibraryStatus = LibraryStatus.PLANNING,
     val showPopUp: Boolean = false,
-    val synopsisExpanded: Boolean = false
+    val synopsisExpanded: Boolean = false,
+    val entryId: Int = 0
 )
 
 enum class Result {

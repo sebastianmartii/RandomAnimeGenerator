@@ -26,7 +26,5 @@ data class MainInfoEntity(
     val episodes: Int? = null,
     val studios: String? = null,
     // library params
-    @ColumnInfo("is_favorite") val isFavorite: Boolean = false,
     @ColumnInfo("library_type") val libraryType: String,
-    @ColumnInfo("library_status") val libraryStatus: String = "planning"
 )

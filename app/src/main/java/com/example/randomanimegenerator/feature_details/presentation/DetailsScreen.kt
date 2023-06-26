@@ -33,6 +33,7 @@ import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -42,10 +43,13 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.surfaceColorAtElevation
@@ -71,6 +75,7 @@ import coil.compose.AsyncImage
 import com.example.randomanimegenerator.R
 import com.example.randomanimegenerator.core.constants.animeDetailsStatus
 import com.example.randomanimegenerator.core.constants.mangaDetailStatus
+import com.example.randomanimegenerator.core.navigation.Destinations
 import com.example.randomanimegenerator.core.util.ShimmerContent
 import com.example.randomanimegenerator.core.util.shimmerEffect
 import com.example.randomanimegenerator.feature_details.domain.model.AdditionalInfo
@@ -111,11 +116,49 @@ fun DetailsScreen(
                 is DetailsViewModel.UiEvent.ShowSnackBar -> {
                     snackBarHostState.showSnackbar(event.message)
                 }
+
+                is DetailsViewModel.UiEvent.ShowSignInSnackBar -> {
+                    snackBarHostState.showSnackbar(
+                        message = event.message,
+                        actionLabel = "Sign In",
+                        duration = SnackbarDuration.Long,
+                    )
+                }
             }
         }
     }
     Scaffold(
-        snackbarHost = { SnackbarHost(snackBarHostState) },
+        snackbarHost = {
+            SnackbarHost(snackBarHostState) { data ->
+                if (data.visuals.actionLabel != null) {
+                    Snackbar(
+                        modifier = Modifier.padding(12.dp),
+                        action = {
+                            TextButton(
+                                onClick = {
+                                    navController.navigate(Destinations.SignIn.route)
+                                },
+                                colors = ButtonDefaults.textButtonColors(
+                                    contentColor = MaterialTheme.colorScheme.onTertiary
+                                )
+                            ) {
+                                Text(text = data.visuals.actionLabel!!)
+                            }
+                        },
+                        content = {
+                            Text(text = data.visuals.message)
+                        }
+                    )
+                } else {
+                    Snackbar(
+                        modifier = Modifier.padding(12.dp),
+                        content = {
+                            Text(text = data.visuals.message)
+                        }
+                    )
+                }
+            }
+        },
         topBar = {
             TopAppBar(
                 navigationIcon = {

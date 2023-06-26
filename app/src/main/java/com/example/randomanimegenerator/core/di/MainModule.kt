@@ -23,6 +23,9 @@ class MainModule {
             context = context,
             RandomAnimeGeneratorDb::class.java,
             "random_anime_generator_db"
-        ).addMigrations(RandomAnimeGeneratorDb.MIGRATION_1_2).build()
+        )
+            .addMigrations(RandomAnimeGeneratorDb.MIGRATION_1_2, RandomAnimeGeneratorDb.MIGRATION_3_4)
+            .fallbackToDestructiveMigration()
+            .build()
     }
 }

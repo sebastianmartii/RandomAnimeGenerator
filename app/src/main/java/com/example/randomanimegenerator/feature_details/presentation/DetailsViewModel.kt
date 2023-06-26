@@ -4,21 +4,25 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.randomanimegenerator.core.util.Resource
+import com.example.randomanimegenerator.feature_details.data.mappers.toStatus
 import com.example.randomanimegenerator.feature_details.data.mappers.toStatusString
 import com.example.randomanimegenerator.feature_details.domain.repository.DetailsRepository
 import com.example.randomanimegenerator.feature_details.domain.use_cases.DetailsUseCases
 import com.example.randomanimegenerator.feature_generator.presentation.Type
 import com.example.randomanimegenerator.feature_generator.presentation.toType
 import com.example.randomanimegenerator.feature_library.presentation.LibraryStatus
+import com.example.randomanimegenerator.feature_profile.presentation.AuthenticationClient
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -28,20 +32,38 @@ import kotlin.time.Duration.Companion.seconds
 class DetailsViewModel @Inject constructor(
     private val useCases: DetailsUseCases,
     private val repo: DetailsRepository,
+    private val authClient: AuthenticationClient,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val id = savedStateHandle.get<Int>("id")
     private val type = savedStateHandle.get<String>("type")
 
+    private val _status = repo.getStatus(id!!, type!!, authClient.getSignedInUser()?.userId ?: "")
+
     private val _state = MutableStateFlow(DetailsState(type = type!!.toType()))
-    val state = _state.asStateFlow()
+    val state = _state.combine(_status) { state, status ->
+        state.copy(
+            libraryStatus = status.toStatus()
+        )
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), DetailsState())
 
     private val _channel = Channel<UiEvent>()
     val eventFlow = _channel.receiveAsFlow()
 
     init {
+        getIsEntryUserFavorite()
         getScreenContents()
+    }
+
+    private fun getIsEntryUserFavorite() {
+        viewModelScope.launch {
+            _state.update {
+                it.copy(
+                    isFavorite = repo.isEntryUserFavorite(id!!, type!!, authClient.getSignedInUser()?.userId ?: "")
+                )
+            }
+        }
     }
 
     private fun getScreenContents() {
@@ -79,8 +101,7 @@ class DetailsViewModel @Inject constructor(
                                 additionalInfo = result.data?.statusList ?: emptyList(),
                                 isLoading = false,
                                 mainInfoResult = Result.ERROR,
-                                isFavorite = result.data?.isFavorite ?: false,
-                                libraryStatus = result.data?.libraryStatus ?: LibraryStatus.PLANNING
+                                entryId = result.data?.entryId ?: 0
                             )
                         }
                         _channel.send(UiEvent.ShowSnackBar(message = result.message ?: "Error"))
@@ -99,8 +120,7 @@ class DetailsViewModel @Inject constructor(
                                 additionalInfo = result.data?.statusList ?: emptyList(),
                                 isLoading = true,
                                 mainInfoResult = Result.LOADING,
-                                isFavorite = result.data?.isFavorite ?: false,
-                                libraryStatus = result.data?.libraryStatus ?: LibraryStatus.PLANNING
+                                entryId = result.data?.entryId ?: 0
                             )
                         }
                     }
@@ -118,8 +138,7 @@ class DetailsViewModel @Inject constructor(
                                 additionalInfo = result.data?.statusList ?: emptyList(),
                                 isLoading = false,
                                 mainInfoResult = Result.SUCCESS,
-                                isFavorite = result.data?.isFavorite ?: false,
-                                libraryStatus = result.data?.libraryStatus ?: LibraryStatus.PLANNING
+                                entryId = result.data?.entryId ?: 0
                             )
                         }
                     }
@@ -205,27 +224,51 @@ class DetailsViewModel @Inject constructor(
                     )
                 }
                 viewModelScope.launch {
-                    repo.updateLibraryStatus(id!!, type!!, event.status.toStatusString())
+                    repo.updateLibraryStatus(
+                        id!!,
+                        type!!,
+                        event.status.toStatusString(),
+                        authClient.getSignedInUser()?.userId ?: ""
+                    )
                 }
             }
 
             is DetailsEvent.AddOrRemoveFromFavorites -> {
-                _state.update {
-                    it.copy(
-                        isFavorite = !event.isFavorite
-                    )
-                }
-                viewModelScope.launch {
-                    when (event.isFavorite) {
-                        true -> {
-                            repo.addOrRemoveFromFavorites(id!!, type!!, false)
-                            _channel.send(UiEvent.ShowSnackBar("Entry has been deleted from favorites"))
-                        }
+                val isLoggedIn = authClient.getSignedInUser() != null
+                if (isLoggedIn) {
+                    _state.update {
+                        it.copy(
+                            isFavorite = !event.isFavorite
+                        )
+                    }
+                    viewModelScope.launch {
+                        when (event.isFavorite) {
+                            true -> {
+                                repo.removeFromUserFavorites(
+                                    id!!,
+                                    type!!,
+                                    authClient.getSignedInUser()?.userId ?: ""
+                                )
+                                _channel.send(UiEvent.ShowSnackBar("Entry has been deleted from favorites"))
+                            }
 
-                        false -> {
-                            repo.addOrRemoveFromFavorites(id!!, type!!, true)
-                            _channel.send(UiEvent.ShowSnackBar("Entry has been added to favorites"))
+                            false -> {
+                                repo.addToUserFavorites(
+                                    id!!,
+                                    type!!,
+                                    authClient.getSignedInUser()?.userId ?: "",
+                                    LibraryStatus.PLANNING.toStatusString(),
+                                    state.value.entryId,
+                                    state.value.title,
+                                    state.value.imageUrl
+                                )
+                                _channel.send(UiEvent.ShowSnackBar("Entry has been added to favorites"))
+                            }
                         }
+                    }
+                } else {
+                    viewModelScope.launch {
+                        _channel.send(UiEvent.ShowSignInSnackBar("Sign In to add to favorites"))
                     }
                 }
             }
@@ -365,6 +408,7 @@ class DetailsViewModel @Inject constructor(
 
     sealed class UiEvent {
         data class ShowSnackBar(val message: String) : UiEvent()
+        data class ShowSignInSnackBar(val message: String) : UiEvent()
         data class NavigateToDestination(val destinationRoute: String) : UiEvent()
         object NavigateBack : UiEvent()
     }

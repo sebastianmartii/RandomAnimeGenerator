@@ -29,7 +29,7 @@ class MigrationTest {
             InstrumentationRegistry.getInstrumentation().targetContext,
             RandomAnimeGeneratorDb::class.java,
             DB_NAME
-        ).addMigrations(RandomAnimeGeneratorDb.MIGRATION_1_2).build().apply {
+        ).addMigrations(RandomAnimeGeneratorDb.MIGRATION_1_2, RandomAnimeGeneratorDb.MIGRATION_3_4).fallbackToDestructiveMigration().build().apply {
             openHelper.writableDatabase.close()
         }
     }

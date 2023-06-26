@@ -38,7 +38,7 @@ object LibraryModule {
         database: RandomAnimeGeneratorDb
     ): LibraryRepository {
         return LibraryRepositoryImpl(
-            mainInfoDao = database.mainInfoDao
+            userFavoritesDao = database.userFavoritesDao,
         )
     }
 }

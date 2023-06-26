@@ -2,8 +2,8 @@ package com.example.randomanimegenerator.feature_profile.di
 
 import android.content.Context
 import com.example.randomanimegenerator.core.database.RandomAnimeGeneratorDb
-import com.example.randomanimegenerator.core.database.daos.MainInfoDao
 import com.example.randomanimegenerator.core.database.daos.UserDao
+import com.example.randomanimegenerator.core.database.daos.UserFavoritesDao
 import com.example.randomanimegenerator.feature_profile.data.repository.ProfileRepositoryImpl
 import com.example.randomanimegenerator.feature_profile.domain.repository.ProfileRepository
 import com.example.randomanimegenerator.feature_profile.domain.use_cases.GetEntriesCountUseCase
@@ -32,11 +32,11 @@ object ProfileModule {
     @Provides
     @Singleton
     fun provideProfileRepository(
-        mainInfoDao: MainInfoDao,
+        userFavoritesDao: UserFavoritesDao,
         userDao: UserDao,
         authenticationClient: AuthenticationClient
     ): ProfileRepository {
-        return ProfileRepositoryImpl(mainInfoDao, userDao, authenticationClient)
+        return ProfileRepositoryImpl(userFavoritesDao, userDao, authenticationClient)
     }
 
     @Provides
@@ -49,10 +49,10 @@ object ProfileModule {
 
     @Provides
     @Singleton
-    fun provideMainInfoDao(
+    fun provideUserFavoritesDao(
         db: RandomAnimeGeneratorDb
-    ): MainInfoDao {
-        return db.mainInfoDao
+    ): UserFavoritesDao {
+        return db.userFavoritesDao
     }
 
     @Provides

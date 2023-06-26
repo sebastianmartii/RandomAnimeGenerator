@@ -1,6 +1,7 @@
 package com.example.randomanimegenerator.feature_details.data.repository
 
 import com.example.randomanimegenerator.core.database.RandomAnimeGeneratorDb
+import com.example.randomanimegenerator.core.database.entities.UserFavoritesEntity
 import com.example.randomanimegenerator.core.util.Resource
 import com.example.randomanimegenerator.feature_details.data.mappers.toCharacter
 import com.example.randomanimegenerator.feature_details.data.mappers.toCharactersEntity
@@ -12,7 +13,6 @@ import com.example.randomanimegenerator.feature_details.data.mappers.toReview
 import com.example.randomanimegenerator.feature_details.data.mappers.toReviewsEntity
 import com.example.randomanimegenerator.feature_details.data.mappers.toStaff
 import com.example.randomanimegenerator.feature_details.data.mappers.toStaffEntity
-import com.example.randomanimegenerator.feature_details.data.mappers.toStatusString
 import com.example.randomanimegenerator.feature_details.data.remote.DetailsApi
 import com.example.randomanimegenerator.feature_details.domain.model.Character
 import com.example.randomanimegenerator.feature_details.domain.model.MainModel
@@ -22,7 +22,6 @@ import com.example.randomanimegenerator.feature_details.domain.model.Staff
 import com.example.randomanimegenerator.feature_details.domain.repository.DetailsRepository
 import com.example.randomanimegenerator.feature_generator.presentation.Type
 import com.example.randomanimegenerator.feature_generator.presentation.toTypeString
-import com.example.randomanimegenerator.feature_library.presentation.LibraryStatus
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
@@ -30,8 +29,10 @@ import java.io.IOException
 
 class DetailsRepositoryImpl(
     private val detailsApi: DetailsApi,
-    private val db: RandomAnimeGeneratorDb
+    private val db: RandomAnimeGeneratorDb,
 ) : DetailsRepository {
+
+    override fun getStatus(id: Int, type: String, userUID: String): Flow<String> = db.userFavoritesDao.getStatus(type, id, userUID)
 
     override fun getInfo(id: Int, type: Type): Flow<Resource<MainModel>> =
         flow {
@@ -40,22 +41,10 @@ class DetailsRepositoryImpl(
             val dbInfo = db.mainInfoDao.getOne(id, type.toTypeString())
             emit(Resource.Loading(data = dbInfo.toMainModel()))
 
-            val isFavorite = try {
-                dbInfo.isFavorite
-            } catch (e: NullPointerException) {
-                false
-            }
-
             val libraryId = try {
                 dbInfo.id
             } catch (e: NullPointerException) {
                 null
-            }
-
-            val libraryStatus = try {
-                dbInfo.libraryStatus
-            } catch (e: NullPointerException) {
-                LibraryStatus.PLANNING.toStatusString()
             }
 
             try {
@@ -67,9 +56,7 @@ class DetailsRepositoryImpl(
                             db.mainInfoDao.insert(
                                 response.body()!!.toMainInfoEntity(
                                     type,
-                                    isFavorite,
                                     libraryId,
-                                    libraryStatus
                                 )
                             )
                         }
@@ -82,9 +69,7 @@ class DetailsRepositoryImpl(
                             db.mainInfoDao.insert(
                                 response.body()!!.toMainInfoEntity(
                                     type,
-                                    isFavorite,
                                     libraryId,
-                                    libraryStatus
                                 )
                             )
                         }
@@ -224,11 +209,35 @@ class DetailsRepositoryImpl(
         emit(Resource.Success(data = newStaff.map { it.toStaff() }))
     }
 
-    override suspend fun addOrRemoveFromFavorites(malId: Int, type: String, isFavorite: Boolean) {
-        db.mainInfoDao.updateEntry(malId, type, isFavorite)
+    override suspend fun addToUserFavorites(
+        malId: Int,
+        type: String,
+        userUID: String,
+        status: String,
+        entryId: Int,
+        title: String,
+        imageUrl: String
+    ) {
+        db.userFavoritesDao.addToUserFavorites(UserFavoritesEntity(
+            entryMalID = malId,
+            entryType = type,
+            userUID = userUID,
+            entryStatus = status,
+            title = title,
+            imageUrl = imageUrl
+        ))
     }
 
-    override suspend fun updateLibraryStatus(malId: Int, type: String, libraryStatus: String) {
-        db.mainInfoDao.updateEntryStatus(malId, type, libraryStatus)
+    override suspend fun removeFromUserFavorites(malId: Int, type: String, userUID: String) {
+        db.userFavoritesDao.deleteFromUserFavorites(malId, type, userUID)
+    }
+
+    override suspend fun isEntryUserFavorite(malId: Int, type: String, userUID: String): Boolean {
+        val userFavorites = db.userFavoritesDao.getUserFavorites(type, userUID)
+        return userFavorites.contains(malId)
+    }
+
+    override suspend fun updateLibraryStatus(malId: Int, type: String, libraryStatus: String, userUID: String) {
+        db.userFavoritesDao.updateEntryStatus(malId, type, libraryStatus, userUID)
     }
 }
