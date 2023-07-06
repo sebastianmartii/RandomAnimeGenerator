@@ -1,9 +1,14 @@
 package com.example.randomanimegenerator.core.navigation
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SheetValue
+import androidx.compose.material3.rememberBottomSheetScaffoldState
+import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.focus.FocusRequester
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -25,6 +30,7 @@ import com.example.randomanimegenerator.feature_library.presentation.animeStatus
 import com.example.randomanimegenerator.feature_library.presentation.librarySortType
 import com.example.randomanimegenerator.feature_library.presentation.mangaStatusList
 
+@OptIn(ExperimentalMaterial3Api::class)
 fun NavGraphBuilder.bottomNavGraph(
     navController: NavHostController,
     paddingValues: PaddingValues,
@@ -54,6 +60,10 @@ fun NavGraphBuilder.bottomNavGraph(
             val viewModel = hiltViewModel<LibraryViewModel>()
             val state by viewModel.state.collectAsStateWithLifecycle(initialValue = LibraryState())
 
+            val scope = rememberCoroutineScope()
+            val sheetState = rememberStandardBottomSheetState(initialValue = SheetValue.Hidden, skipHiddenState = false)
+            val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(sheetState)
+
             LaunchedEffect(key1 = true) {
                 viewModel.onEvent(LibraryEvent.SetType(Type.ANIME))
             }
@@ -61,6 +71,8 @@ fun NavGraphBuilder.bottomNavGraph(
             AnimeLibraryScreen(
                 paddingValues = paddingValues,
                 state = state,
+                scope = scope,
+                scaffoldState = bottomSheetScaffoldState,
                 statusList = animeStatusList,
                 sortList = librarySortType,
                 onEvent = viewModel::onEvent,
@@ -79,6 +91,10 @@ fun NavGraphBuilder.bottomNavGraph(
             val viewModel = hiltViewModel<LibraryViewModel>()
             val state by viewModel.state.collectAsStateWithLifecycle(initialValue = LibraryState())
 
+            val scope = rememberCoroutineScope()
+            val sheetState = rememberStandardBottomSheetState(initialValue = SheetValue.Hidden, skipHiddenState = false)
+            val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(sheetState)
+
             LaunchedEffect(key1 = true) {
                 viewModel.onEvent(LibraryEvent.SetType(Type.MANGA))
             }
@@ -86,6 +102,8 @@ fun NavGraphBuilder.bottomNavGraph(
             MangaLibraryScreen(
                 paddingValues = paddingValues,
                 state = state,
+                scope = scope,
+                scaffoldState = bottomSheetScaffoldState,
                 statusList = mangaStatusList,
                 sortList = librarySortType,
                 onEvent = viewModel::onEvent,

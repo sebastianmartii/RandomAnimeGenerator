@@ -10,4 +10,10 @@ data class LibraryState(
     val isSearching: Boolean = false,
     val libraryStatus: LibraryStatus = LibraryStatus.ALL,
     val librarySortType: LibrarySortType = LibrarySortType.OLDEST,
+    val filterType: FilterType = FilterType.FILTER
 )
+
+
+enum class FilterType {
+    FILTER, SORT
+}

@@ -117,6 +117,14 @@ class LibraryViewModel @Inject constructor(
             is LibraryEvent.SetType -> {
                 type.value = event.type
             }
+
+            is LibraryEvent.ChangeFilterType -> {
+                _state.update {
+                    it.copy(
+                        filterType = event.filterType
+                    )
+                }
+            }
         }
     }
 }

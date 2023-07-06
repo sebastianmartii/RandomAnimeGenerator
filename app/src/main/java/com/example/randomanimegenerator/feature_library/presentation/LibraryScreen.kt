@@ -1,37 +1,51 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.example.randomanimegenerator.feature_library.presentation
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.core.keyframes
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Cancel
-import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.CheckBox
+import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.Card
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.surfaceColorAtElevation
@@ -40,17 +54,23 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.randomanimegenerator.R
 import com.example.randomanimegenerator.feature_generator.presentation.toTypeString
+import com.example.randomanimegenerator.feature_library.data.mappers.toSortTypeString
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import java.util.Locale
 
 @Composable
 fun AnimeLibraryScreen(
@@ -58,6 +78,8 @@ fun AnimeLibraryScreen(
     statusList: List<LibraryStatus>,
     sortList: List<LibrarySortType>,
     paddingValues: PaddingValues,
+    scope: CoroutineScope,
+    scaffoldState: BottomSheetScaffoldState,
     modifier: Modifier = Modifier,
     onEvent: (LibraryEvent) -> Unit,
     focusRequester: FocusRequester,
@@ -68,6 +90,8 @@ fun AnimeLibraryScreen(
         statusList = statusList,
         sortList = sortList,
         paddingValues = paddingValues,
+        scope = scope,
+        scaffoldState = scaffoldState,
         onEvent = onEvent,
         focusRequester = focusRequester,
         onNavigateToDetailsScreen = onNavigateToDetailsScreen,
@@ -81,6 +105,8 @@ fun MangaLibraryScreen(
     statusList: List<LibraryStatus>,
     sortList: List<LibrarySortType>,
     paddingValues: PaddingValues,
+    scope: CoroutineScope,
+    scaffoldState: BottomSheetScaffoldState,
     modifier: Modifier = Modifier,
     onEvent: (LibraryEvent) -> Unit,
     focusRequester: FocusRequester,
@@ -91,6 +117,8 @@ fun MangaLibraryScreen(
         statusList = statusList,
         sortList = sortList,
         paddingValues = paddingValues,
+        scope = scope,
+        scaffoldState = scaffoldState,
         onEvent = onEvent,
         focusRequester = focusRequester,
         onNavigateToDetailsScreen = onNavigateToDetailsScreen,
@@ -104,12 +132,148 @@ private fun LibraryScreen(
     statusList: List<LibraryStatus>,
     sortList: List<LibrarySortType>,
     paddingValues: PaddingValues,
+    scope: CoroutineScope,
+    scaffoldState: BottomSheetScaffoldState,
     modifier: Modifier = Modifier,
     onEvent: (LibraryEvent) -> Unit,
     focusRequester: FocusRequester,
     onNavigateToDetailsScreen: (id: Int, type: String) -> Unit
 ) {
-    Scaffold(
+    BottomSheetScaffold(
+        scaffoldState = scaffoldState,
+        sheetPeekHeight = 0.dp,
+        sheetContent = {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(350.dp)
+            ) {
+                Column(modifier = Modifier.fillMaxSize()) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        TextButton(onClick = {
+                            onEvent(LibraryEvent.ChangeFilterType(FilterType.FILTER))
+                        }) {
+                            Text(
+                                text = stringResource(id = R.string.filter),
+                            )
+                        }
+                        TextButton(onClick = {
+                            onEvent(LibraryEvent.ChangeFilterType(FilterType.SORT))
+                        }) {
+                            Text(
+                                text = stringResource(id = R.string.sort),
+                            )
+                        }
+                    }
+                    AnimatedContent(
+                        targetState = state.filterType,
+                        transitionSpec = {
+                            when(targetState) {
+                                FilterType.FILTER -> {
+                                    (slideInHorizontally(
+                                        keyframes {
+                                            durationMillis = 150
+                                        }
+                                    ) { fullWidth -> fullWidth } + fadeIn()).togetherWith(
+                                        slideOutHorizontally(
+                                            keyframes {
+                                                durationMillis = 150
+                                            }
+                                        ) { fullWidth -> -fullWidth } + fadeOut())
+                                }
+                                FilterType.SORT -> {
+                                    (slideInHorizontally(
+                                        keyframes {
+                                            durationMillis = 150
+                                        }
+                                    ) { fullWidth -> -fullWidth } + fadeIn()).togetherWith(
+                                        slideOutHorizontally(
+                                            keyframes {
+                                                durationMillis = 150
+                                            }
+                                        ) { fullWidth -> fullWidth } + fadeOut())
+                                }
+                            }.using(
+                                SizeTransform(clip = false)
+                            )
+
+                        }
+                    ) {filterType ->
+                        when(filterType) {
+                            FilterType.FILTER -> {
+                                Column(modifier = Modifier.fillMaxSize()) {
+                                    Row(
+                                        modifier = Modifier
+                                            .padding(start = 4.dp, bottom = 2.dp)
+                                            .fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.Start
+                                    ) {
+                                        Box(
+                                            modifier = Modifier
+                                                .background(MaterialTheme.colorScheme.inversePrimary)
+                                                .clip(MaterialTheme.shapes.large)
+                                                .fillMaxWidth(0.5f)
+                                                .height(4.dp)
+                                        )
+                                    }
+                                    Divider(
+                                        modifier = Modifier
+                                            .height(2.dp)
+                                            .fillMaxWidth()
+                                    )
+                                    statusList.onEach { status ->
+                                        FilterItem(
+                                            status = status,
+                                            selected = status.name == state.libraryStatus.name,
+                                            onSelect = {
+                                                onEvent(LibraryEvent.ChangeStatus(it))
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+                            FilterType.SORT -> {
+                                Column(modifier = Modifier.fillMaxSize()) {
+                                    Row(
+                                        modifier = Modifier
+                                            .padding(end = 4.dp, bottom = 2.dp)
+                                            .fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.End
+                                    ) {
+                                        Box(
+                                            modifier = Modifier
+                                                .background(MaterialTheme.colorScheme.inversePrimary)
+                                                .clip(MaterialTheme.shapes.large)
+                                                .fillMaxWidth(0.5f)
+                                                .height(4.dp)
+                                        )
+                                    }
+                                    Divider(
+                                        modifier = Modifier
+                                            .height(2.dp)
+                                            .fillMaxWidth()
+                                    )
+                                    sortList.onEach { sortType ->
+                                        SortItem(
+                                            sortType = sortType,
+                                            selected = sortType.name == state.librarySortType.name,
+                                            onSelect = {
+                                                onEvent(LibraryEvent.ChangeSortType(it))
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         topBar = {
             if (state.isSearching) {
                 SearchTopAppBar(
@@ -120,16 +284,35 @@ private fun LibraryScreen(
                     onSearch = {
                         onEvent(LibraryEvent.Search)
                     },
+                    onChangeSheetState = {
+                        scope.launch {
+                            if (scaffoldState.bottomSheetState.isVisible) {
+                                scaffoldState.bottomSheetState.hide()
+                            } else {
+                                scaffoldState.bottomSheetState.expand()
+                            }
+                        }
+                    },
                     onClearTextField = {
                         onEvent(LibraryEvent.ClearTextField)
                     },
-                    focusRequester = focusRequester
+                    focusRequester = focusRequester,
+                    expanded = scaffoldState.bottomSheetState.isVisible
                 )
             } else {
                 RegularTopAppBar(
                     title = state.type.toTypeString(),
                     onSearch = {
                         onEvent(LibraryEvent.Search)
+                    },
+                    onChangeSheetState = {
+                        scope.launch {
+                            if (scaffoldState.bottomSheetState.isVisible) {
+                                scaffoldState.bottomSheetState.hide()
+                            } else {
+                                scaffoldState.bottomSheetState.expand()
+                            }
+                        }
                     }
                 )
             }
@@ -141,34 +324,22 @@ private fun LibraryScreen(
             columns = GridCells.Fixed(3),
             modifier = Modifier
                 .padding(values)
+                .then(
+                    if (scaffoldState.bottomSheetState.isVisible) {
+                        val interactionSource = MutableInteractionSource()
+                        Modifier.clickable(
+                            interactionSource = interactionSource,
+                            indication = null
+                        ) {
+                            scope.launch {
+                                scaffoldState.bottomSheetState.hide()
+                            }
+                        }
+                    } else {
+                        Modifier
+                    }
+                )
         ) {
-            item(span = { GridItemSpan(3) }) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .horizontalScroll(rememberScrollState()),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    statusList.onEach { item ->
-                        CustomStatusFilterChip(
-                            text = item,
-                            selected = item.name == state.libraryStatus.name,
-                            onSelect = {
-                                onEvent(LibraryEvent.ChangeStatus(it))
-                            }
-                        )
-                    }
-                    sortList.onEach { item ->
-                        CustomSortFilterChip(
-                            text = item,
-                            selected = item.name == state.librarySortType.name,
-                            onSelect = {
-                                onEvent(LibraryEvent.ChangeSortType(it))
-                            }
-                        )
-                    }
-                }
-            }
             items(state.content) {
                 LibraryCard(
                     title = it.title,
@@ -234,44 +405,12 @@ private fun LibraryCard(
     }
 }
 
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun CustomStatusFilterChip(
-    text: LibraryStatus,
-    selected: Boolean,
-    onSelect: (LibraryStatus) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    FilterChip(
-        selected = selected,
-        onClick = { onSelect(text) },
-        label = { Text(text = text.name) },
-        leadingIcon = if (selected) {
-            {
-                Icon(
-                    imageVector = Icons.Filled.Done,
-                    contentDescription = null,
-                    modifier = Modifier.size(FilterChipDefaults.IconSize)
-                )
-            }
-        } else {
-            null
-        },
-        modifier = modifier.padding(
-            start = 4.dp,
-            top = 1.dp,
-            bottom = 1.dp,
-            end = 2.dp
-        )
-    )
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun RegularTopAppBar(
     title: String,
-    onSearch: () -> Unit
+    onSearch: () -> Unit,
+    onChangeSheetState: () -> Unit
 ) {
     TopAppBar(
         title = {
@@ -287,6 +426,12 @@ private fun RegularTopAppBar(
                     contentDescription = stringResource(id = R.string.search_button_text)
                 )
             }
+            IconButton(onClick = onChangeSheetState) {
+                Icon(
+                    imageVector = Icons.Default.FilterList,
+                    contentDescription = stringResource(id = R.string.filter)
+                )
+            }
         },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp)
@@ -300,9 +445,12 @@ private fun SearchTopAppBar(
     searchText: String,
     onSearchTextChanges: (String) -> Unit,
     onSearch: () -> Unit,
+    onChangeSheetState: () -> Unit,
     onClearTextField: () -> Unit,
-    focusRequester: FocusRequester
+    focusRequester: FocusRequester,
+    expanded: Boolean
 ) {
+    val focusManager = LocalFocusManager.current
     LaunchedEffect(key1 = Unit) {
         focusRequester.requestFocus()
     }
@@ -322,7 +470,13 @@ private fun SearchTopAppBar(
                     )
                 },
                 trailingIcon = {
-                    IconButton(onClick = onClearTextField) {
+                    IconButton(onClick = {
+                        if (searchText.isBlank()) {
+                            onSearch()
+                        } else {
+                            onClearTextField()
+                        }
+                    }) {
                         Icon(
                             imageVector = Icons.Default.Cancel,
                             contentDescription = stringResource(id = R.string.clear_text_field_text)
@@ -355,6 +509,19 @@ private fun SearchTopAppBar(
                     contentDescription = stringResource(id = R.string.search_button_text)
                 )
             }
+            IconButton(onClick = {
+                onChangeSheetState()
+                if (!expanded) {
+                    focusManager.clearFocus()
+                } else {
+                    focusRequester.requestFocus()
+                }
+            }) {
+                Icon(
+                    imageVector = Icons.Default.FilterList,
+                    contentDescription = stringResource(id = R.string.filter)
+                )
+            }
         },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp)
@@ -362,34 +529,73 @@ private fun SearchTopAppBar(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun CustomSortFilterChip(
-    text: LibrarySortType,
+fun FilterItem(
+    status: LibraryStatus,
     selected: Boolean,
-    onSelect: (LibrarySortType) -> Unit,
-    modifier: Modifier = Modifier
+    onSelect: (LibraryStatus) -> Unit
 ) {
-    FilterChip(
-        selected = selected,
-        onClick = { onSelect(text) },
-        label = { Text(text = text.name) },
-        leadingIcon = if (selected) {
-            {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp, horizontal = 16.dp)
+            .clickable {
+                onSelect(status)
+            }
+    ) {
+        Crossfade(targetState = selected) { selected ->
+            if (selected) {
                 Icon(
-                    imageVector = Icons.Filled.Done,
-                    contentDescription = null,
-                    modifier = Modifier.size(FilterChipDefaults.IconSize)
+                    imageVector = Icons.Filled.CheckBox,
+                    contentDescription = stringResource(id = R.string.check_box)
+                )
+            } else {
+                Icon(
+                    imageVector = Icons.Filled.CheckBoxOutlineBlank,
+                    contentDescription = stringResource(id = R.string.check_box)
                 )
             }
-        } else {
-            null
-        },
-        modifier = modifier.padding(
-            start = 4.dp,
-            top = 1.dp,
-            bottom = 1.dp,
-            end = 2.dp
+        }
+        Text(
+            text = status.name.lowercase()
+                .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() },
+            textAlign = TextAlign.Start,
+            modifier = Modifier.padding(start = 16.dp),
         )
-    )
+    }
+}
+
+@Composable
+fun SortItem(
+    sortType: LibrarySortType,
+    selected: Boolean,
+    onSelect: (LibrarySortType) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp, horizontal = 16.dp)
+            .clickable {
+                onSelect(sortType)
+            }
+    ) {
+        Crossfade(targetState = selected) { selected ->
+            if (selected) {
+                Icon(
+                    imageVector = Icons.Filled.CheckBox,
+                    contentDescription = stringResource(id = R.string.check_box)
+                )
+            } else {
+                Icon(
+                    imageVector = Icons.Filled.CheckBoxOutlineBlank,
+                    contentDescription = stringResource(id = R.string.check_box)
+                )
+            }
+        }
+        Text(
+            text = sortType.toSortTypeString(),
+            textAlign = TextAlign.Start,
+            modifier = Modifier.padding(start = 16.dp),
+        )
+    }
 }

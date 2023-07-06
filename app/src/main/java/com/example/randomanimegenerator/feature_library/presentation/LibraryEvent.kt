@@ -7,6 +7,7 @@ sealed interface LibraryEvent {
     data class ChangeSortType(val sortType: LibrarySortType) : LibraryEvent
     data class ChangeSearchText(val query: String) : LibraryEvent
     data class SetType(val type: Type) : LibraryEvent
+    data class ChangeFilterType(val filterType: FilterType) : LibraryEvent
     object Search : LibraryEvent
     object ClearTextField : LibraryEvent
 }
