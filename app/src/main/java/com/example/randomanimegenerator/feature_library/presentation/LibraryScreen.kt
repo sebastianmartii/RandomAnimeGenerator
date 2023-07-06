@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -146,7 +147,7 @@ private fun LibraryScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(350.dp)
+                    .height(400.dp)
             ) {
                 Column(modifier = Modifier.fillMaxSize()) {
                     Row(
@@ -218,13 +219,14 @@ private fun LibraryScreen(
                                                 .background(MaterialTheme.colorScheme.inversePrimary)
                                                 .clip(MaterialTheme.shapes.large)
                                                 .fillMaxWidth(0.5f)
-                                                .height(4.dp)
+                                                .height(4.dp),
                                         )
                                     }
                                     Divider(
                                         modifier = Modifier
                                             .height(2.dp)
                                             .fillMaxWidth()
+                                            .padding(bottom = 8.dp, top = 2.dp)
                                     )
                                     statusList.onEach { status ->
                                         FilterItem(
@@ -323,7 +325,6 @@ private fun LibraryScreen(
         LazyVerticalGrid(
             columns = GridCells.Fixed(3),
             modifier = Modifier
-                .padding(values)
                 .then(
                     if (scaffoldState.bottomSheetState.isVisible) {
                         val interactionSource = MutableInteractionSource()
@@ -339,6 +340,8 @@ private fun LibraryScreen(
                         Modifier
                     }
                 )
+                .fillMaxHeight()
+                .padding(values)
         ) {
             items(state.content) {
                 LibraryCard(
@@ -346,6 +349,9 @@ private fun LibraryScreen(
                     imageUrl = it.imageUrl,
                     modifier = Modifier.clickable {
                         onNavigateToDetailsScreen(it.malId, state.type.toTypeString())
+                        scope.launch {
+                            scaffoldState.bottomSheetState.hide()
+                        }
                     }
                 )
             }
