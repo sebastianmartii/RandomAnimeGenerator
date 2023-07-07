@@ -22,4 +22,5 @@ Random Anime Generator made with Jikan v4 api providing unofficial MyAnimeList d
 
 ## App Screenshots
 <img src="https://github.com/sebastianmartii/RandomAnimeGenerator/blob/master/Screenshots/Screenshot_2023-07-07-09-51-59-75_d83f66b90ef83c80fb871307199ded9d.jpg
+" data-canonical-src="https://github.com/sebastianmartii/RandomAnimeGenerator/blob/master/Screenshots/Screenshot_2023-07-07-09-51-59-75_d83f66b90ef83c80fb871307199ded9d.jpg
 " width = "270" height = "510">
