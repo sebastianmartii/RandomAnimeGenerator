@@ -21,6 +21,11 @@ Random Anime Generator made with Jikan v4 api providing unofficial MyAnimeList d
 - Dagger-Hilt
 
 ## App Screenshots
-<img src="https://github.com/sebastianmartii/RandomAnimeGenerator/blob/master/Screenshots/Screenshot_2023-07-07-09-51-59-75_d83f66b90ef83c80fb871307199ded9d.jpg
-" data-canonical-src="https://github.com/sebastianmartii/RandomAnimeGenerator/blob/master/Screenshots/Screenshot_2023-07-07-09-51-59-75_d83f66b90ef83c80fb871307199ded9d.jpg
-" width = "270" height = "510">
+![Generator Screen](https://github.com/sebastianmartii/RandomAnimeGenerator/blob/master/Screenshots/Screenshot_2023-07-07-09-51-59-75_d83f66b90ef83c80fb871307199ded9d.jpg)
+![Generator Screen Single Item](https://github.com/sebastianmartii/RandomAnimeGenerator/blob/master/Screenshots/Screenshot_2023-07-07-09-53-52-52_d83f66b90ef83c80fb871307199ded9d.jpg)
+![Generator Screen Item List](https://github.com/sebastianmartii/RandomAnimeGenerator/blob/master/Screenshots/Screenshot_2023-07-07-09-54-05-88_d83f66b90ef83c80fb871307199ded9d.jpg)
+![Anime Library Screen](https://github.com/sebastianmartii/RandomAnimeGenerator/blob/master/Screenshots/Screenshot_2023-07-07-09-52-06-94_d83f66b90ef83c80fb871307199ded9d.jpg)
+![Anime Library Screen Filtered](https://github.com/sebastianmartii/RandomAnimeGenerator/blob/master/Screenshots/Screenshot_2023-07-07-09-52-15-69_d83f66b90ef83c80fb871307199ded9d.jpg)
+![Manga Library Screen Sorted](https://github.com/sebastianmartii/RandomAnimeGenerator/blob/master/Screenshots/Screenshot_2023-07-07-09-52-27-25_d83f66b90ef83c80fb871307199ded9d.jpg)
+![Profile Screen](https://github.com/sebastianmartii/RandomAnimeGenerator/blob/master/Screenshots/Screenshot_2023-07-07-09-53-08-38_d83f66b90ef83c80fb871307199ded9d.jpg)
+![Anime Library Screen Search](https://github.com/sebastianmartii/RandomAnimeGenerator/blob/master/Screenshots/Screenshot_2023-07-07-09-53-40-89_d83f66b90ef83c80fb871307199ded9d.jpg)
