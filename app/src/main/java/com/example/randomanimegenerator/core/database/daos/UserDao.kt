@@ -2,15 +2,16 @@ package com.example.randomanimegenerator.core.database.daos
 
 import androidx.room.Dao
 import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Upsert
 import com.example.randomanimegenerator.core.database.entities.UserEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface UserDao {
 
-    @Upsert
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun upsertUser(user: UserEntity)
 
     @Delete

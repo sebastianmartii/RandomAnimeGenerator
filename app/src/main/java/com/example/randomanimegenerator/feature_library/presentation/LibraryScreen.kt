@@ -144,137 +144,14 @@ private fun LibraryScreen(
         scaffoldState = scaffoldState,
         sheetPeekHeight = 0.dp,
         sheetContent = {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(400.dp)
-            ) {
-                Column(modifier = Modifier.fillMaxSize()) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        TextButton(onClick = {
-                            onEvent(LibraryEvent.ChangeFilterType(FilterType.FILTER))
-                        }) {
-                            Text(
-                                text = stringResource(id = R.string.filter),
-                            )
-                        }
-                        TextButton(onClick = {
-                            onEvent(LibraryEvent.ChangeFilterType(FilterType.SORT))
-                        }) {
-                            Text(
-                                text = stringResource(id = R.string.sort),
-                            )
-                        }
-                    }
-                    AnimatedContent(
-                        targetState = state.filterType,
-                        transitionSpec = {
-                            when(targetState) {
-                                FilterType.FILTER -> {
-                                    (slideInHorizontally(
-                                        keyframes {
-                                            durationMillis = 150
-                                        }
-                                    ) { fullWidth -> fullWidth } + fadeIn()).togetherWith(
-                                        slideOutHorizontally(
-                                            keyframes {
-                                                durationMillis = 150
-                                            }
-                                        ) { fullWidth -> -fullWidth } + fadeOut())
-                                }
-                                FilterType.SORT -> {
-                                    (slideInHorizontally(
-                                        keyframes {
-                                            durationMillis = 150
-                                        }
-                                    ) { fullWidth -> -fullWidth } + fadeIn()).togetherWith(
-                                        slideOutHorizontally(
-                                            keyframes {
-                                                durationMillis = 150
-                                            }
-                                        ) { fullWidth -> fullWidth } + fadeOut())
-                                }
-                            }.using(
-                                SizeTransform(clip = false)
-                            )
-
-                        }
-                    ) {filterType ->
-                        when(filterType) {
-                            FilterType.FILTER -> {
-                                Column(modifier = Modifier.fillMaxSize()) {
-                                    Row(
-                                        modifier = Modifier
-                                            .padding(start = 4.dp, bottom = 2.dp)
-                                            .fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.Start
-                                    ) {
-                                        Box(
-                                            modifier = Modifier
-                                                .background(MaterialTheme.colorScheme.inversePrimary)
-                                                .clip(MaterialTheme.shapes.large)
-                                                .fillMaxWidth(0.5f)
-                                                .height(4.dp),
-                                        )
-                                    }
-                                    Divider(
-                                        modifier = Modifier
-                                            .height(2.dp)
-                                            .fillMaxWidth()
-                                            .padding(bottom = 8.dp, top = 2.dp)
-                                    )
-                                    statusList.onEach { status ->
-                                        FilterItem(
-                                            status = status,
-                                            selected = status.name == state.libraryStatus.name,
-                                            onSelect = {
-                                                onEvent(LibraryEvent.ChangeStatus(it))
-                                            }
-                                        )
-                                    }
-                                }
-                            }
-                            FilterType.SORT -> {
-                                Column(modifier = Modifier.fillMaxSize()) {
-                                    Row(
-                                        modifier = Modifier
-                                            .padding(end = 4.dp, bottom = 2.dp)
-                                            .fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.End
-                                    ) {
-                                        Box(
-                                            modifier = Modifier
-                                                .background(MaterialTheme.colorScheme.inversePrimary)
-                                                .clip(MaterialTheme.shapes.large)
-                                                .fillMaxWidth(0.5f)
-                                                .height(4.dp)
-                                        )
-                                    }
-                                    Divider(
-                                        modifier = Modifier
-                                            .height(2.dp)
-                                            .fillMaxWidth()
-                                    )
-                                    sortList.onEach { sortType ->
-                                        SortItem(
-                                            sortType = sortType,
-                                            selected = sortType.name == state.librarySortType.name,
-                                            onSelect = {
-                                                onEvent(LibraryEvent.ChangeSortType(it))
-                                            }
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            SheetContent(
+                statusList = statusList,
+                sortList = sortList,
+                filterType = state.filterType,
+                libraryStatus = state.libraryStatus,
+                librarySortType = state.librarySortType,
+                onEvent = onEvent
+            )
         },
         topBar = {
             if (state.isSearching) {
@@ -348,12 +225,164 @@ private fun LibraryScreen(
                     title = it.title,
                     imageUrl = it.imageUrl,
                     modifier = Modifier.clickable {
-                        onNavigateToDetailsScreen(it.malId, state.type.toTypeString())
-                        scope.launch {
-                            scaffoldState.bottomSheetState.hide()
+                        if (scaffoldState.bottomSheetState.isVisible) {
+                            scope.launch {
+                                scaffoldState.bottomSheetState.hide()
+                            }
+                            return@clickable
                         }
+                        onNavigateToDetailsScreen(it.malId, state.type.toTypeString())
                     }
                 )
+            }
+        }
+    }
+}
+
+
+@Composable
+fun SheetContent(
+    statusList: List<LibraryStatus>,
+    sortList: List<LibrarySortType>,
+    filterType: FilterType,
+    libraryStatus: LibraryStatus,
+    librarySortType: LibrarySortType,
+    modifier: Modifier = Modifier,
+    onEvent: (LibraryEvent) -> Unit,
+) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(400.dp)
+    ) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                TextButton(
+                    onClick = {
+                        onEvent(LibraryEvent.ChangeFilterType(FilterType.FILTER))
+                    },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.filter),
+                    )
+                }
+                TextButton(
+                    onClick = {
+                        onEvent(LibraryEvent.ChangeFilterType(FilterType.SORT))
+                    },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.sort),
+                    )
+                }
+            }
+            AnimatedContent(
+                targetState = filterType,
+                transitionSpec = {
+                    when(targetState) {
+                        FilterType.FILTER -> {
+                            (slideInHorizontally(
+                                keyframes {
+                                    durationMillis = 150
+                                }
+                            ) { fullWidth -> fullWidth } + fadeIn()).togetherWith(
+                                slideOutHorizontally(
+                                    keyframes {
+                                        durationMillis = 150
+                                    }
+                                ) { fullWidth -> -fullWidth } + fadeOut())
+                        }
+                        FilterType.SORT -> {
+                            (slideInHorizontally(
+                                keyframes {
+                                    durationMillis = 150
+                                }
+                            ) { fullWidth -> -fullWidth } + fadeIn()).togetherWith(
+                                slideOutHorizontally(
+                                    keyframes {
+                                        durationMillis = 150
+                                    }
+                                ) { fullWidth -> fullWidth } + fadeOut())
+                        }
+                    }.using(
+                        SizeTransform(clip = false)
+                    )
+
+                }
+            ) {filterType ->
+                when(filterType) {
+                    FilterType.FILTER -> {
+                        Column(modifier = Modifier.fillMaxSize()) {
+                            Row(
+                                modifier = Modifier
+                                    .padding(start = 4.dp, bottom = 2.dp)
+                                    .fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Start
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .background(MaterialTheme.colorScheme.inversePrimary)
+                                        .clip(MaterialTheme.shapes.large)
+                                        .fillMaxWidth(0.5f)
+                                        .height(4.dp),
+                                )
+                            }
+                            Divider(
+                                modifier = Modifier
+                                    .height(2.dp)
+                                    .fillMaxWidth()
+                                    .padding(bottom = 8.dp, top = 2.dp)
+                            )
+                            statusList.onEach { status ->
+                                FilterItem(
+                                    status = status,
+                                    selected = status.name == libraryStatus.name,
+                                    onSelect = {
+                                        onEvent(LibraryEvent.ChangeStatus(it))
+                                    }
+                                )
+                            }
+                        }
+                    }
+                    FilterType.SORT -> {
+                        Column(modifier = Modifier.fillMaxSize()) {
+                            Row(
+                                modifier = Modifier
+                                    .padding(end = 4.dp, bottom = 2.dp)
+                                    .fillMaxWidth(),
+                                horizontalArrangement = Arrangement.End
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .background(MaterialTheme.colorScheme.inversePrimary)
+                                        .clip(MaterialTheme.shapes.large)
+                                        .fillMaxWidth(0.5f)
+                                        .height(4.dp)
+                                )
+                            }
+                            Divider(
+                                modifier = Modifier
+                                    .height(2.dp)
+                                    .fillMaxWidth()
+                            )
+                            sortList.onEach { sortType ->
+                                SortItem(
+                                    sortType = sortType,
+                                    selected = sortType.name == librarySortType.name,
+                                    onSelect = {
+                                        onEvent(LibraryEvent.ChangeSortType(it))
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
             }
         }
     }
