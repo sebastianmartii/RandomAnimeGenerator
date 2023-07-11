@@ -21,11 +21,11 @@ Random Anime Generator made with Jikan v4 api providing unofficial MyAnimeList d
 - Dagger-Hilt
 
 ## App Screenshots
-![Manga List Results](https://github.com/sebastianmartii/RandomAnimeGenerator/blob/master/Screenshots/Zrzut%20ekranu%202023-05-14%20184931.png)
-![Anime Single Result](https://github.com/sebastianmartii/RandomAnimeGenerator/blob/master/Screenshots/Zrzut%20ekranu%202023-05-14%20185013.png)
-![Generator Setting Screen](https://github.com/sebastianmartii/RandomAnimeGenerator/blob/master/Screenshots/Zrzut%20ekranu%202023-05-14%20185035.png)
-![Anime Library Watching](https://github.com/sebastianmartii/RandomAnimeGenerator/blob/master/Screenshots/Zrzut%20ekranu%202023-05-14%20185157.png)
-![Manga Library All](https://github.com/sebastianmartii/RandomAnimeGenerator/blob/master/Screenshots/Zrzut%20ekranu%202023-05-14%20185244.png)
-![Jujutsu Kaisen Manga Details Favorite](https://github.com/sebastianmartii/RandomAnimeGenerator/blob/master/Screenshots/Zrzut%20ekranu%202023-05-14%20185320.png)
-![NHK ni Youkoso Anime Details](https://github.com/sebastianmartii/RandomAnimeGenerator/blob/master/Screenshots/Zrzut%20ekranu%202023-05-14%20185400.png)
-![3-gatsu no Lion Anime Details Favorites](https://github.com/sebastianmartii/RandomAnimeGenerator/blob/master/Screenshots/Zrzut%20ekranu%202023-05-14%20185841.png)
+![Generator Screen](https://github.com/sebastianmartii/RandomAnimeGenerator/blob/master/Screenshots/Screenshot_2023-07-07-09-51-59-75_d83f66b90ef83c80fb871307199ded9d.jpg)
+![Generator Screen Single Item](https://github.com/sebastianmartii/RandomAnimeGenerator/blob/master/Screenshots/Screenshot_2023-07-07-09-53-52-52_d83f66b90ef83c80fb871307199ded9d.jpg)
+![Generator Screen Item List](https://github.com/sebastianmartii/RandomAnimeGenerator/blob/master/Screenshots/Screenshot_2023-07-07-09-54-05-88_d83f66b90ef83c80fb871307199ded9d.jpg)
+![Anime Library Screen](https://github.com/sebastianmartii/RandomAnimeGenerator/blob/master/Screenshots/Screenshot_2023-07-07-09-52-06-94_d83f66b90ef83c80fb871307199ded9d.jpg)
+![Anime Library Screen Filtered](https://github.com/sebastianmartii/RandomAnimeGenerator/blob/master/Screenshots/Screenshot_2023-07-07-09-52-15-69_d83f66b90ef83c80fb871307199ded9d.jpg)
+![Manga Library Screen Sorted](https://github.com/sebastianmartii/RandomAnimeGenerator/blob/master/Screenshots/Screenshot_2023-07-07-09-52-27-25_d83f66b90ef83c80fb871307199ded9d.jpg)
+![Profile Screen](https://github.com/sebastianmartii/RandomAnimeGenerator/blob/master/Screenshots/Screenshot_2023-07-07-09-53-08-38_d83f66b90ef83c80fb871307199ded9d.jpg)
+![Anime Library Screen Search](https://github.com/sebastianmartii/RandomAnimeGenerator/blob/master/Screenshots/Screenshot_2023-07-07-09-53-40-89_d83f66b90ef83c80fb871307199ded9d.jpg)
