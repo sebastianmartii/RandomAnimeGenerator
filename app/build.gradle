@@ -8,12 +8,12 @@ plugins {
 
 android {
     namespace 'com.example.randomanimegenerator'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.example.randomanimegenerator"
         minSdk 24
-        targetSdk 33
+        targetSdk 34
         versionCode 1
         versionName "1.0"
 
@@ -61,14 +61,14 @@ android {
 
 dependencies {
 
-    def room_version = "2.5.1"
+    def room_version = "2.5.2"
 
-    implementation 'androidx.core:core-ktx:1.10.1'
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
+    implementation 'androidx.core:core-ktx:1.12.0'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.2'
     implementation 'androidx.activity:activity-compose:1.7.2'
     implementation "androidx.compose.ui:ui:$compose_version"
     implementation "androidx.compose.ui:ui-tooling-preview:$compose_version"
-    implementation 'androidx.compose.material3:material3:1.2.0-alpha02'
+    implementation 'androidx.compose.material3:material3:1.2.0-alpha08'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
@@ -77,24 +77,24 @@ dependencies {
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
 
     // Authentication
-    implementation 'com.google.firebase:firebase-auth-ktx:22.0.0'
-    implementation 'com.google.android.gms:play-services-auth:20.5.0'
+    implementation 'com.google.firebase:firebase-auth-ktx:22.1.2'
+    implementation 'com.google.android.gms:play-services-auth:20.7.0'
 
     // Compose dependencies
-    implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1"
-    implementation "androidx.lifecycle:lifecycle-runtime-compose:2.6.1"
-    implementation "androidx.navigation:navigation-compose:2.6.0"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2"
+    implementation "androidx.lifecycle:lifecycle-runtime-compose:2.6.2"
+    implementation "androidx.navigation:navigation-compose:2.7.3"
 
     // Material icons extended
     implementation "androidx.compose.material:material-icons-extended:$compose_version"
 
     // Coil
-    implementation "io.coil-kt:coil-compose:2.3.0"
+    implementation 'io.coil-kt:coil-compose:2.4.0'
 
     // Coroutines
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1"
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2"
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
 
     // Room
     implementation "androidx.room:room-ktx:$room_version"
@@ -109,29 +109,29 @@ dependencies {
     implementation "com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.2"
 
     // Dagger - Hilt
-    implementation 'com.google.dagger:hilt-android:2.45'
-    kapt 'com.google.dagger:hilt-android-compiler:2.45'
+    implementation 'com.google.dagger:hilt-android:2.48'
+    kapt 'com.google.dagger:hilt-android-compiler:2.48'
     kapt "androidx.hilt:hilt-compiler:1.0.0"
     implementation 'androidx.hilt:hilt-navigation-compose:1.1.0-alpha01'
 
     // Local unit tests
-    testImplementation 'app.cash.turbine:turbine:0.7.0'
+    testImplementation 'app.cash.turbine:turbine:1.0.0'
     testImplementation "androidx.test:core:1.5.0"
     testImplementation "junit:junit:4.13.2"
     testImplementation "androidx.arch.core:core-testing:2.2.0"
-    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.5.1"
-    testImplementation "com.google.truth:truth:1.1.3"
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3'
+    testImplementation 'com.google.truth:truth:1.1.5'
     testImplementation "com.squareup.okhttp3:mockwebserver:4.9.1"
-    testImplementation "io.mockk:mockk:1.10.5"
-    debugImplementation "androidx.compose.ui:ui-test-manifest:1.5.0-beta02"
+    testImplementation 'io.mockk:mockk:1.13.8'
+    debugImplementation "androidx.compose.ui:ui-test-manifest:1.6.0-alpha06"
 
     // Instrumentation tests
-    androidTestImplementation 'com.google.dagger:hilt-android-testing:2.37'
-    kaptAndroidTest 'com.google.dagger:hilt-android-compiler:2.45'
+    androidTestImplementation 'com.google.dagger:hilt-android-testing:2.48'
+    kaptAndroidTest 'com.google.dagger:hilt-android-compiler:2.48'
     androidTestImplementation "junit:junit:4.13.2"
-    androidTestImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.5.1"
+    androidTestImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3'
     androidTestImplementation "androidx.arch.core:core-testing:2.2.0"
-    androidTestImplementation "com.google.truth:truth:1.1.3"
+    androidTestImplementation 'com.google.truth:truth:1.1.5'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test:core-ktx:1.5.0'
     androidTestImplementation "com.squareup.okhttp3:mockwebserver:4.9.1"
