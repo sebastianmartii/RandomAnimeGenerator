@@ -88,7 +88,7 @@ private fun ChipGroup(
             .height(IntrinsicSize.Max),
         horizontalAlignment = Alignment.Start
     ) {
-        Divider(color = MaterialTheme.colorScheme.outlineVariant)
+        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
         Text(
             text = chipGroupTitle,
             style = MaterialTheme.typography.titleLarge,
