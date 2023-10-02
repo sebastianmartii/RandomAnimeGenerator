@@ -18,9 +18,8 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -86,7 +85,7 @@ class DetailsViewModel @Inject constructor(
                     type = type!!.toType()
                 )
             }
-            mainInfo.await().onEach { result ->
+            mainInfo.await().collectLatest { result ->
                 when (result) {
                     is Resource.Error -> {
                         _state.update {
@@ -143,8 +142,8 @@ class DetailsViewModel @Inject constructor(
                         }
                     }
                 }
-            }.launchIn(this)
-            characters.await().onEach { result ->
+            }
+            characters.await().collectLatest { result ->
                 when (result) {
                     is Resource.Error -> {
                         _state.update {
@@ -177,8 +176,8 @@ class DetailsViewModel @Inject constructor(
                         }
                     }
                 }
-            }.launchIn(this)
-            reviews.await().onEach { result ->
+            }
+            reviews.await().collectLatest { result ->
                 when (result) {
                     is Resource.Error -> {
                         _state.update {
@@ -211,7 +210,7 @@ class DetailsViewModel @Inject constructor(
                         }
                     }
                 }
-            }.launchIn(this)
+            }
         }
     }
 
@@ -282,7 +281,7 @@ class DetailsViewModel @Inject constructor(
                     }
                     if (event.type == Type.ANIME) {
                         delay(1.seconds)
-                        useCases.getStaffUseCase(id!!).onEach { result ->
+                        useCases.getStaffUseCase(id!!).collectLatest { result ->
                             when (result) {
                                 is Resource.Error -> {
                                     _state.update {
@@ -319,10 +318,10 @@ class DetailsViewModel @Inject constructor(
                                     }
                                 }
                             }
-                        }.launchIn(this)
+                        }
                     }
                     delay(1.seconds)
-                    useCases.getRecommendationsUseCase(id!!, type!!.toType()).onEach { result ->
+                    useCases.getRecommendationsUseCase(id!!, type!!.toType()).collectLatest { result ->
                         when (result) {
                             is Resource.Error -> {
                                 _state.update {
@@ -359,7 +358,7 @@ class DetailsViewModel @Inject constructor(
                                 }
                             }
                         }
-                    }.launchIn(this)
+                    }
                 }
             }
 
