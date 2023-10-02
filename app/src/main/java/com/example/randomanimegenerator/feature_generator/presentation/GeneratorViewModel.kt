@@ -7,8 +7,7 @@ import com.example.randomanimegenerator.feature_generator.domain.use_case.Genera
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -36,7 +35,7 @@ class GeneratorViewModel @Inject constructor(
                     generateContentUseCase(
                         type = event.state.typeSelected,
                         minScore = event.state.scoreSelected.toInt()
-                    ).onEach { result ->
+                    ).collectLatest { result ->
                         when (result) {
                             is Resource.Error -> {
                                 _state.value = state.value.copy(
@@ -74,7 +73,7 @@ class GeneratorViewModel @Inject constructor(
                                 )
                             }
                         }
-                    }.launchIn(this)
+                    }
                 }
             }
 
