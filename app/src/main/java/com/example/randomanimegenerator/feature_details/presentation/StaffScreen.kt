@@ -1,6 +1,5 @@
 package com.example.randomanimegenerator.feature_details.presentation
 
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -26,9 +25,7 @@ import com.example.randomanimegenerator.feature_details.domain.model.Staff
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StaffScreen(
-    paddingValues: PaddingValues,
     staff: List<Staff>,
-    modifier: Modifier = Modifier,
     onNavigateBack: () -> Unit
 ) {
     Scaffold(
@@ -52,8 +49,7 @@ fun StaffScreen(
                     containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp)
                 )
             )
-        },
-        modifier = modifier.padding(paddingValues)
+        }
     ) { values ->
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),

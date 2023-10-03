@@ -2,7 +2,6 @@ package com.example.randomanimegenerator.feature_details.presentation
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -37,9 +36,7 @@ import com.example.randomanimegenerator.feature_details.domain.model.Character
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CharactersScreen(
-    paddingValues: PaddingValues,
     characterList: List<Character>,
-    modifier: Modifier = Modifier,
     onNavigateBack: () -> Unit
 ) {
     Scaffold(
@@ -64,7 +61,6 @@ fun CharactersScreen(
                 )
             )
         },
-        modifier = modifier.padding(paddingValues)
     ) { values ->
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),

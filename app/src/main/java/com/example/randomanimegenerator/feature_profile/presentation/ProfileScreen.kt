@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -40,17 +39,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.randomanimegenerator.R
+import com.example.randomanimegenerator.core.navigation.BottomNavItem
+import com.example.randomanimegenerator.core.navigation.BottomNavigationBar
 import com.example.randomanimegenerator.feature_generator.presentation.Type
 import com.example.randomanimegenerator.feature_generator.presentation.toTypeString
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
-    paddingValues: PaddingValues,
     state: ProfileState,
-    modifier: Modifier = Modifier,
+    bottomNavItems: List<BottomNavItem>,
     onEvent: (ProfileEvent) -> Unit,
     onNavigateToSignInScreen: () -> Unit,
+    onNavigateToBottomNavItem: (String) -> Unit,
     onProfilePictureChange: () -> Unit
 ) {
     Scaffold(
@@ -75,7 +76,13 @@ fun ProfileScreen(
                 )
             )
         },
-        modifier = modifier.padding(paddingValues)
+        bottomBar = {
+            BottomNavigationBar(
+                items = bottomNavItems,
+                selectedItemIndex = 3,
+                onItemClick = onNavigateToBottomNavItem
+            )
+        }
     ) { values ->
         Column(
             modifier = Modifier

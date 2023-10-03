@@ -1,6 +1,5 @@
 package com.example.randomanimegenerator.feature_details.presentation
 
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -27,9 +26,7 @@ import com.example.randomanimegenerator.feature_details.domain.model.SingleRevie
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReviewsScreen(
-    paddingValues: PaddingValues,
     reviews: List<Review>,
-    modifier: Modifier = Modifier,
     onNavigateBack: () -> Unit,
     onNavigateToSingleReview: (SingleReview) -> Unit
 ) {
@@ -54,8 +51,7 @@ fun ReviewsScreen(
                     containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp)
                 )
             )
-        },
-        modifier = modifier.padding(paddingValues)
+        }
     ) { values ->
         LazyColumn(modifier = Modifier.padding(values)) {
             items(reviews) { review ->

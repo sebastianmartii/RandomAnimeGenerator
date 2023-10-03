@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowColumn
 import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -93,13 +92,11 @@ import kotlinx.coroutines.flow.collectLatest
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailsScreen(
-    paddingValues: PaddingValues,
     state: DetailsState,
     snackBarFlow: Flow<DetailsViewModel.UiEvent>,
     navController: NavController,
     scrollState: ScrollState,
     snackBarHostState: SnackbarHostState,
-    modifier: Modifier = Modifier,
     onEvent: (DetailsEvent) -> Unit,
 ) {
     LaunchedEffect(key1 = true) {
@@ -189,9 +186,7 @@ fun DetailsScreen(
                     containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp)
                 )
             )
-        },
-        modifier = modifier
-            .padding(paddingValues)
+        }
     ) { values ->
         Column(
             modifier = Modifier

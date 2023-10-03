@@ -1,8 +1,6 @@
 package com.example.randomanimegenerator.feature_generator.presentation
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.PlayArrow
@@ -20,19 +18,20 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.randomanimegenerator.R
+import com.example.randomanimegenerator.core.navigation.BottomNavItem
+import com.example.randomanimegenerator.core.navigation.BottomNavigationBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GeneratorScreen(
-    paddingValues: PaddingValues,
     state: GeneratorState,
-    modifier: Modifier = Modifier,
+    bottomNavigationItems: List<BottomNavItem>,
     onEvent: (GeneratorEvent) -> Unit,
-    onDetailsNavigate: (Int) -> Unit
+    onNavigateToDetailsScreen: (Int) -> Unit,
+    onNavigateToBottomNavItem: (String) -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -86,7 +85,13 @@ fun GeneratorScreen(
                 )
             )
         },
-        modifier = modifier.padding(paddingValues)
+        bottomBar = {
+            BottomNavigationBar(
+                items = bottomNavigationItems,
+                selectedItemIndex = 0,
+                onItemClick = onNavigateToBottomNavItem
+            )
+        }
     ) { values ->
         AnimatedContent(targetState = state.editGeneratingParams, label = "") {
             when (it) {
@@ -94,7 +99,7 @@ fun GeneratorScreen(
                     GeneratedContent(
                         paddingValues = values,
                         state = state,
-                        onDetailsNavigate = onDetailsNavigate
+                        onDetailsNavigate = onNavigateToDetailsScreen
                     )
                 }
 

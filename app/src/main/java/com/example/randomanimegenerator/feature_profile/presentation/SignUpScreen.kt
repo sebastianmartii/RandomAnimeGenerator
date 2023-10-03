@@ -3,14 +3,13 @@ package com.example.randomanimegenerator.feature_profile.presentation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -36,6 +35,8 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.randomanimegenerator.R
+import com.example.randomanimegenerator.core.navigation.BottomNavItem
+import com.example.randomanimegenerator.core.navigation.BottomNavigationBar
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 
@@ -43,12 +44,12 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun SignUpScreen(
     state: SignInState,
+    bottomNavItems: List<BottomNavItem>,
     eventFlow: Flow<ProfileFeatureUiEvent>,
-    modifier: Modifier = Modifier,
-    paddingValues: PaddingValues,
     snackBarHostState: SnackbarHostState,
     onEvent: (SignUpEvent) -> Unit,
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    onNavigateToBottomNavItem: (String) -> Unit,
 ) {
     LaunchedEffect(key1 = true) {
         eventFlow.collectLatest { event ->
@@ -71,7 +72,7 @@ fun SignUpScreen(
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
-                            imageVector = Icons.Default.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
                             contentDescription = stringResource(id = R.string.back_action_button_text)
                         )
                     }
@@ -81,8 +82,14 @@ fun SignUpScreen(
                 )
             )
         },
+        bottomBar = {
+            BottomNavigationBar(
+                items = bottomNavItems,
+                selectedItemIndex = 3,
+                onItemClick = onNavigateToBottomNavItem
+            )
+        },
         snackbarHost = { SnackbarHost(snackBarHostState) },
-        modifier = modifier.padding(paddingValues)
     ) { values ->
         Box(
             modifier = Modifier

@@ -3,7 +3,6 @@ package com.example.randomanimegenerator.feature_profile.presentation
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -34,6 +33,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.example.randomanimegenerator.R
+import com.example.randomanimegenerator.core.navigation.BottomNavItem
+import com.example.randomanimegenerator.core.navigation.BottomNavigationBar
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 
@@ -41,13 +42,13 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun SignInScreen(
     state: SignInState,
+    bottomNavItems: List<BottomNavItem>,
     eventFlow: Flow<ProfileFeatureUiEvent>,
-    paddingValues: PaddingValues,
     snackBarHostState: SnackbarHostState,
-    modifier: Modifier = Modifier,
     onEvent: (SignInEvent) -> Unit,
     onSignInWithGoogle: () -> Unit,
-    onNavigateToSignUpScreen: () -> Unit
+    onNavigateToSignUpScreen: () -> Unit,
+    onNavigateToBottomNavItem: (String) -> Unit,
 ) {
     LaunchedEffect(key1 = true) {
         eventFlow.collectLatest { event ->
@@ -72,10 +73,16 @@ fun SignInScreen(
                 )
             )
         },
+        bottomBar = {
+            BottomNavigationBar(
+                items = bottomNavItems,
+                selectedItemIndex = 3,
+                onItemClick = onNavigateToBottomNavItem
+            )
+        },
         snackbarHost = {
             SnackbarHost(hostState = snackBarHostState)
-        },
-        modifier = modifier.padding(paddingValues)
+        }
     ) { values ->
         Box(
             modifier = Modifier

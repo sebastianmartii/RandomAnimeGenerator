@@ -1,6 +1,8 @@
 package com.example.randomanimegenerator.feature_generator.presentation
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Tune
@@ -27,6 +29,7 @@ fun GeneratorSettings(
     Column(
         modifier = modifier
             .fillMaxSize()
+            .verticalScroll(rememberScrollState())
             .padding(paddingValues),
     ) {
         Box(

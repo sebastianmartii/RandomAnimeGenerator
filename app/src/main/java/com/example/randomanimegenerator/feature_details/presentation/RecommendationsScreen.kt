@@ -1,6 +1,5 @@
 package com.example.randomanimegenerator.feature_details.presentation
 
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -27,9 +26,7 @@ import com.example.randomanimegenerator.feature_details.domain.model.Recommendat
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecommendationsScreen(
-    paddingValues: PaddingValues,
     recommendations: List<Recommendation>,
-    modifier: Modifier = Modifier,
     onNavigateBack: () -> Unit,
     onNavigateToRecommendation: (Int) -> Unit
 ) {
@@ -54,8 +51,7 @@ fun RecommendationsScreen(
                     containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp)
                 )
             )
-        },
-        modifier = modifier.padding(paddingValues),
+        }
     ) { values ->
         LazyVerticalGrid(
             columns = GridCells.Fixed(3),
