@@ -10,4 +10,6 @@ sealed interface LibraryEvent {
     data class ChangeFilterType(val filterType: FilterType) : LibraryEvent
     object Search : LibraryEvent
     object ClearTextField : LibraryEvent
+    object OpenFilterMenu : LibraryEvent
+    object CloseFilterMenu : LibraryEvent
 }

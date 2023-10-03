@@ -12,13 +12,16 @@ import com.example.randomanimegenerator.feature_library.domain.use_case.GetAllUs
 import com.example.randomanimegenerator.feature_profile.presentation.AuthenticationClient
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -83,6 +86,9 @@ class LibraryViewModel @Inject constructor(
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), LibraryState())
 
+    private val _channel = Channel<UiEvent>()
+    val eventFlow = _channel.receiveAsFlow()
+
     fun onEvent(event: LibraryEvent) {
         when (event) {
             is LibraryEvent.ChangeStatus -> {
@@ -101,12 +107,12 @@ class LibraryViewModel @Inject constructor(
                 }
             }
 
-            LibraryEvent.Search -> {
+            is LibraryEvent.Search -> {
                 _isSearching.update { !it }
                 _searchText.update { "" }
             }
 
-            LibraryEvent.ClearTextField -> {
+            is LibraryEvent.ClearTextField -> {
                 _searchText.update { "" }
             }
 
@@ -125,6 +131,23 @@ class LibraryViewModel @Inject constructor(
                     )
                 }
             }
+
+            is LibraryEvent.CloseFilterMenu -> {
+                viewModelScope.launch {
+                    _channel.send(UiEvent.CloseFilterMenu)
+                }
+            }
+
+            is LibraryEvent.OpenFilterMenu -> {
+                viewModelScope.launch {
+                    _channel.send(UiEvent.OpenFilterMenu)
+                }
+            }
         }
+    }
+
+    sealed class UiEvent {
+        object OpenFilterMenu : UiEvent()
+        object CloseFilterMenu : UiEvent()
     }
 }
