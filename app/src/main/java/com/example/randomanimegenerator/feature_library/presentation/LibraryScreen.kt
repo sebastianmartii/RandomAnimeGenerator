@@ -29,7 +29,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.CheckBox
 import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
@@ -38,13 +38,15 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.Card
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -52,6 +54,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -67,78 +70,27 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.randomanimegenerator.R
+import com.example.randomanimegenerator.core.navigation.BottomNavItem
+import com.example.randomanimegenerator.core.navigation.BottomNavigationBar
+import com.example.randomanimegenerator.feature_generator.presentation.Type
 import com.example.randomanimegenerator.feature_generator.presentation.toTypeString
 import com.example.randomanimegenerator.feature_library.data.mappers.toSortTypeString
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
 import java.util.Locale
 
 @Composable
 fun AnimeLibraryScreen(
     state: LibraryState,
+    bottomNavItems: List<BottomNavItem>,
     statusList: List<LibraryStatus>,
     sortList: List<LibrarySortType>,
-    paddingValues: PaddingValues,
-    scope: CoroutineScope,
+    eventFlow: Flow<LibraryViewModel.UiEvent>,
     scaffoldState: BottomSheetScaffoldState,
-    modifier: Modifier = Modifier,
     onEvent: (LibraryEvent) -> Unit,
     focusRequester: FocusRequester,
-    onNavigateToDetailsScreen: (id: Int, type: String) -> Unit
-) {
-    LibraryScreen(
-        state = state,
-        statusList = statusList,
-        sortList = sortList,
-        paddingValues = paddingValues,
-        scope = scope,
-        scaffoldState = scaffoldState,
-        onEvent = onEvent,
-        focusRequester = focusRequester,
-        onNavigateToDetailsScreen = onNavigateToDetailsScreen,
-        modifier = modifier
-    )
-}
-
-@Composable
-fun MangaLibraryScreen(
-    state: LibraryState,
-    statusList: List<LibraryStatus>,
-    sortList: List<LibrarySortType>,
-    paddingValues: PaddingValues,
-    scope: CoroutineScope,
-    scaffoldState: BottomSheetScaffoldState,
-    modifier: Modifier = Modifier,
-    onEvent: (LibraryEvent) -> Unit,
-    focusRequester: FocusRequester,
-    onNavigateToDetailsScreen: (id: Int, type: String) -> Unit
-) {
-    LibraryScreen(
-        state = state,
-        statusList = statusList,
-        sortList = sortList,
-        paddingValues = paddingValues,
-        scope = scope,
-        scaffoldState = scaffoldState,
-        onEvent = onEvent,
-        focusRequester = focusRequester,
-        onNavigateToDetailsScreen = onNavigateToDetailsScreen,
-        modifier = modifier
-    )
-}
-
-@Composable
-private fun LibraryScreen(
-    state: LibraryState,
-    statusList: List<LibraryStatus>,
-    sortList: List<LibrarySortType>,
-    paddingValues: PaddingValues,
-    scope: CoroutineScope,
-    scaffoldState: BottomSheetScaffoldState,
-    modifier: Modifier = Modifier,
-    onEvent: (LibraryEvent) -> Unit,
-    focusRequester: FocusRequester,
-    onNavigateToDetailsScreen: (id: Int, type: String) -> Unit
+    onNavigateToDetailsScreen: (id: Int, type: String) -> Unit,
+    onNavigateToBottomNavItem: (String) -> Unit
 ) {
     BottomSheetScaffold(
         scaffoldState = scaffoldState,
@@ -152,7 +104,88 @@ private fun LibraryScreen(
                 librarySortType = state.librarySortType,
                 onEvent = onEvent
             )
-        },
+        }
+    ) { paddingValues ->
+        LibraryScreen(
+            state = state,
+            bottomNavItems = bottomNavItems,
+            paddingValues = paddingValues,
+            eventFlow = eventFlow,
+            scaffoldState = scaffoldState,
+            onEvent = onEvent,
+            focusRequester = focusRequester,
+            onNavigateToDetailsScreen = onNavigateToDetailsScreen,
+            onNavigateToBottomNavItem = onNavigateToBottomNavItem
+        )
+    }
+}
+
+@Composable
+fun MangaLibraryScreen(
+    state: LibraryState,
+    bottomNavItems: List<BottomNavItem>,
+    statusList: List<LibraryStatus>,
+    sortList: List<LibrarySortType>,
+    eventFlow: Flow<LibraryViewModel.UiEvent>,
+    scaffoldState: BottomSheetScaffoldState,
+    onEvent: (LibraryEvent) -> Unit,
+    focusRequester: FocusRequester,
+    onNavigateToDetailsScreen: (id: Int, type: String) -> Unit,
+    onNavigateToBottomNavItem: (String) -> Unit
+) {
+    BottomSheetScaffold(
+        scaffoldState = scaffoldState,
+        sheetPeekHeight = 0.dp,
+        sheetContent = {
+            SheetContent(
+                statusList = statusList,
+                sortList = sortList,
+                filterType = state.filterType,
+                libraryStatus = state.libraryStatus,
+                librarySortType = state.librarySortType,
+                onEvent = onEvent
+            )
+        }
+    ) { paddingValues ->
+        LibraryScreen(
+            state = state,
+            bottomNavItems = bottomNavItems,
+            paddingValues = paddingValues,
+            eventFlow = eventFlow,
+            scaffoldState = scaffoldState,
+            onEvent = onEvent,
+            focusRequester = focusRequester,
+            onNavigateToDetailsScreen = onNavigateToDetailsScreen,
+            onNavigateToBottomNavItem = onNavigateToBottomNavItem
+        )
+    }
+}
+
+@Composable
+private fun LibraryScreen(
+    state: LibraryState,
+    paddingValues: PaddingValues,
+    bottomNavItems: List<BottomNavItem>,
+    eventFlow: Flow<LibraryViewModel.UiEvent>,
+    scaffoldState: BottomSheetScaffoldState,
+    onEvent: (LibraryEvent) -> Unit,
+    focusRequester: FocusRequester,
+    onNavigateToDetailsScreen: (id: Int, type: String) -> Unit,
+    onNavigateToBottomNavItem: (String) -> Unit
+) {
+    LaunchedEffect(key1 = true) {
+        eventFlow.collectLatest { event ->
+            when(event) {
+                LibraryViewModel.UiEvent.CloseFilterMenu -> {
+                    scaffoldState.bottomSheetState.hide()
+                }
+                LibraryViewModel.UiEvent.OpenFilterMenu -> {
+                    scaffoldState.bottomSheetState.expand()
+                }
+            }
+        }
+    }
+    Scaffold(
         topBar = {
             if (state.isSearching) {
                 SearchTopAppBar(
@@ -164,19 +197,17 @@ private fun LibraryScreen(
                         onEvent(LibraryEvent.Search)
                     },
                     onChangeSheetState = {
-                        scope.launch {
-                            if (scaffoldState.bottomSheetState.isVisible) {
-                                scaffoldState.bottomSheetState.hide()
-                            } else {
-                                scaffoldState.bottomSheetState.expand()
-                            }
+                        if (scaffoldState.bottomSheetState.currentValue == SheetValue.Expanded) {
+                            onEvent(LibraryEvent.CloseFilterMenu)
+                        } else {
+                            onEvent(LibraryEvent.OpenFilterMenu)
                         }
                     },
                     onClearTextField = {
                         onEvent(LibraryEvent.ClearTextField)
                     },
                     focusRequester = focusRequester,
-                    expanded = scaffoldState.bottomSheetState.isVisible
+                    expanded = scaffoldState.bottomSheetState.currentValue == SheetValue.Expanded
                 )
             } else {
                 RegularTopAppBar(
@@ -185,33 +216,35 @@ private fun LibraryScreen(
                         onEvent(LibraryEvent.Search)
                     },
                     onChangeSheetState = {
-                        scope.launch {
-                            if (scaffoldState.bottomSheetState.isVisible) {
-                                scaffoldState.bottomSheetState.hide()
-                            } else {
-                                scaffoldState.bottomSheetState.expand()
-                            }
+                        if (scaffoldState.bottomSheetState.currentValue == SheetValue.Expanded) {
+                            onEvent(LibraryEvent.CloseFilterMenu)
+                        } else {
+                            onEvent(LibraryEvent.OpenFilterMenu)
                         }
                     }
                 )
             }
         },
-        modifier = modifier
-            .padding(paddingValues)
+        bottomBar = {
+            BottomNavigationBar(
+                items = bottomNavItems,
+                selectedItemIndex = if (state.type == Type.ANIME) 1 else 2,
+                onItemClick = onNavigateToBottomNavItem
+            )
+        },
+        modifier = Modifier.padding(paddingValues)
     ) { values ->
         LazyVerticalGrid(
             columns = GridCells.Fixed(3),
             modifier = Modifier
                 .then(
-                    if (scaffoldState.bottomSheetState.isVisible) {
-                        val interactionSource = MutableInteractionSource()
+                    if (scaffoldState.bottomSheetState.currentValue == SheetValue.Expanded) {
+                        val interactionSource = remember { MutableInteractionSource() }
                         Modifier.clickable(
                             interactionSource = interactionSource,
                             indication = null
                         ) {
-                            scope.launch {
-                                scaffoldState.bottomSheetState.hide()
-                            }
+                            onEvent(LibraryEvent.CloseFilterMenu)
                         }
                     } else {
                         Modifier
@@ -225,10 +258,8 @@ private fun LibraryScreen(
                     title = it.title,
                     imageUrl = it.imageUrl,
                     modifier = Modifier.clickable {
-                        if (scaffoldState.bottomSheetState.isVisible) {
-                            scope.launch {
-                                scaffoldState.bottomSheetState.hide()
-                            }
+                        if (scaffoldState.bottomSheetState.currentValue == SheetValue.Expanded) {
+                            onEvent(LibraryEvent.CloseFilterMenu)
                             return@clickable
                         }
                         onNavigateToDetailsScreen(it.malId, state.type.toTypeString())
@@ -314,7 +345,8 @@ fun SheetContent(
                         SizeTransform(clip = false)
                     )
 
-                }
+                },
+                label = ""
             ) {filterType ->
                 when(filterType) {
                     FilterType.FILTER -> {
@@ -333,7 +365,7 @@ fun SheetContent(
                                         .height(4.dp),
                                 )
                             }
-                            Divider(
+                            HorizontalDivider(
                                 modifier = Modifier
                                     .height(2.dp)
                                     .fillMaxWidth()
@@ -366,7 +398,7 @@ fun SheetContent(
                                         .height(4.dp)
                                 )
                             }
-                            Divider(
+                            HorizontalDivider(
                                 modifier = Modifier
                                     .height(2.dp)
                                     .fillMaxWidth()
@@ -532,7 +564,7 @@ private fun SearchTopAppBar(
         navigationIcon = {
             IconButton(onClick = onSearch) {
                 Icon(
-                    imageVector = Icons.Default.ArrowBack,
+                    imageVector = Icons.AutoMirrored.Default.ArrowBack,
                     contentDescription = stringResource(id = R.string.stop_searching_text)
                 )
             }
@@ -578,7 +610,7 @@ fun FilterItem(
                 onSelect(status)
             }
     ) {
-        Crossfade(targetState = selected) { selected ->
+        Crossfade(targetState = selected, label = "") { selected ->
             if (selected) {
                 Icon(
                     imageVector = Icons.Filled.CheckBox,
@@ -614,7 +646,7 @@ fun SortItem(
                 onSelect(sortType)
             }
     ) {
-        Crossfade(targetState = selected) { selected ->
+        Crossfade(targetState = selected, label = "") { selected ->
             if (selected) {
                 Icon(
                     imageVector = Icons.Filled.CheckBox,
