@@ -3,12 +3,12 @@ package com.example.randomanimegenerator
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.material3.Scaffold
-import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
-import com.example.randomanimegenerator.core.constants.navigationItems
-import com.example.randomanimegenerator.core.navigation.BottomNavigationBar
-import com.example.randomanimegenerator.core.navigation.Navigation
+import com.example.randomanimegenerator.core.navigation.Destinations
+import com.example.randomanimegenerator.core.navigation.bottomNavGraph
+import com.example.randomanimegenerator.core.navigation.detailsNavGraph
+import com.example.randomanimegenerator.core.navigation.profileNavGraph
 import com.example.randomanimegenerator.feature_profile.presentation.AuthenticationClient
 import com.example.randomanimegenerator.ui.theme.RandomAnimeGeneratorTheme
 import com.google.android.gms.auth.api.identity.Identity
@@ -29,26 +29,13 @@ class MainActivity : ComponentActivity() {
         setContent {
             RandomAnimeGeneratorTheme {
                 val navController = rememberNavController()
-                Scaffold(
-                    bottomBar = {
-                        BottomNavigationBar(
-                            items = navigationItems,
-                            navController = navController,
-                            onItemClick = {
-                                navController.navigate(it.route) {
-                                    popUpTo(navController.graph.findStartDestination().id)
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
-                            }
-                        )
-                    }
+                NavHost(
+                    navController = navController,
+                    startDestination = Destinations.BottomBarGraph.route
                 ) {
-                    Navigation(
-                        navController = navController,
-                        paddingValues = it,
-                        authenticationClient = authClient
-                    )
+                    bottomNavGraph(navController)
+                    detailsNavGraph(navController)
+                    profileNavGraph(navController, authClient)
                 }
             }
         }
