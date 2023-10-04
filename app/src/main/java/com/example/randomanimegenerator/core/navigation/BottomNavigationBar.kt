@@ -6,25 +6,21 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavController
-import androidx.navigation.compose.currentBackStackEntryAsState
 
 @Composable
 fun BottomNavigationBar(
     items: List<BottomNavItem>,
-    navController: NavController,
+    selectedItemIndex: Int,
     modifier: Modifier = Modifier,
-    onItemClick: (BottomNavItem) -> Unit
+    onItemClick: (String) -> Unit
 ) {
-    val backStackEntry = navController.currentBackStackEntryAsState()
     NavigationBar(
         modifier = modifier,
     ) {
-        items.forEach {item ->
-            val selected = item.route == backStackEntry.value?.destination?.route
+        items.forEachIndexed { index, item ->
             NavigationBarItem(
-                selected = selected,
-                onClick = { onItemClick(item) },
+                selected = selectedItemIndex == index,
+                onClick = { onItemClick(item.route) },
                 label = {
                     Text(text = item.name)
                 },
