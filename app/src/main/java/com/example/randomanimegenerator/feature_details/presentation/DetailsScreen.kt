@@ -301,7 +301,16 @@ private fun MainInfoSection(
         modifier = modifier
             .fillMaxWidth()
             .animateContentSize()
-            .then(if (synopsisExpanded) Modifier.wrapContentHeight() else Modifier.height(250.dp)),
+            .then(
+                when {
+                    (!synopsisExpanded && description.length < 240) || synopsisExpanded -> {
+                        Modifier.wrapContentHeight()
+                    }
+                    else -> {
+                        Modifier.height(250.dp)
+                    }
+                }
+            ),
         shape = MaterialTheme.shapes.small.copy(
             topStart = CornerSize(0.dp),
             topEnd = CornerSize(0.dp)
@@ -458,29 +467,31 @@ private fun CharactersSection(
         ShimmerContent(
             result = result,
             contentAfterLoading = {
-                Row(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .horizontalScroll(rememberScrollState()),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    characters.onEach { character ->
-                        if (characters.indexOf(character) < 7) {
-                            CharacterCard(
-                                name = character.name,
-                                imageUrl = character.imageUrl,
+                if (characters.isNotEmpty()) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .horizontalScroll(rememberScrollState()),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        characters.onEach { character ->
+                            if (characters.indexOf(character) < 7) {
+                                CharacterCard(
+                                    name = character.name,
+                                    imageUrl = character.imageUrl,
+                                )
+                            }
+                        }
+                        if (characters.size > 7 || characters.isEmpty()) {
+                            EmptyCharactersCard(
+                                characters = characters,
+                                modifier = Modifier.then(
+                                    if (characters.isEmpty()) Modifier else Modifier.clickable {
+                                        onNavigateToCharactersScreen()
+                                    }
+                                )
                             )
                         }
-                    }
-                    if (characters.size > 7 || characters.isEmpty()) {
-                        EmptyCharactersCard(
-                            characters = characters,
-                            modifier = Modifier.then(
-                                if (characters.isEmpty()) Modifier else Modifier.clickable {
-                                    onNavigateToCharactersScreen()
-                                }
-                            )
-                        )
                     }
                 }
             },
@@ -498,16 +509,6 @@ private fun CharactersSection(
                                 .width(90.dp)
                         )
                     }
-                }
-            },
-            errorContent = {
-                Row(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .horizontalScroll(rememberScrollState()),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    EmptyCharactersCard(characters = characters)
                 }
             }
         )
@@ -622,15 +623,6 @@ private fun StatsAndReviewsSection(
                         LoadingReviewCard()
                     }
                 }
-            },
-            errorContent = {
-                Column(
-                    modifier = Modifier
-                        .weight(4f)
-                        .height(reviewsColumnHeight)
-                ) {
-                    EmptyReviewsCard()
-                }
             }
         )
     }
@@ -664,30 +656,32 @@ private fun StaffSection(
             ShimmerContent(
                 result = result,
                 contentAfterLoading = {
-                    FlowColumn(
-                        maxItemsInEachColumn = 4,
-                        modifier = Modifier.padding(4.dp),
-                        verticalArrangement = Arrangement.Top,
-                        horizontalArrangement = Arrangement.Start
-                    ) {
-                        staff.onEach { staffMember ->
-                            if (staff.indexOf(staffMember) < 7) {
+                    if (staff.isNotEmpty()) {
+                        FlowColumn(
+                            maxItemsInEachColumn = 4,
+                            modifier = Modifier.padding(4.dp),
+                            verticalArrangement = Arrangement.Top,
+                            horizontalArrangement = Arrangement.Start
+                        ) {
+                            staff.onEach { staffMember ->
+                                if (staff.indexOf(staffMember) < 7) {
+                                    StaffCard(
+                                        name = staffMember.name,
+                                        imageUrl = staffMember.imageUrl,
+                                        positions = staffMember.position
+                                    )
+                                }
+                            }
+                            if (staff.size > 7 || staff.isEmpty()) {
                                 StaffCard(
-                                    name = staffMember.name,
-                                    imageUrl = staffMember.imageUrl,
-                                    positions = staffMember.position
+                                    name = stringResource(id = R.string.see_more_label_text),
+                                    imageUrl = stringResource(id = R.string.question_mark_staff_image_url),
+                                    positions = "",
+                                    modifier = Modifier.clickable {
+                                        onNavigateToStaffScreen()
+                                    }
                                 )
                             }
-                        }
-                        if (staff.size > 7 || staff.isEmpty()) {
-                            StaffCard(
-                                name = stringResource(id = R.string.see_more_label_text),
-                                imageUrl = stringResource(id = R.string.question_mark_staff_image_url),
-                                positions = "",
-                                modifier = Modifier.clickable {
-                                    onNavigateToStaffScreen()
-                                }
-                            )
                         }
                     }
                 },
@@ -700,8 +694,7 @@ private fun StaffSection(
                             LoadingStaffCard(modifier = Modifier.fillMaxWidth(0.5f))
                         }
                     }
-                },
-                errorContent = {}
+                }
             )
         }
     }
@@ -731,32 +724,34 @@ private fun RecommendationsSection(
         ShimmerContent(
             result = result,
             contentAfterLoading = {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(IntrinsicSize.Max)
-                        .horizontalScroll(rememberScrollState()),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    recommendations.onEach { recommendation ->
-                        if (recommendations.indexOf(recommendation) < 7) {
-                            RecommendationCard(
-                                recommendation = recommendation,
-                                onNavigateToRecommendation = {
-                                    onNavigateToRecommendation(it)
-                                }
+                if (recommendations.isNotEmpty()) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(IntrinsicSize.Max)
+                            .horizontalScroll(rememberScrollState()),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        recommendations.onEach { recommendation ->
+                            if (recommendations.indexOf(recommendation) < 7) {
+                                RecommendationCard(
+                                    recommendation = recommendation,
+                                    onNavigateToRecommendation = {
+                                        onNavigateToRecommendation(it)
+                                    }
+                                )
+                            }
+                        }
+                        if (recommendations.size > 7 || recommendations.isEmpty()) {
+                            EmptyRecommendationsCard(
+                                recommendations = recommendations,
+                                modifier = Modifier.then(
+                                    if (recommendations.isEmpty()) Modifier else Modifier.clickable {
+                                        onNavigateToRecommendationsScreen()
+                                    }
+                                )
                             )
                         }
-                    }
-                    if (recommendations.size > 7 || recommendations.isEmpty()) {
-                        EmptyRecommendationsCard(
-                            recommendations = recommendations,
-                            modifier = Modifier.then(
-                                if (recommendations.isEmpty()) Modifier else Modifier.clickable {
-                                    onNavigateToRecommendationsScreen()
-                                }
-                            )
-                        )
                     }
                 }
             },
@@ -775,17 +770,6 @@ private fun RecommendationsSection(
                                 .width(110.dp)
                         )
                     }
-                }
-            },
-            errorContent = {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(IntrinsicSize.Max)
-                        .horizontalScroll(rememberScrollState()),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    EmptyRecommendationsCard(recommendations = recommendations)
                 }
             }
         )
