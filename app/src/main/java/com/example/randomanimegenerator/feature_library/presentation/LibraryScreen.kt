@@ -253,7 +253,12 @@ private fun LibraryScreen(
                 .fillMaxHeight()
                 .padding(values)
         ) {
-            items(state.content) {
+            items(
+                state.content,
+                key = { libraryModel ->
+                    libraryModel.malId
+                }
+            ) {
                 LibraryCard(
                     title = it.title,
                     imageUrl = it.imageUrl,
