@@ -26,12 +26,11 @@ fun ShimmerContent(
     result: Result,
     contentAfterLoading: @Composable () -> Unit,
     loadingContent: @Composable () -> Unit,
-    errorContent: @Composable () -> Unit,
 ) {
     when(result) {
         Result.SUCCESS -> contentAfterLoading()
         Result.LOADING -> loadingContent()
-        Result.ERROR -> errorContent()
+        Result.ERROR -> contentAfterLoading()
     }
 }
 
@@ -39,13 +38,13 @@ fun Modifier.shimmerEffect(): Modifier = composed {
     var size by remember {
         mutableStateOf(IntSize.Zero)
     }
-    val transition = rememberInfiniteTransition()
+    val transition = rememberInfiniteTransition(label = "")
     val startOffsetX by transition.animateFloat(
         initialValue = -2 * size.width.toFloat(),
         targetValue = 2 * size.width.toFloat(),
         animationSpec = infiniteRepeatable(
             animation = tween(durationMillis = 1000)
-        )
+        ), label = ""
     )
 
 
