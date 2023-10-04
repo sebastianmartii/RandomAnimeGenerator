@@ -6,7 +6,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -14,18 +13,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
+import com.example.randomanimegenerator.core.constants.navigationItems
 import com.example.randomanimegenerator.feature_profile.presentation.AuthenticationClient
 import com.example.randomanimegenerator.feature_profile.presentation.ProfileEvent
 import com.example.randomanimegenerator.feature_profile.presentation.ProfileScreen
-import com.example.randomanimegenerator.feature_profile.presentation.ProfileState
 import com.example.randomanimegenerator.feature_profile.presentation.ProfileViewModel
 import com.example.randomanimegenerator.feature_profile.presentation.SignInEvent
 import com.example.randomanimegenerator.feature_profile.presentation.SignInScreen
-import com.example.randomanimegenerator.feature_profile.presentation.SignInState
 import com.example.randomanimegenerator.feature_profile.presentation.SignInViewModel
 import com.example.randomanimegenerator.feature_profile.presentation.SignUpEvent
 import com.example.randomanimegenerator.feature_profile.presentation.SignUpScreen
@@ -34,7 +33,6 @@ import kotlinx.coroutines.runBlocking
 
 fun NavGraphBuilder.profileNavGraph(
     navController: NavHostController,
-    paddingValues: PaddingValues,
     authenticationClient: AuthenticationClient
 ) {
     navigation(
@@ -45,7 +43,7 @@ fun NavGraphBuilder.profileNavGraph(
             route = Destinations.SignIn.route
         ) {
             val viewModel = hiltViewModel<SignInViewModel>()
-            val state by viewModel.state.collectAsStateWithLifecycle(SignInState())
+            val state by viewModel.state.collectAsStateWithLifecycle()
 
             val snackBarHostState = remember {
                 SnackbarHostState()
@@ -74,8 +72,8 @@ fun NavGraphBuilder.profileNavGraph(
 
             SignInScreen(
                 state = state,
+                bottomNavItems = navigationItems,
                 eventFlow = viewModel.eventFlow,
-                paddingValues = paddingValues,
                 onEvent = viewModel::onEvent,
                 snackBarHostState = snackBarHostState,
                 onSignInWithGoogle = {
@@ -90,6 +88,13 @@ fun NavGraphBuilder.profileNavGraph(
                 },
                 onNavigateToSignUpScreen = {
                     navController.navigate(Destinations.SignUp.route)
+                },
+                onNavigateToBottomNavItem = { route ->
+                    navController.navigate(route) {
+                        popUpTo(navController.graph.findStartDestination().id)
+                        launchSingleTop = true
+                        restoreState = true
+                    }
                 }
             )
         }
@@ -97,7 +102,7 @@ fun NavGraphBuilder.profileNavGraph(
             route = Destinations.Profile.route
         ) {
             val viewModel = hiltViewModel<ProfileViewModel>()
-            val state by viewModel.state.collectAsStateWithLifecycle(ProfileState())
+            val state by viewModel.state.collectAsStateWithLifecycle()
 
             val context = LocalContext.current
 
@@ -119,9 +124,9 @@ fun NavGraphBuilder.profileNavGraph(
             )
 
             ProfileScreen(
-                paddingValues = paddingValues,
                 state = state,
                 onEvent = viewModel::onEvent,
+                bottomNavItems = navigationItems,
                 onNavigateToSignInScreen = {
                     navController.navigate(Destinations.SignIn.route)
                 },
@@ -129,12 +134,19 @@ fun NavGraphBuilder.profileNavGraph(
                     launcher.launch(
                         PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                     )
+                },
+                onNavigateToBottomNavItem = { route ->
+                    navController.navigate(route) {
+                        popUpTo(navController.graph.findStartDestination().id)
+                        launchSingleTop = true
+                        restoreState = true
+                    }
                 }
             )
         }
         composable(route = Destinations.SignUp.route) {
             val viewModel = hiltViewModel<SignUpViewModel>()
-            val state by viewModel.state.collectAsStateWithLifecycle(SignInState())
+            val state by viewModel.state.collectAsStateWithLifecycle()
 
             LaunchedEffect(key1 = state.isSignInSuccessful) {
                 if (state.isSignInSuccessful) {
@@ -149,12 +161,19 @@ fun NavGraphBuilder.profileNavGraph(
 
             SignUpScreen(
                 state = state,
+                bottomNavItems = navigationItems,
                 eventFlow = viewModel.eventFlow,
-                paddingValues = paddingValues,
                 onEvent = viewModel::onEvent,
                 snackBarHostState = snackBarHostState,
                 onNavigateBack = {
                     navController.popBackStack()
+                },
+                onNavigateToBottomNavItem = { route ->
+                    navController.navigate(route) {
+                        popUpTo(navController.graph.findStartDestination().id)
+                        launchSingleTop = true
+                        restoreState = true
+                    }
                 }
             )
         }

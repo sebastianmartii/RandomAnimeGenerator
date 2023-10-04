@@ -1,6 +1,5 @@
 package com.example.randomanimegenerator.core.navigation
 
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.getValue
@@ -16,7 +15,6 @@ import androidx.navigation.navigation
 import com.example.randomanimegenerator.feature_details.presentation.CharactersScreen
 import com.example.randomanimegenerator.feature_details.presentation.CharactersViewModel
 import com.example.randomanimegenerator.feature_details.presentation.DetailsScreen
-import com.example.randomanimegenerator.feature_details.presentation.DetailsState
 import com.example.randomanimegenerator.feature_details.presentation.DetailsViewModel
 import com.example.randomanimegenerator.feature_details.presentation.RecommendationsScreen
 import com.example.randomanimegenerator.feature_details.presentation.RecommendationsViewModel
@@ -28,7 +26,6 @@ import com.example.randomanimegenerator.feature_details.presentation.StaffViewMo
 
 fun NavGraphBuilder.detailsNavGraph(
     navController: NavHostController,
-    paddingValues: PaddingValues
 ) {
     navigation(
         startDestination = Destinations.Details.route,
@@ -46,9 +43,8 @@ fun NavGraphBuilder.detailsNavGraph(
                 SnackbarHostState()
             }
             val viewModel = hiltViewModel<DetailsViewModel>()
-            val state by viewModel.state.collectAsStateWithLifecycle(DetailsState())
+            val state by viewModel.state.collectAsStateWithLifecycle()
             DetailsScreen(
-                paddingValues = paddingValues,
                 state = state,
                 snackBarFlow = viewModel.eventFlow,
                 navController = navController,
@@ -67,7 +63,6 @@ fun NavGraphBuilder.detailsNavGraph(
             val viewModel = hiltViewModel<CharactersViewModel>()
             val characters by viewModel.characters.collectAsStateWithLifecycle(emptyList())
             CharactersScreen(
-                paddingValues = paddingValues,
                 characterList = characters,
                 onNavigateBack = {
                     navController.popBackStack()
@@ -84,7 +79,6 @@ fun NavGraphBuilder.detailsNavGraph(
             val viewModel = hiltViewModel<StaffViewModel>()
             val staff by viewModel.staff.collectAsStateWithLifecycle(emptyList())
             StaffScreen(
-                paddingValues = paddingValues,
                 staff = staff,
                 onNavigateBack = {
                     navController.popBackStack()
@@ -101,7 +95,6 @@ fun NavGraphBuilder.detailsNavGraph(
             val viewModel = hiltViewModel<ReviewsViewModel>()
             val reviews by viewModel.reviews.collectAsStateWithLifecycle(emptyList())
             ReviewsScreen(
-                paddingValues = paddingValues,
                 reviews = reviews,
                 onNavigateBack = {
                     navController.popBackStack()
@@ -120,7 +113,6 @@ fun NavGraphBuilder.detailsNavGraph(
             )
         ) { navBackStackEntry ->
             SingleReviewScreen(
-                paddingValues = paddingValues,
                 review = navBackStackEntry.arguments?.getString("review") ?: "",
                 score = navBackStackEntry.arguments?.getInt("score") ?: 0,
                 author = navBackStackEntry.arguments?.getString("author") ?: "",
@@ -139,7 +131,6 @@ fun NavGraphBuilder.detailsNavGraph(
             val viewModel = hiltViewModel<RecommendationsViewModel>()
             val recommendations by viewModel.recommendations.collectAsStateWithLifecycle(emptyList())
             RecommendationsScreen(
-                paddingValues = paddingValues,
                 recommendations = recommendations,
                 onNavigateBack = {
                     navController.popBackStack()
