@@ -13,13 +13,11 @@ import com.example.randomanimegenerator.feature_details.domain.use_cases.GetStaf
 import com.example.randomanimegenerator.feature_generator.presentation.Type
 import com.example.randomanimegenerator.feature_library.presentation.LibraryStatus
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class DetailsViewModelTest {
 
     @get:Rule
@@ -27,6 +25,7 @@ class DetailsViewModelTest {
 
     private lateinit var repo: FakeDetailsRepository
     private lateinit var viewModel: DetailsViewModel
+    private lateinit var authClient: AuthenticationClientTest
     private val savedStateHandle = SavedStateHandle().apply {
         set("id", 0)
         set("type", "Anime")
@@ -43,7 +42,8 @@ class DetailsViewModelTest {
             getReviewsUseCase = GetReviewsUseCase(repo),
             getStaffUseCase = GetStaffUseCase(repo)
         )
-        viewModel = DetailsViewModel(detailsUseCases, repo, savedStateHandle)
+        authClient = AuthenticationClientTest()
+        viewModel = DetailsViewModel(detailsUseCases, repo, authClient, savedStateHandle)
     }
 
     @Test
@@ -66,10 +66,11 @@ class DetailsViewModelTest {
 
     @Test
     fun `Popup cover image, state updated accordingly`() = runTest {
-        viewModel.onEvent(DetailsEvent.PopUpImage)
+        viewModel.onEvent(DetailsEvent.ShowPopUpImage(null))
         viewModel.state.test {
             val emission = awaitItem()
             assertThat(emission.showPopUp).isTrue()
+            assertThat(emission.popUpPlaceholder).isEqualTo(null)
         }
     }
 

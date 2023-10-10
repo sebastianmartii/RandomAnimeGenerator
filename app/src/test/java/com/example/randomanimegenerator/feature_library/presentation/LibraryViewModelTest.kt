@@ -1,24 +1,26 @@
 package com.example.randomanimegenerator.feature_library.presentation
 
 import app.cash.turbine.test
+import com.example.randomanimegenerator.feature_details.presentation.AuthenticationClientTest
 import com.example.randomanimegenerator.feature_library.data.repository.FakeLibraryRepository
 import com.example.randomanimegenerator.feature_library.domain.use_case.GetAllByStatusUseCase
 import com.example.randomanimegenerator.feature_library.domain.use_case.GetAllUseCase
+import com.example.randomanimegenerator.feature_profile.presentation.AuthenticationClient
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class LibraryViewModelTest {
 
     private lateinit var repo: FakeLibraryRepository
     private lateinit var viewModel: LibraryViewModel
+    private lateinit var authenticationClient: AuthenticationClient
     @Before
     fun setUp() {
         repo = FakeLibraryRepository()
-        viewModel = LibraryViewModel(GetAllUseCase(repo), GetAllByStatusUseCase(repo))
+        authenticationClient = AuthenticationClientTest()
+        viewModel = LibraryViewModel(GetAllUseCase(repo), GetAllByStatusUseCase(repo), authenticationClient)
     }
 
     @Test

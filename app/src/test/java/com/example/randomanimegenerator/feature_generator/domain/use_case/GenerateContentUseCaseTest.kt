@@ -2,13 +2,11 @@ package com.example.randomanimegenerator.feature_generator.domain.use_case
 
 import com.example.randomanimegenerator.feature_generator.data.repository.FakeGeneratorRepository
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class GenerateContentUseCaseTest {
 
     private lateinit var repo: FakeGeneratorRepository

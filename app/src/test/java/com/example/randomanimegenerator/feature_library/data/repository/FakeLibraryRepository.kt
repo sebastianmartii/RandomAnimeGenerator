@@ -1,181 +1,110 @@
 package com.example.randomanimegenerator.feature_library.data.repository
 
-import com.example.randomanimegenerator.core.database.entities.MainInfoEntity
-import com.example.randomanimegenerator.feature_details.data.mappers.toStatusString
+import com.example.randomanimegenerator.core.database.entities.UserFavoritesEntity
 import com.example.randomanimegenerator.feature_library.domain.repository.LibraryRepository
-import com.example.randomanimegenerator.feature_library.presentation.LibraryStatus
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 class FakeLibraryRepository : LibraryRepository {
 
-    private val mainInfo = listOf(
-        MainInfoEntity(
+    private val userFavoritesList = listOf(
+        UserFavoritesEntity(
             id = 1,
-            malId = 1,
-            title = "title 1",
+            title = "title a",
             imageUrl = "",
-            largeImageUrl = "",
-            synopsis = "",
-            type = "",
-            status = "",
-            score = 8.0,
-            genres = "",
-            themes = "",
-            libraryType = "",
-            libraryStatus = LibraryStatus.PLANNING.toStatusString()
-        ),
-        MainInfoEntity(
-            id = 4,
-            malId = 4,
-            title = "title 4",
-            imageUrl = "",
-            largeImageUrl = "",
-            synopsis = "",
-            type = "",
-            status = "",
-            score = 8.0,
-            genres = "",
-            themes = "",
-            libraryType = "",
-            libraryStatus = LibraryStatus.PLANNING.toStatusString()
-        ),
-        MainInfoEntity(
-            id = 5,
-            malId = 5,
-            title = "title 5",
-            imageUrl = "",
-            largeImageUrl = "",
-            synopsis = "",
-            type = "",
-            status = "",
-            score = 8.0,
-            genres = "",
-            themes = "",
-            libraryType = "",
-            libraryStatus = LibraryStatus.PLANNING.toStatusString()
-        ),
-        MainInfoEntity(
-            id = 6,
-            malId = 6,
-            title = "title 6",
-            imageUrl = "",
-            largeImageUrl = "",
-            synopsis = "",
-            type = "",
-            status = "",
-            score = 8.0,
-            genres = "",
-            themes = "",
-            libraryType = "",
-            libraryStatus = LibraryStatus.PLANNING.toStatusString()
-        ),
-        MainInfoEntity(
-            id = 3,
-            malId = 3,
-            title = "title 3",
-            imageUrl = "",
-            largeImageUrl = "",
-            synopsis = "",
-            type = "",
-            status = "",
-            score = 8.0,
-            genres = "",
-            themes = "",
-            libraryType = "",
-            libraryStatus = LibraryStatus.PLANNING.toStatusString()
-        ),
-        MainInfoEntity(
+            entryMalID = 1,
+            entryStatus = "planning",
+            entryType = "",
+            userUID = ""
+        ),UserFavoritesEntity(
             id = 2,
-            malId = 2,
-            title = "title 2",
+            title = "title b",
             imageUrl = "",
-            largeImageUrl = "",
-            synopsis = "",
-            type = "",
-            status = "",
-            score = 8.0,
-            genres = "",
-            themes = "",
-            libraryType = "",
-            libraryStatus = LibraryStatus.FINISHED.toStatusString()
+            entryMalID = 2,
+            entryStatus = "planning",
+            entryType = "",
+            userUID = ""
+        ),UserFavoritesEntity(
+            id = 3,
+            title = "title c",
+            imageUrl = "",
+            entryMalID = 3,
+            entryStatus = "finished",
+            entryType = "",
+            userUID = ""
+        ),UserFavoritesEntity(
+            id = 4,
+            title = "title d",
+            imageUrl = "",
+            entryMalID = 4,
+            entryStatus = "finished",
+            entryType = "",
+            userUID = ""
+        ),UserFavoritesEntity(
+            id = 5,
+            title = "title e",
+            imageUrl = "",
+            entryMalID = 5,
+            entryStatus = "planning",
+            entryType = "",
+            userUID = ""
+        ),UserFavoritesEntity(
+            id = 6,
+            title = "title f",
+            imageUrl = "",
+            entryMalID = 6,
+            entryStatus = "planning",
+            entryType = "",
+            userUID = ""
         ),
-        MainInfoEntity(
-            id = 7,
-            malId = 7,
-            title = "title 7",
-            imageUrl = "",
-            largeImageUrl = "",
-            synopsis = "",
-            type = "",
-            status = "",
-            score = 8.0,
-            genres = "",
-            themes = "",
-            libraryType = "",
-            libraryStatus = LibraryStatus.FINISHED.toStatusString()
-        ),
-        MainInfoEntity(
-            id = 8,
-            malId = 8,
-            title = "title 8",
-            imageUrl = "",
-            largeImageUrl = "",
-            synopsis = "",
-            type = "",
-            status = "",
-            score = 8.0,
-            genres = "",
-            themes = "",
-            libraryType = "",
-            libraryStatus = LibraryStatus.FINISHED.toStatusString()
-        ),
-        MainInfoEntity(
-            id = 9,
-            malId = 9,
-            title = "title 9",
-            imageUrl = "",
-            largeImageUrl = "",
-            synopsis = "",
-            type = "",
-            status = "",
-            score = 8.0,
-            genres = "",
-            themes = "",
-            libraryType = "",
-            libraryStatus = LibraryStatus.FINISHED.toStatusString()
-        )
     )
 
-    override fun getAllAZ(type: String): Flow<List<MainInfoEntity>> = flow {
-        emit(mainInfo.sortedBy { it.title })
+
+    override fun getAllAZ(type: String, userUID: String): Flow<List<UserFavoritesEntity>> = flow {
+        emit(userFavoritesList.sortedBy { it.title })
     }
 
-    override fun getAllZA(type: String): Flow<List<MainInfoEntity>> = flow {
-        emit(mainInfo.sortedByDescending { it.title })
+    override fun getAllZA(type: String, userUID: String): Flow<List<UserFavoritesEntity>> = flow {
+        emit(userFavoritesList.sortedByDescending { it.title })
     }
 
-    override fun getAllNewest(type: String): Flow<List<MainInfoEntity>> = flow {
-        emit(mainInfo.sortedBy { it.id })
+    override fun getAllNewest(type: String, userUID: String): Flow<List<UserFavoritesEntity>> = flow {
+        emit(userFavoritesList.sortedBy { it.id })
     }
 
-    override fun getAllOldest(type: String): Flow<List<MainInfoEntity>> = flow {
-        emit(mainInfo.sortedByDescending { it.id })
+    override fun getAllOldest(type: String, userUID: String): Flow<List<UserFavoritesEntity>> = flow {
+        emit(userFavoritesList.sortedByDescending { it.id })
     }
 
-    override fun getAllByStatusAZ(type: String, status: String): Flow<List<MainInfoEntity>> = flow {
-        emit(mainInfo.filter { it.libraryStatus == status }.sortedBy { it.title })
+    override fun getAllByStatusAZ(
+        type: String,
+        status: String,
+        userUID: String
+    ): Flow<List<UserFavoritesEntity>> = flow {
+        emit(userFavoritesList.filter { it.entryStatus == status }.sortedBy { it.title })
     }
 
-    override fun getAllByStatusZA(type: String, status: String): Flow<List<MainInfoEntity>> = flow {
-        emit(mainInfo.filter { it.libraryStatus == status }.sortedByDescending { it.title })
+    override fun getAllByStatusZA(
+        type: String,
+        status: String,
+        userUID: String
+    ): Flow<List<UserFavoritesEntity>> = flow {
+        emit(userFavoritesList.filter { it.entryStatus == status }.sortedByDescending { it.title })
     }
 
-    override fun getAllByStatusNewest(type: String, status: String): Flow<List<MainInfoEntity>> = flow {
-        emit(mainInfo.filter { it.libraryStatus == status }.sortedBy { it.id })
+    override fun getAllByStatusNewest(
+        type: String,
+        status: String,
+        userUID: String
+    ): Flow<List<UserFavoritesEntity>> = flow {
+        emit(userFavoritesList.filter { it.entryStatus == status }.sortedBy { it.id })
     }
 
-    override fun getAllByStatusOldest(type: String, status: String): Flow<List<MainInfoEntity>> = flow {
-        emit(mainInfo.filter { it.libraryStatus == status }.sortedByDescending { it.id })
+    override fun getAllByStatusOldest(
+        type: String,
+        status: String,
+        userUID: String
+    ): Flow<List<UserFavoritesEntity>> = flow {
+        emit(userFavoritesList.filter { it.entryStatus == status }.sortedByDescending { it.id })
     }
 }

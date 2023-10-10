@@ -8,7 +8,6 @@ import com.example.randomanimegenerator.feature_details.domain.model.Review
 import com.example.randomanimegenerator.feature_details.domain.model.Staff
 import com.example.randomanimegenerator.feature_details.domain.repository.DetailsRepository
 import com.example.randomanimegenerator.feature_generator.presentation.Type
-import com.example.randomanimegenerator.feature_library.presentation.LibraryStatus
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
@@ -33,8 +32,7 @@ class FakeDetailsRepository : DetailsRepository {
             themes = "",
             demographic = "",
             isLoading = false,
-            isFavorite = false,
-            libraryStatus = LibraryStatus.PLANNING
+            entryId = 0
         )))
     }
 
@@ -78,7 +76,37 @@ class FakeDetailsRepository : DetailsRepository {
         )))
     }
 
-    override suspend fun addOrRemoveFromFavorites(malId: Int, type: String, isFavorite: Boolean) {}
+    private var status: String = "planning"
+    private var isFavorite: Boolean = false
 
-    override suspend fun updateLibraryStatus(malId: Int, type: String, libraryStatus: String) {}
+    override fun getStatus(id: Int, type: String, userUID: String): Flow<String> = flow {
+        emit(status)
+    }
+
+    override suspend fun removeFromUserFavorites(malId: Int, type: String, userUID: String) {
+        isFavorite = false
+    }
+
+    override suspend fun addToUserFavorites(
+        malId: Int,
+        type: String,
+        userUID: String,
+        status: String,
+        entryId: Int,
+        title: String,
+        imageUrl: String
+    ) {
+        isFavorite = true
+    }
+
+    override suspend fun isEntryUserFavorite(malId: Int, type: String, userUID: String): Boolean = isFavorite
+
+    override suspend fun updateLibraryStatus(
+        malId: Int,
+        type: String,
+        libraryStatus: String,
+        userUID: String
+    ) {
+        status = libraryStatus
+    }
 }
