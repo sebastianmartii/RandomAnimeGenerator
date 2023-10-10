@@ -19,7 +19,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.example.randomanimegenerator.core.constants.navigationItems
-import com.example.randomanimegenerator.feature_profile.presentation.AuthenticationClient
+import com.example.randomanimegenerator.feature_profile.presentation.AuthenticationClientImpl
 import com.example.randomanimegenerator.feature_profile.presentation.ProfileEvent
 import com.example.randomanimegenerator.feature_profile.presentation.ProfileScreen
 import com.example.randomanimegenerator.feature_profile.presentation.ProfileViewModel
@@ -33,7 +33,7 @@ import kotlinx.coroutines.runBlocking
 
 fun NavGraphBuilder.profileNavGraph(
     navController: NavHostController,
-    authenticationClient: AuthenticationClient
+    authenticationClientImpl: AuthenticationClientImpl
 ) {
     navigation(
         route = Destinations.ProfileNavGraph.route,
@@ -54,7 +54,7 @@ fun NavGraphBuilder.profileNavGraph(
                 onResult = { result ->
                     if (result.resultCode == Activity.RESULT_OK) {
                         runBlocking {
-                            val signInResult = authenticationClient.signInWithIntent(
+                            val signInResult = authenticationClientImpl.signInWithIntent(
                                 intent = result.data ?: return@runBlocking
                             )
                             viewModel.onEvent(SignInEvent.OnSignInResult(signInResult))
@@ -78,7 +78,7 @@ fun NavGraphBuilder.profileNavGraph(
                 snackBarHostState = snackBarHostState,
                 onSignInWithGoogle = {
                     runBlocking {
-                        val signInIntendSender = authenticationClient.signIn()
+                        val signInIntendSender = authenticationClientImpl.signIn()
                         launcher.launch(
                             IntentSenderRequest.Builder(
                                 signInIntendSender ?: return@runBlocking
@@ -107,7 +107,7 @@ fun NavGraphBuilder.profileNavGraph(
             val context = LocalContext.current
 
             LaunchedEffect(key1 = Unit) {
-                if (authenticationClient.getSignedInUser() == null) {
+                if (authenticationClientImpl.getSignedInUser() == null) {
                     navController.navigate(Destinations.SignIn.route)
                 }
             }

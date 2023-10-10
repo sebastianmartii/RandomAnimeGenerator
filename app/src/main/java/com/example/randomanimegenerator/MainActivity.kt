@@ -9,7 +9,7 @@ import com.example.randomanimegenerator.core.navigation.Destinations
 import com.example.randomanimegenerator.core.navigation.bottomNavGraph
 import com.example.randomanimegenerator.core.navigation.detailsNavGraph
 import com.example.randomanimegenerator.core.navigation.profileNavGraph
-import com.example.randomanimegenerator.feature_profile.presentation.AuthenticationClient
+import com.example.randomanimegenerator.feature_profile.presentation.AuthenticationClientImpl
 import com.example.randomanimegenerator.ui.theme.RandomAnimeGeneratorTheme
 import com.google.android.gms.auth.api.identity.Identity
 import dagger.hilt.android.AndroidEntryPoint
@@ -18,7 +18,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     private val authClient by lazy {
-        AuthenticationClient(
+        AuthenticationClientImpl(
             context = applicationContext,
             oneTapClient = Identity.getSignInClient(applicationContext)
         )

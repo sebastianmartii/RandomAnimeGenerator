@@ -17,7 +17,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
-    private val authenticationClient: AuthenticationClient,
+    private val authenticationClientImpl: AuthenticationClientImpl,
     private val repo: ProfileRepository
 ) : ViewModel() {
 
@@ -51,7 +51,7 @@ class SignUpViewModel @Inject constructor(
                         _channel.send(ProfileFeatureUiEvent.ShowSnackBar("Provided email or/and password are invalid"))
                         return@launch
                     }
-                    authenticationClient.signUpWithEmailAndPassword(event.email, event.password)
+                    authenticationClientImpl.signUpWithEmailAndPassword(event.email, event.password)
                     _state.update {
                         it.copy(
                             isLoading = true
@@ -59,7 +59,7 @@ class SignUpViewModel @Inject constructor(
                     }
                     delay(1000L)
                     val signUpResult =
-                        authenticationClient.signInWithEmailAndPassword(event.email, event.password)
+                        authenticationClientImpl.signInWithEmailAndPassword(event.email, event.password)
                     onEvent(SignUpEvent.OnSignUpResult(signUpResult))
                 }
             }

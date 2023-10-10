@@ -10,16 +10,16 @@ import kotlinx.coroutines.flow.Flow
 class ProfileRepositoryImpl(
     private val userFavoritesDao: UserFavoritesDao,
     private val userDao: UserDao,
-    private val authenticationClient: AuthenticationClient
+    private val authenticationClientImpl: AuthenticationClient
 ) : ProfileRepository {
 
     override fun getEntriesCount(type: String): Flow<List<String>> = userFavoritesDao.getEntriesCount(
         type,
-        authenticationClient.getSignedInUser()?.userId ?: ""
+        authenticationClientImpl.getSignedInUser()?.userId ?: ""
     )
 
     override suspend fun addUser(UID: String, userName: String?, profilePictureUrl: String?) {
-        val authUser = authenticationClient.getSignedInUser()
+        val authUser = authenticationClientImpl.getSignedInUser()
         userDao.upsertUser(authUser.toUserEntity())
     }
 

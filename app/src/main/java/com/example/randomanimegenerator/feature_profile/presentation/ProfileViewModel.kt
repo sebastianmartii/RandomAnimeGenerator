@@ -25,7 +25,7 @@ import javax.inject.Inject
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
-    private val authenticationClient: AuthenticationClient,
+    private val authenticationClientImpl: AuthenticationClientImpl,
     private val repo: ProfileRepository,
     userDao: UserDao,
     getEntriesCountUseCase: GetEntriesCountUseCase,
@@ -34,7 +34,7 @@ class ProfileViewModel @Inject constructor(
     private val _animeEntriesCount = getEntriesCountUseCase(Type.ANIME.toTypeString())
     private val _mangaEntriesCount = getEntriesCountUseCase(Type.MANGA.toTypeString())
 
-    private val _userUID = authenticationClient.getSignedInUser()?.userId
+    private val _userUID = authenticationClientImpl.getSignedInUser()?.userId
     private val _currentUser = userDao.getUser(_userUID ?: "").flatMapLatest {
         flow {
             emit(it.toUserData())
@@ -113,7 +113,7 @@ class ProfileViewModel @Inject constructor(
 
             ProfileEvent.SignOut -> {
                 viewModelScope.launch {
-                    authenticationClient.signOut()
+                    authenticationClientImpl.signOut()
                 }
             }
 

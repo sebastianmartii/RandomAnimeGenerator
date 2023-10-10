@@ -14,7 +14,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SignInViewModel @Inject constructor(
-    private val authenticationClient: AuthenticationClient,
+    private val authenticationClientImpl: AuthenticationClientImpl,
     private val repo: ProfileRepository
 ) : ViewModel() {
 
@@ -75,7 +75,7 @@ class SignInViewModel @Inject constructor(
             is SignInEvent.SignInWithEmailAndPassword -> {
                 viewModelScope.launch {
                     val signInResult =
-                        authenticationClient.signInWithEmailAndPassword(event.email, event.password)
+                        authenticationClientImpl.signInWithEmailAndPassword(event.email, event.password)
                     onEvent(SignInEvent.OnSignInResult(signInResult))
                     _state.update {
                         it.copy(

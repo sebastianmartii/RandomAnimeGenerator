@@ -8,6 +8,7 @@ import com.example.randomanimegenerator.feature_profile.data.repository.ProfileR
 import com.example.randomanimegenerator.feature_profile.domain.repository.ProfileRepository
 import com.example.randomanimegenerator.feature_profile.domain.use_cases.GetEntriesCountUseCase
 import com.example.randomanimegenerator.feature_profile.presentation.AuthenticationClient
+import com.example.randomanimegenerator.feature_profile.presentation.AuthenticationClientImpl
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.auth.api.identity.SignInClient
 import dagger.Module
@@ -34,9 +35,9 @@ object ProfileModule {
     fun provideProfileRepository(
         userFavoritesDao: UserFavoritesDao,
         userDao: UserDao,
-        authenticationClient: AuthenticationClient
+        authenticationClientImpl: AuthenticationClient
     ): ProfileRepository {
-        return ProfileRepositoryImpl(userFavoritesDao, userDao, authenticationClient)
+        return ProfileRepositoryImpl(userFavoritesDao, userDao, authenticationClientImpl)
     }
 
     @Provides
@@ -69,6 +70,6 @@ object ProfileModule {
         @ApplicationContext context: Context,
         oneTapClient: SignInClient
     ): AuthenticationClient {
-        return AuthenticationClient(context, oneTapClient)
+        return AuthenticationClientImpl(context, oneTapClient)
     }
 }
