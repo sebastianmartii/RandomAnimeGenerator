@@ -16,11 +16,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.randomanimegenerator.feature_details.domain.model.Recommendation
 
 @Composable
@@ -44,12 +47,17 @@ fun RecommendationCard(
                 .fillMaxWidth()
         ) {
             AsyncImage(
-                model = recommendation.imageUrl,
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(recommendation.imageUrl)
+                    .build(),
                 contentDescription = recommendation.title,
+                placeholder = ColorPainter(MaterialTheme.colorScheme.primaryContainer),
+                error = ColorPainter(MaterialTheme.colorScheme.primaryContainer),
+                fallback = ColorPainter(MaterialTheme.colorScheme.primaryContainer),
+                contentScale = ContentScale.FillBounds,
                 modifier = Modifier
                     .fillMaxHeight()
-                    .align(Alignment.TopCenter),
-                contentScale = ContentScale.FillBounds
+                    .align(Alignment.TopCenter)
             )
             Box(
                 modifier = Modifier

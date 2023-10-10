@@ -1,5 +1,6 @@
 package com.example.randomanimegenerator.feature_details.presentation
 
+import coil.memory.MemoryCache
 import com.example.randomanimegenerator.feature_details.domain.model.AdditionalInfo
 import com.example.randomanimegenerator.feature_details.domain.model.Character
 import com.example.randomanimegenerator.feature_details.domain.model.Recommendation
@@ -33,7 +34,8 @@ data class DetailsState(
     val libraryStatus: LibraryStatus = LibraryStatus.PLANNING,
     val showPopUp: Boolean = false,
     val synopsisExpanded: Boolean = false,
-    val entryId: Int = 0
+    val entryId: Int = 0,
+    val popUpPlaceholder: MemoryCache.Key? = null
 )
 
 enum class Result {

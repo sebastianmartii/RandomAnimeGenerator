@@ -386,15 +386,16 @@ class DetailsViewModel @Inject constructor(
                 }
             }
 
-            DetailsEvent.PopUpImage -> {
+            is DetailsEvent.ShowPopUpImage -> {
                 _state.update {
                     it.copy(
-                        showPopUp = !_state.value.showPopUp
+                        showPopUp = !_state.value.showPopUp,
+                        popUpPlaceholder = event.placeholder
                     )
                 }
             }
 
-            DetailsEvent.ExpandSynopsis -> {
+            is DetailsEvent.ExpandSynopsis -> {
                 _state.update {
                     it.copy(
                         synopsisExpanded = !_state.value.synopsisExpanded

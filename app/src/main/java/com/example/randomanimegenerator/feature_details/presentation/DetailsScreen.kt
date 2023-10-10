@@ -59,7 +59,9 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
@@ -71,6 +73,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import coil.memory.MemoryCache
+import coil.request.ImageRequest
 import com.example.randomanimegenerator.R
 import com.example.randomanimegenerator.core.constants.animeDetailsStatus
 import com.example.randomanimegenerator.core.constants.mangaDetailStatus
@@ -210,8 +214,8 @@ fun DetailsScreen(
                 onStatusSelect = {
                     onEvent(DetailsEvent.SelectStatus(it))
                 },
-                onPopUpImage = {
-                    onEvent(DetailsEvent.PopUpImage)
+                onShowPopUpImage = { placeholder ->
+                    onEvent(DetailsEvent.ShowPopUpImage(placeholder))
                 },
                 onSynopsisExpand = {
                     onEvent(DetailsEvent.ExpandSynopsis)
@@ -268,13 +272,17 @@ fun DetailsScreen(
         Popup(
             alignment = Alignment.Center,
             onDismissRequest = {
-                onEvent(DetailsEvent.PopUpImage)
+                onEvent(DetailsEvent.ShowPopUpImage(null))
             }
         ) {
             AsyncImage(
-                model = state.largeImageUrl.ifBlank { state.imageUrl },
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(state.largeImageUrl.ifBlank { state.imageUrl })
+                    .placeholderMemoryCacheKey(state.popUpPlaceholder)
+                    .build(),
                 contentDescription = stringResource(id = R.string.pop_up_image_text),
-                modifier = Modifier.fillMaxHeight(0.6f)
+                modifier = Modifier
+                    .fillMaxHeight(0.6f)
             )
         }
     }
@@ -293,7 +301,7 @@ private fun MainInfoSection(
     result: Result,
     synopsisExpanded: Boolean,
     onStatusSelect: (LibraryStatus) -> Unit,
-    onPopUpImage: () -> Unit,
+    onShowPopUpImage: (MemoryCache.Key?) -> Unit,
     onSynopsisExpand: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -325,16 +333,25 @@ private fun MainInfoSection(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
+                var placeholder: MemoryCache.Key? = null
                 AsyncImage(
-                    model = imageUrl,
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(imageUrl)
+                        .build(),
                     contentDescription = stringResource(id = R.string.cover_image_text),
+                    placeholder = ColorPainter(MaterialTheme.colorScheme.primaryContainer),
+                    error = ColorPainter(MaterialTheme.colorScheme.primaryContainer),
+                    fallback = ColorPainter(MaterialTheme.colorScheme.primaryContainer),
+                    onSuccess = {
+                        placeholder = it.result.memoryCacheKey
+                    },
                     modifier = Modifier
                         .clip(MaterialTheme.shapes.small)
                         .height(180.dp)
                         .aspectRatio(2f / 3f)
                         .padding(end = 8.dp)
                         .clickable {
-                            onPopUpImage()
+                            onShowPopUpImage(placeholder)
                         }
                         .then(if (result == Result.LOADING) Modifier.shimmerEffect() else Modifier)
                 )

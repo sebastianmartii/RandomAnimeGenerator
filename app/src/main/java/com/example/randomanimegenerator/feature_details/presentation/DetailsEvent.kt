@@ -1,5 +1,6 @@
 package com.example.randomanimegenerator.feature_details.presentation
 
+import coil.memory.MemoryCache
 import com.example.randomanimegenerator.feature_generator.presentation.Type
 import com.example.randomanimegenerator.feature_library.presentation.LibraryStatus
 
@@ -17,6 +18,6 @@ sealed interface DetailsEvent {
 
     data class NavigateToRecommendation(val destination: String, val malId: Int) : DetailsEvent
     object NavigateBack : DetailsEvent
-    object PopUpImage : DetailsEvent
+    data class ShowPopUpImage(val placeholder: MemoryCache.Key?) : DetailsEvent
     object ExpandSynopsis : DetailsEvent
 }

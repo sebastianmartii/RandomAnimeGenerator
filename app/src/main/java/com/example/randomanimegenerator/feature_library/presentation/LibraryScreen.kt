@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
-
 package com.example.randomanimegenerator.feature_library.presentation
 
 import androidx.compose.animation.AnimatedContent
@@ -63,12 +61,15 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.randomanimegenerator.R
 import com.example.randomanimegenerator.core.navigation.BottomNavItem
 import com.example.randomanimegenerator.core.navigation.BottomNavigationBar
@@ -79,6 +80,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import java.util.Locale
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AnimeLibraryScreen(
     state: LibraryState,
@@ -120,6 +122,7 @@ fun AnimeLibraryScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MangaLibraryScreen(
     state: LibraryState,
@@ -161,6 +164,7 @@ fun MangaLibraryScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun LibraryScreen(
     state: LibraryState,
@@ -443,12 +447,17 @@ private fun LibraryCard(
                 .fillMaxWidth()
         ) {
             AsyncImage(
-                model = imageUrl,
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(imageUrl)
+                    .build(),
+                placeholder = ColorPainter(MaterialTheme.colorScheme.primaryContainer),
+                error = ColorPainter(MaterialTheme.colorScheme.primaryContainer),
+                fallback = ColorPainter(MaterialTheme.colorScheme.primaryContainer),
                 contentDescription = title,
+                contentScale = ContentScale.FillBounds,
                 modifier = Modifier
                     .height(190.dp)
-                    .align(Alignment.TopCenter),
-                contentScale = ContentScale.FillBounds
+                    .align(Alignment.TopCenter)
             )
             Box(
                 modifier = Modifier

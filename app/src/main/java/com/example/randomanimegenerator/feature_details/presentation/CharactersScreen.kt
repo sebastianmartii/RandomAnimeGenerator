@@ -26,10 +26,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.painter.ColorPainter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.randomanimegenerator.R
 import com.example.randomanimegenerator.feature_details.domain.model.Character
 
@@ -92,8 +95,13 @@ private fun CharacterItem(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         AsyncImage(
-            model = imageUrl,
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(imageUrl)
+                .build(),
             contentDescription = name,
+            placeholder = ColorPainter(MaterialTheme.colorScheme.primaryContainer),
+            error = ColorPainter(MaterialTheme.colorScheme.primaryContainer),
+            fallback = ColorPainter(MaterialTheme.colorScheme.primaryContainer),
             modifier = Modifier
                 .clip(MaterialTheme.shapes.small)
                 .height(120.dp)
