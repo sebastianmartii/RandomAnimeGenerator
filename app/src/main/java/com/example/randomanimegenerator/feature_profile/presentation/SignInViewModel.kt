@@ -40,6 +40,11 @@ class SignInViewModel @Inject constructor(
                             )
                         )
                     }
+                    _state.update {
+                        it.copy(
+                            isLoading = false
+                        )
+                    }
                 }
                 _state.update {
                     it.copy(
