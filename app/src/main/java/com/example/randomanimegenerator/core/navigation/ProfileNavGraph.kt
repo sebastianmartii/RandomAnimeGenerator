@@ -10,7 +10,10 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -48,6 +51,8 @@ fun NavGraphBuilder.profileNavGraph(
             val snackBarHostState = remember {
                 SnackbarHostState()
             }
+            val keyboardController = LocalSoftwareKeyboardController.current
+            val focusManager = LocalFocusManager.current
 
             val launcher = rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.StartIntentSenderForResult(),
@@ -95,6 +100,12 @@ fun NavGraphBuilder.profileNavGraph(
                         launchSingleTop = true
                         restoreState = true
                     }
+                },
+                onKeyboardHide = {
+                    keyboardController?.hide()
+                },
+                onFocusMove = {
+                    focusManager.moveFocus(FocusDirection.Next)
                 }
             )
         }
@@ -158,6 +169,8 @@ fun NavGraphBuilder.profileNavGraph(
             val snackBarHostState = remember {
                 SnackbarHostState()
             }
+            val keyboardController = LocalSoftwareKeyboardController.current
+            val focusManager = LocalFocusManager.current
 
             SignUpScreen(
                 state = state,
@@ -174,6 +187,12 @@ fun NavGraphBuilder.profileNavGraph(
                         launchSingleTop = true
                         restoreState = true
                     }
+                },
+                onKeyboardHide = {
+                    keyboardController?.hide()
+                },
+                onFocusMove = {
+                    focusManager.moveFocus(FocusDirection.Next)
                 }
             )
         }

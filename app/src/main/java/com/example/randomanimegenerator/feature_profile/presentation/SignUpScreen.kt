@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
@@ -31,6 +33,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -50,6 +54,8 @@ fun SignUpScreen(
     onEvent: (SignUpEvent) -> Unit,
     onNavigateBack: () -> Unit,
     onNavigateToBottomNavItem: (String) -> Unit,
+    onKeyboardHide: () -> Unit,
+    onFocusMove: () -> Unit
 ) {
     LaunchedEffect(key1 = true) {
         eventFlow.collectLatest { event ->
@@ -120,7 +126,18 @@ fun SignUpScreen(
                     placeholder = {
                         Text(text = stringResource(id = R.string.email_text))
                     },
-                    modifier = Modifier.fillMaxWidth()
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Next,
+                        keyboardType = KeyboardType.Email
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onNext = {
+                            onFocusMove()
+                        }
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField(
@@ -135,7 +152,18 @@ fun SignUpScreen(
                         Text(text = stringResource(id = R.string.password_text))
                     },
                     visualTransformation = PasswordVisualTransformation(),
-                    modifier = Modifier.fillMaxWidth()
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Done,
+                        keyboardType = KeyboardType.Password
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            onKeyboardHide()
+                        }
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
                 )
                 Button(
                     onClick = {
