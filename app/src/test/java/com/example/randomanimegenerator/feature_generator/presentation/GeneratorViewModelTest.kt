@@ -4,12 +4,10 @@ import app.cash.turbine.test
 import com.example.randomanimegenerator.feature_generator.data.repository.FakeGeneratorRepository
 import com.example.randomanimegenerator.feature_generator.domain.use_case.GenerateContentUseCase
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class GeneratorViewModelTest {
 
 
