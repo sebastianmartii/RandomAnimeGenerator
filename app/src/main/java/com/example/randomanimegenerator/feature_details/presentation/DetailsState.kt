@@ -19,6 +19,7 @@ data class DetailsState(
     val studios: String = "",
     val characters: List<Character> = emptyList(),
     val reviews: List<Review> = emptyList(),
+    val spectatedReview: Review? = null,
     val staff: List<Staff> = emptyList(),
     val recommendation: List<Recommendation> = emptyList(),
     val additionalInfo: List<AdditionalInfo> = emptyList(),
