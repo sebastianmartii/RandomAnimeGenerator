@@ -4,7 +4,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -12,17 +11,15 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
+import com.example.randomanimegenerator.core.util.sharedViewModel
 import com.example.randomanimegenerator.feature_details.presentation.CharactersScreen
-import com.example.randomanimegenerator.feature_details.presentation.CharactersViewModel
+import com.example.randomanimegenerator.feature_details.presentation.DetailsEvent
 import com.example.randomanimegenerator.feature_details.presentation.DetailsScreen
 import com.example.randomanimegenerator.feature_details.presentation.DetailsViewModel
 import com.example.randomanimegenerator.feature_details.presentation.RecommendationsScreen
-import com.example.randomanimegenerator.feature_details.presentation.RecommendationsViewModel
 import com.example.randomanimegenerator.feature_details.presentation.ReviewsScreen
-import com.example.randomanimegenerator.feature_details.presentation.ReviewsViewModel
 import com.example.randomanimegenerator.feature_details.presentation.SingleReviewScreen
 import com.example.randomanimegenerator.feature_details.presentation.StaffScreen
-import com.example.randomanimegenerator.feature_details.presentation.StaffViewModel
 
 fun NavGraphBuilder.detailsNavGraph(
     navController: NavHostController,
@@ -37,12 +34,12 @@ fun NavGraphBuilder.detailsNavGraph(
                 navArgument(name = "id") { type = NavType.IntType },
                 navArgument(name = "type") { type = NavType.StringType }
             )
-        ) {
+        ) { entry ->
             val scrollState = rememberScrollState()
             val snackBarHostState = remember {
                 SnackbarHostState()
             }
-            val viewModel = hiltViewModel<DetailsViewModel>()
+            val viewModel = entry.sharedViewModel<DetailsViewModel>(navController)
             val state by viewModel.state.collectAsStateWithLifecycle()
             DetailsScreen(
                 state = state,
@@ -51,87 +48,84 @@ fun NavGraphBuilder.detailsNavGraph(
                 onEvent = viewModel::onEvent,
                 scrollState = scrollState,
                 snackBarHostState = snackBarHostState,
-            )
-        }
-        composable(
-            route = Destinations.Characters.route,
-            arguments = listOf(
-                navArgument(name = "id") { type = NavType.IntType },
-                navArgument(name = "type") { type = NavType.StringType }
-            )
-        ) {
-            val viewModel = hiltViewModel<CharactersViewModel>()
-            val characters by viewModel.characters.collectAsStateWithLifecycle(emptyList())
-            CharactersScreen(
-                characterList = characters,
-                onNavigateBack = {
-                    navController.popBackStack()
-                }
-            )
-        }
-        composable(
-            route = Destinations.Staff.route,
-            arguments = listOf(
-                navArgument(name = "id") { type = NavType.IntType },
-                navArgument(name = "type") { type = NavType.StringType },
-            )
-        ) {
-            val viewModel = hiltViewModel<StaffViewModel>()
-            val staff by viewModel.staff.collectAsStateWithLifecycle(emptyList())
-            StaffScreen(
-                staff = staff,
-                onNavigateBack = {
-                    navController.popBackStack()
-                }
-            )
-        }
-        composable(
-            route = Destinations.Reviews.route,
-            arguments = listOf(
-                navArgument(name = "id") { type = NavType.IntType },
-                navArgument(name = "type") { type = NavType.StringType },
-            )
-        ) {
-            val viewModel = hiltViewModel<ReviewsViewModel>()
-            val reviews by viewModel.reviews.collectAsStateWithLifecycle(emptyList())
-            ReviewsScreen(
-                reviews = reviews,
                 onNavigateBack = {
                     navController.popBackStack()
                 },
-                onNavigateToSingleReview = {
-                    navController.navigate("review/${it.author}/${it.score}/${it.review}")
+                onNavigateToDestination = { route ->
+                    navController.navigate(route)
+                },
+                onNavigateToDetailsScreen = { detailsRoute, id ->
+                    navController.navigate("${detailsRoute}/${id}/${viewModel.type}")
                 }
             )
         }
         composable(
-            route = Destinations.Review.route,
-            arguments = listOf(
-                navArgument(name = "author") { type = NavType.StringType },
-                navArgument(name = "score") { type = NavType.IntType },
-                navArgument(name = "review") { type = NavType.StringType }
-            )
-        ) { navBackStackEntry ->
-            SingleReviewScreen(
-                review = navBackStackEntry.arguments?.getString("review") ?: "",
-                score = navBackStackEntry.arguments?.getInt("score") ?: 0,
-                author = navBackStackEntry.arguments?.getString("author") ?: "",
+            route = Destinations.Characters.route
+        ) { entry ->
+            val viewModel = entry.sharedViewModel<DetailsViewModel>(navController)
+            val state by viewModel.state.collectAsStateWithLifecycle()
+
+            CharactersScreen(
+                characterList = state.characters,
                 onNavigateBack = {
                     navController.popBackStack()
                 }
             )
         }
         composable(
-            route = Destinations.Recommendations.route,
-            arguments = listOf(
-                navArgument(name = "id") { type = NavType.IntType },
-                navArgument(name = "type") { type = NavType.StringType },
+            route = Destinations.Staff.route
+        ) { entry ->
+            val viewModel = entry.sharedViewModel<DetailsViewModel>(navController)
+            val state by viewModel.state.collectAsStateWithLifecycle()
+
+            StaffScreen(
+                staff = state.staff,
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
             )
-        ) {
-            val viewModel = hiltViewModel<RecommendationsViewModel>()
-            val recommendations by viewModel.recommendations.collectAsStateWithLifecycle(emptyList())
+        }
+        composable(
+            route = Destinations.Reviews.route
+        ) { entry ->
+            val viewModel = entry.sharedViewModel<DetailsViewModel>(navController)
+            val state by viewModel.state.collectAsStateWithLifecycle()
+
+            ReviewsScreen(
+                reviews = state.reviews,
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onNavigateToSingleReview = { review ->
+                    viewModel.onEvent(DetailsEvent.NavigateToSingleReview(review))
+                    navController.navigate(Destinations.Review.route)
+                }
+            )
+        }
+        composable(
+            route = Destinations.Review.route
+        ) { entry ->
+            val viewModel = entry.sharedViewModel<DetailsViewModel>(navController)
+            val state by viewModel.state.collectAsStateWithLifecycle()
+
+            SingleReviewScreen(
+                review = state.spectatedReview?.review ?: "",
+                score = state.spectatedReview?.score ?: 0,
+                author = state.spectatedReview?.userName ?: "",
+                onNavigateBack = {
+                    navController.popBackStack()
+                    viewModel.onEvent(DetailsEvent.NavigateBackFromSingleReview)
+                }
+            )
+        }
+        composable(
+            route = Destinations.Recommendations.route
+        ) { entry ->
+            val viewModel = entry.sharedViewModel<DetailsViewModel>(navController)
+            val state by viewModel.state.collectAsStateWithLifecycle()
+
             RecommendationsScreen(
-                recommendations = recommendations,
+                recommendations = state.recommendation,
                 onNavigateBack = {
                     navController.popBackStack()
                 },

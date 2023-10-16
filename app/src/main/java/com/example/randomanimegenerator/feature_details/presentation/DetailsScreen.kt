@@ -85,7 +85,6 @@ import com.example.randomanimegenerator.feature_details.domain.model.AdditionalI
 import com.example.randomanimegenerator.feature_details.domain.model.Character
 import com.example.randomanimegenerator.feature_details.domain.model.Recommendation
 import com.example.randomanimegenerator.feature_details.domain.model.Review
-import com.example.randomanimegenerator.feature_details.domain.model.SingleReview
 import com.example.randomanimegenerator.feature_details.domain.model.Staff
 import com.example.randomanimegenerator.feature_generator.presentation.Type
 import com.example.randomanimegenerator.feature_library.presentation.LibraryStatus
@@ -102,22 +101,16 @@ fun DetailsScreen(
     scrollState: ScrollState,
     snackBarHostState: SnackbarHostState,
     onEvent: (DetailsEvent) -> Unit,
+    onNavigateBack: () -> Unit,
+    onNavigateToDestination: (String) -> Unit,
+    onNavigateToDetailsScreen: (destination: String, id: Int) -> Unit
 ) {
     LaunchedEffect(key1 = true) {
         snackBarFlow.collectLatest { event ->
             when (event) {
-                is DetailsViewModel.UiEvent.NavigateBack -> {
-                    navController.popBackStack()
-                }
-
-                is DetailsViewModel.UiEvent.NavigateToDestination -> {
-                    navController.navigate(route = event.destinationRoute)
-                }
-
                 is DetailsViewModel.UiEvent.ShowSnackBar -> {
                     snackBarHostState.showSnackbar(event.message)
                 }
-
                 is DetailsViewModel.UiEvent.ShowSignInSnackBar -> {
                     snackBarHostState.showSnackbar(
                         message = event.message,
@@ -163,7 +156,7 @@ fun DetailsScreen(
         topBar = {
             TopAppBar(
                 navigationIcon = {
-                    IconButton(onClick = { onEvent(DetailsEvent.NavigateBack) }) {
+                    IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Default.ArrowBack,
                             contentDescription = stringResource(id = R.string.back_action_button_text)
@@ -224,23 +217,21 @@ fun DetailsScreen(
             CharactersSection(
                 characters = state.characters,
                 result = state.charactersResult,
-                onNavigateToCharactersScreen = { onEvent(DetailsEvent.NavigateToDestination("characters")) }
+                onNavigateToCharactersScreen = {
+                    onNavigateToDestination(Destinations.Characters.route)
+                }
             )
             Spacer(modifier = Modifier.height(8.dp))
             StatsAndReviewsSection(
                 additionalInfo = state.additionalInfo,
                 reviews = state.reviews,
                 result = state.reviewsResult,
-                onNavigateToReviewScreen = { onEvent(DetailsEvent.NavigateToDestination("reviews")) },
+                onNavigateToReviewScreen = {
+                    onNavigateToDestination(Destinations.Reviews.route)
+                },
                 onNavigateToSingleReview = { review ->
-                    onEvent(
-                        DetailsEvent.NavigateToSingleReview(
-                            destination = "review",
-                            author = review.author,
-                            score = review.score,
-                            review = review.review
-                        )
-                    )
+                    onEvent(DetailsEvent.NavigateToSingleReview(review))
+                    onNavigateToDestination(Destinations.Review.route)
                 }
             )
             Spacer(modifier = Modifier.height(8.dp))
@@ -248,7 +239,9 @@ fun DetailsScreen(
                 StaffSection(
                     staff = state.staff,
                     result = state.staffResult,
-                    onNavigateToStaffScreen = { onEvent(DetailsEvent.NavigateToDestination("staff")) }
+                    onNavigateToStaffScreen = {
+                        onNavigateToDestination(Destinations.Staff.route)
+                    }
                 )
             }
             Spacer(modifier = Modifier.height(8.dp))
@@ -256,10 +249,10 @@ fun DetailsScreen(
                 recommendations = state.recommendation,
                 result = state.recommendationsResult,
                 onNavigateToRecommendationsScreen = {
-                    onEvent(DetailsEvent.NavigateToDestination("recommendations"))
+                    onNavigateToDestination(Destinations.Recommendations.route)
                 },
-                onNavigateToRecommendation = {
-                    onEvent(DetailsEvent.NavigateToRecommendation("details", it))
+                onNavigateToRecommendation = { id ->
+                    onNavigateToDetailsScreen(Destinations.DetailsWithoutArguments.route, id)
                 }
             )
             Spacer(modifier = Modifier.height(4.dp))
@@ -539,7 +532,7 @@ private fun StatsAndReviewsSection(
     result: Result,
     modifier: Modifier = Modifier,
     onNavigateToReviewScreen: () -> Unit,
-    onNavigateToSingleReview: (SingleReview) -> Unit
+    onNavigateToSingleReview: (Review) -> Unit
 ) {
     var reviewsColumnHeight by remember {
         mutableStateOf(0.dp)
@@ -614,8 +607,8 @@ private fun StatsAndReviewsSection(
                                 userName = review.userName,
                                 score = review.score,
                                 review = review.review,
-                                onNavigateToSingleReview = {
-                                    onNavigateToSingleReview(it)
+                                onNavigateToSingleReview = { singleReview ->
+                                    onNavigateToSingleReview(singleReview)
                                 },
                                 modifier = Modifier.then(
                                     if (reviews.indexOf(review) < 2) Modifier.padding(
