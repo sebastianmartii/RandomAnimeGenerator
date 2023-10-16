@@ -19,7 +19,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.example.randomanimegenerator.feature_details.domain.model.SingleReview
+import com.example.randomanimegenerator.feature_details.domain.model.Review
 
 @Composable
 fun ReviewCard(
@@ -27,13 +27,13 @@ fun ReviewCard(
     score: Int,
     review: String,
     modifier: Modifier = Modifier,
-    onNavigateToSingleReview: (SingleReview) -> Unit
+    onNavigateToSingleReview: (Review) -> Unit
 ) {
     Card(
         modifier = modifier
             .height(180.dp)
             .clickable {
-                onNavigateToSingleReview(SingleReview(userName, score, review))
+                onNavigateToSingleReview(Review(userName, score, review))
             },
         shape = MaterialTheme.shapes.small,
         border = BorderStroke(

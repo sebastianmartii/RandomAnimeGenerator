@@ -21,14 +21,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.randomanimegenerator.R
 import com.example.randomanimegenerator.feature_details.domain.model.Review
-import com.example.randomanimegenerator.feature_details.domain.model.SingleReview
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReviewsScreen(
     reviews: List<Review>,
     onNavigateBack: () -> Unit,
-    onNavigateToSingleReview: (SingleReview) -> Unit
+    onNavigateToSingleReview: (Review) -> Unit
 ) {
     Scaffold(
         topBar = {
