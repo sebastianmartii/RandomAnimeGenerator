@@ -36,11 +36,13 @@ class DetailsViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val id = savedStateHandle.get<Int>("id")
-    private val type = savedStateHandle.get<String>("type")
+    private val _type = savedStateHandle.get<String>("type")
+    val type: String
+        get() = _type!!
 
-    private val _status = repo.getStatus(id!!, type!!, authClient.getSignedInUser()?.userId ?: "")
+    private val _status = repo.getStatus(id!!, _type!!, authClient.getSignedInUser()?.userId ?: "")
 
-    private val _state = MutableStateFlow(DetailsState(type = type!!.toType()))
+    private val _state = MutableStateFlow(DetailsState(type = _type!!.toType()))
     val state = _state.combine(_status) { state, status ->
         state.copy(
             libraryStatus = status.toStatus()
@@ -59,7 +61,7 @@ class DetailsViewModel @Inject constructor(
         viewModelScope.launch {
             _state.update {
                 it.copy(
-                    isFavorite = repo.isEntryUserFavorite(id!!, type!!, authClient.getSignedInUser()?.userId ?: "")
+                    isFavorite = repo.isEntryUserFavorite(id!!, _type!!, authClient.getSignedInUser()?.userId ?: "")
                 )
             }
         }
@@ -70,19 +72,19 @@ class DetailsViewModel @Inject constructor(
             val mainInfo = async {
                 useCases.getInfoUseCase(
                     id = id!!,
-                    type = type!!.toType()
+                    type = _type!!.toType()
                 )
             }
             val characters = async {
                 useCases.getCharactersUseCase(
                     id = id!!,
-                    type = type!!.toType()
+                    type = _type!!.toType()
                 )
             }
             val reviews = async {
                 useCases.getReviewsUseCase(
                     id = id!!,
-                    type = type!!.toType()
+                    type = _type!!.toType()
                 )
             }
             mainInfo.await().collectLatest { result ->
@@ -225,7 +227,7 @@ class DetailsViewModel @Inject constructor(
                 viewModelScope.launch {
                     repo.updateLibraryStatus(
                         id!!,
-                        type!!,
+                        _type!!,
                         event.status.toStatusString(),
                         authClient.getSignedInUser()?.userId ?: ""
                     )
@@ -245,7 +247,7 @@ class DetailsViewModel @Inject constructor(
                             true -> {
                                 repo.removeFromUserFavorites(
                                     id!!,
-                                    type!!,
+                                    _type!!,
                                     authClient.getSignedInUser()?.userId ?: ""
                                 )
                                 _channel.send(UiEvent.ShowSnackBar("Entry has been deleted from favorites"))
@@ -254,7 +256,7 @@ class DetailsViewModel @Inject constructor(
                             false -> {
                                 repo.addToUserFavorites(
                                     id!!,
-                                    type!!,
+                                    _type!!,
                                     authClient.getSignedInUser()?.userId ?: "",
                                     LibraryStatus.PLANNING.toStatusString(),
                                     state.value.entryId,
@@ -321,7 +323,7 @@ class DetailsViewModel @Inject constructor(
                         }
                     }
                     delay(1.seconds)
-                    useCases.getRecommendationsUseCase(id!!, type!!.toType()).collectLatest { result ->
+                    useCases.getRecommendationsUseCase(id!!, _type!!.toType()).collectLatest { result ->
                         when (result) {
                             is Resource.Error -> {
                                 _state.update {
@@ -361,31 +363,13 @@ class DetailsViewModel @Inject constructor(
                     }
                 }
             }
-
-            is DetailsEvent.NavigateBack -> {
-                viewModelScope.launch {
-                    _channel.send(UiEvent.NavigateBack)
-                }
-            }
-
-            is DetailsEvent.NavigateToDestination -> {
-                viewModelScope.launch {
-                    _channel.send(UiEvent.NavigateToDestination("${event.destination}/$id/$type"))
-                }
-            }
-
             is DetailsEvent.NavigateToSingleReview -> {
-                viewModelScope.launch {
-                    _channel.send(UiEvent.NavigateToDestination("${event.destination}/${event.author}/${event.score}/${event.review}"))
+                _state.update {
+                    it.copy(
+                        spectatedReview = event.review
+                    )
                 }
             }
-
-            is DetailsEvent.NavigateToRecommendation -> {
-                viewModelScope.launch {
-                    _channel.send(UiEvent.NavigateToDestination("${event.destination}/${event.malId}/$type"))
-                }
-            }
-
             is DetailsEvent.ShowPopUpImage -> {
                 _state.update {
                     it.copy(
@@ -394,11 +378,17 @@ class DetailsViewModel @Inject constructor(
                     )
                 }
             }
-
             is DetailsEvent.ExpandSynopsis -> {
                 _state.update {
                     it.copy(
                         synopsisExpanded = !_state.value.synopsisExpanded
+                    )
+                }
+            }
+            is DetailsEvent.NavigateBackFromSingleReview -> {
+                _state.update {
+                    it.copy(
+                        spectatedReview = null
                     )
                 }
             }
@@ -409,7 +399,5 @@ class DetailsViewModel @Inject constructor(
     sealed class UiEvent {
         data class ShowSnackBar(val message: String) : UiEvent()
         data class ShowSignInSnackBar(val message: String) : UiEvent()
-        data class NavigateToDestination(val destinationRoute: String) : UiEvent()
-        object NavigateBack : UiEvent()
     }
 }
